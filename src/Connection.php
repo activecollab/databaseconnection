@@ -31,7 +31,7 @@
      * @return string
      * @throws InvalidArgumentException
      */
-    public function escape($unescaped)
+    public function escapeValue($unescaped)
     {
       // Date time value
       if ($unescaped instanceof DateTime) {
@@ -58,7 +58,7 @@
         $escaped = [];
 
         foreach ($unescaped as $v) {
-          $escaped[] = $this->escape(array_shift($v));
+          $escaped[] = $this->escapeValue(array_shift($v));
         }
 
         return '(' . implode(',', $escaped) . ')';
@@ -72,7 +72,7 @@
         $escaped = [];
 
         foreach ($unescaped as $v) {
-          $escaped[] = $this->escape($v);
+          $escaped[] = $this->escapeValue($v);
         }
 
         return '(' . implode(',', $escaped) . ')';
@@ -83,5 +83,27 @@
       } else {
         throw new InvalidArgumentException('Value is expected to be scalar, array, or instance of: DateTime or Result');
       }
+    }
+
+    /**
+     * Escape table field name
+     *
+     * @param  string $unescaped
+     * @return string
+     */
+    public function escapeFieldName($unescaped)
+    {
+      return "`$unescaped`";
+    }
+
+    /**
+     * Escape table name
+     *
+     * @param  string $unescaped
+     * @return string
+     */
+    public function escapeTableName($unescaped)
+    {
+      return "`$unescaped`";
     }
   }

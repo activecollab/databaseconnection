@@ -31,7 +31,7 @@
      */
     public function testEscapeNull()
     {
-      $this->assertEquals('NULL', $this->connection->escape(null));
+      $this->assertEquals('NULL', $this->connection->escapeValue(null));
     }
 
     /**
@@ -39,8 +39,8 @@
      */
     public function testEscapeBoolean()
     {
-      $this->assertEquals("'1'", $this->connection->escape(true));
-      $this->assertEquals("'0'", $this->connection->escape(false));
+      $this->assertEquals("'1'", $this->connection->escapeValue(true));
+      $this->assertEquals("'0'", $this->connection->escapeValue(false));
     }
 
     /**
@@ -48,7 +48,7 @@
      */
     public function testEscapeString()
     {
-      $this->assertEquals("'123'", $this->connection->escape('123'));
+      $this->assertEquals("'123'", $this->connection->escapeValue('123'));
     }
 
     /**
@@ -56,8 +56,8 @@
      */
     public function testEscapeInteger()
     {
-      $this->assertEquals("'123'", $this->connection->escape(123));
-      $this->assertEquals("'-123'", $this->connection->escape(-123));
+      $this->assertEquals("'123'", $this->connection->escapeValue(123));
+      $this->assertEquals("'-123'", $this->connection->escapeValue(-123));
     }
 
     /**
@@ -65,8 +65,8 @@
      */
     public function testEscapeFloat()
     {
-      $this->assertEquals("'123.456'", $this->connection->escape(123.456));
-      $this->assertEquals("'-123.456'", $this->connection->escape(-123.456));
+      $this->assertEquals("'123.456'", $this->connection->escapeValue(123.456));
+      $this->assertEquals("'-123.456'", $this->connection->escapeValue(-123.456));
     }
 
     /**
@@ -74,7 +74,7 @@
      */
     public function testEscapeDateTime()
     {
-      $this->assertEquals("'2015-08-11 23:05:28'", $this->connection->escape(new DateTime('2015-08-11 23:05:28', new DateTimeZone('GMT'))));
+      $this->assertEquals("'2015-08-11 23:05:28'", $this->connection->escapeValue(new DateTime('2015-08-11 23:05:28', new DateTimeZone('GMT'))));
     }
 
     /**
@@ -82,7 +82,7 @@
      */
     public function testEscapeArray()
     {
-      $this->assertEquals("('1','2','3')", $this->connection->escape([ 1, 2, 3 ]));
+      $this->assertEquals("('1','2','3')", $this->connection->escapeValue([ 1, 2, 3 ]));
     }
 
     /**
@@ -90,7 +90,7 @@
      */
     public function testExceptionOnEmptyArray()
     {
-      $this->connection->escape([]);
+      $this->connection->escapeValue([]);
     }
 
     /**
@@ -98,6 +98,22 @@
      */
     public function testExceptionOnUsupportedObject()
     {
-      $this->connection->escape($this->link);
+      $this->connection->escapeValue($this->link);
+    }
+
+    /**
+     * Test escape field name
+     */
+    public function testEscapeFieldName()
+    {
+      $this->assertEquals('`id`', $this->connection->escapeFieldName('id'));
+    }
+
+    /**
+     * Test escape table name
+     */
+    public function testEscapeTableName()
+    {
+      $this->assertEquals('`users`', $this->connection->escapeFieldName('users'));
     }
   }
