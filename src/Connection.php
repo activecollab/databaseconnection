@@ -189,27 +189,38 @@
       if ($this->on_log_query) {
         $microtime = microtime(true);
 
-        $prepared_sql = $this->prepare($sql, $arguments);
+        $prepared_sql = empty($arguments) ?
+          $sql :
+          call_user_func_array([ &$this, 'prepare' ], array_merge([ $sql ], $arguments));
+
         $result = $this->link->query($prepared_sql);
 
         call_user_func($this->on_log_query, $prepared_sql, microtime(true) - $microtime);
 
         return $result;
       } else {
-        return $this->link->query($this->prepare($sql, $arguments));
+        return empty($arguments) ?
+          $this->link->query($sql) :
+          $this->link->query(call_user_func_array([ &$this, 'prepare' ], array_merge([ $sql ], $arguments)));
       }
     }
 
     /**
      * Prepare SQL (replace ? with data from $arguments array)
      *
-     * @param  string $sql
-     * @param  array  $arguments
      * @return string
      */
-    public function prepare($sql, $arguments = null)
+    public function prepare()
     {
-      if (!empty($arguments) && is_array($arguments)) {
+      $arguments = func_get_args();
+
+      if (empty($arguments)) {
+        throw new InvalidArgumentException('Pattern expected');
+      } else if (count($arguments) == 1) {
+        return $arguments[0];
+      } else {
+        $sql = array_shift($arguments);
+
         $offset = 0;
 
         foreach ($arguments as $argument) {
@@ -224,9 +235,9 @@
             $offset = $question_mark_pos + $escaped_len;
           }
         }
-      }
 
-      return $sql;
+        return $sql;
+      }
     }
 
     /**
