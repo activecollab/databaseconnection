@@ -3,8 +3,9 @@
   namespace ActiveCollab\DatabaseConnection\Test;
 
   use ActiveCollab\DatabaseConnection\Connection;
-  use ActiveCollab\DatabaseConnection\Result\Result;
+  use ActiveCollab\DatabaseConnection\Record\ValueCaster;
   use DateTime;
+  use DateTimeZone;
 
   /**
    * @package ActiveCollab\DatabaseConnection\Test
@@ -90,6 +91,44 @@
         'name' => 'Fyodor Dostoyevsky',
         'birthday' => '1821-11-11'
       ], $writers[2]);
+    }
+
+    /**
+     * Test execute
+     */
+    public function testExecuteWithCustomCaster()
+    {
+      $result = $this->connection->execute('SELECT * FROM `writers` ORDER BY `id`');
+
+      $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
+      $this->assertCount(3, $result);
+
+      $caster = new ValueCaster([ 'id' => ValueCaster::CAST_STRING, 'birthday' => ValueCaster::CAST_DATE ]);
+
+      $this->assertEquals(ValueCaster::CAST_STRING, $caster->getTypeByFieldName('id'));
+      $this->assertEquals(ValueCaster::CAST_DATE, $caster->getTypeByFieldName('birthday'));
+
+      $result->setValueCaster($caster);
+
+      $writers = [];
+
+      foreach ($result as $row) {
+        $writers[] = $row;
+      }
+
+      $this->assertCount(3, $writers);
+
+      $this->assertSame('1', $writers[0]['id']);
+      $this->assertSame('Leo Tolstoy', $writers[0]['name']);
+      $this->assertSame('1828-09-09', $writers[0]['birthday']->format('Y-m-d'));
+
+      $this->assertSame('2', $writers[1]['id']);
+      $this->assertSame('Alexander Pushkin', $writers[1]['name']);
+      $this->assertSame('1799-06-06', $writers[1]['birthday']->format('Y-m-d'));
+
+      $this->assertSame('3', $writers[2]['id']);
+      $this->assertSame('Fyodor Dostoyevsky', $writers[2]['name']);
+      $this->assertSame('1821-11-11', $writers[2]['birthday']->format('Y-m-d'));
     }
 
     /**

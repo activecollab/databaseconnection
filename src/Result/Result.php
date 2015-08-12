@@ -240,7 +240,6 @@
         // Just return array
         default:
           $this->current_row = $row;
-
           $this->getValueCaster()->castRowValues($this->current_row);
       }
     }

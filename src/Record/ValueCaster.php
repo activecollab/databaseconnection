@@ -53,24 +53,21 @@
       if ($value === null) {
         return null; // NULL remains NULL
       } else {
-        if (isset($this->dictated[$field_name]) && is_callable($this->dictated[$field_name])) {
-          return call_user_func($this->dictated[$field_name], $value);
-        } else {
-          switch ($this->getTypeByFieldName($field_name)) {
-            case self::CAST_INT:
-              return (int) $value;
-            case self::CAST_FLOAT:
-              return (float) $value;
-            case self::CAST_STRING:
-              return (string) $value;
-            case self::CAST_BOOL:
-              return (bool) $value;
-            case self::CAST_DATE:
-            case self::CAST_DATETIME:
-              return new DateTime($value, new DateTimeZone('GMT'));
-            default:
-              return (string) $value;
-          }
+        switch ($this->getTypeByFieldName($field_name)) {
+          case self::CAST_INT:
+            return (int) $value;
+          case self::CAST_FLOAT:
+            return (float) $value;
+          case self::CAST_STRING:
+            return (string) $value;
+          case self::CAST_BOOL:
+            return (bool) $value;
+          case self::CAST_DATE:
+          case self::CAST_DATETIME:
+
+            return new DateTime($value, new DateTimeZone('UTC'));
+          default:
+            return (string) $value;
         }
       }
     }

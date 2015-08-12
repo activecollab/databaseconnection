@@ -74,7 +74,7 @@
      */
     public function testEscapeDateTime()
     {
-      $this->assertEquals("'2015-08-11 23:05:28'", $this->connection->escapeValue(new DateTime('2015-08-11 23:05:28', new DateTimeZone('GMT'))));
+      $this->assertEquals("'2015-08-11 23:05:28'", $this->connection->escapeValue(new DateTime('2015-08-11 23:05:28', new DateTimeZone('UTC'))));
     }
 
     /**
