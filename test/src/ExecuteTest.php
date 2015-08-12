@@ -3,6 +3,7 @@
   namespace ActiveCollab\DatabaseConnection\Test;
 
   use ActiveCollab\DatabaseConnection\Connection;
+  use ActiveCollab\DatabaseConnection\Result\Result;
   use DateTime;
 
   /**
@@ -52,6 +53,43 @@
     public function testExceptionOnInvalidQuery()
     {
       $this->connection->execute('invalid query 100%');
+    }
+
+    /**
+     * Test execute
+     */
+    public function testExecute()
+    {
+      $result = $this->connection->execute('SELECT * FROM `writers` ORDER BY `id`');
+
+      $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
+      $this->assertCount(3, $result);
+
+      $writers = [];
+
+      foreach ($result as $row) {
+        $writers[] = $row;
+      }
+
+      $this->assertCount(3, $writers);
+
+      $this->assertEquals([
+        'id' => 1,
+        'name' => 'Leo Tolstoy',
+        'birthday' => '1828-09-09'
+      ], $writers[0]);
+
+      $this->assertEquals([
+        'id' => 2,
+        'name' => 'Alexander Pushkin',
+        'birthday' => '1799-06-06'
+      ], $writers[1]);
+
+      $this->assertEquals([
+        'id' => 3,
+        'name' => 'Fyodor Dostoyevsky',
+        'birthday' => '1821-11-11'
+      ], $writers[2]);
     }
 
     /**

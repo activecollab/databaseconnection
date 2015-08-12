@@ -107,25 +107,22 @@
       if (empty($arguments)) {
         throw new BadMethodCallException('SQL query with optional list of arguments was expected');
       } else {
-        return $this->execute2(array_shift($arguments), $arguments, $load_mode);
+        return $this->advancedExecute(array_shift($arguments), $arguments, $load_mode);
       }
     }
 
     /**
-     * Execute SQL query
+     * Prepare and execute query, while letting the developer change the load and return modes
      *
-     * @param  string                                       $sql
-     * @param  mixed                                        $arguments
-     * @param  int                                          $load
-     * @param  int                                          $return_mode
-     * @param  string                                       $return_class_or_field
-     * @return array|bool|DBResult|mixed|MySQLDBResult|null
+     * @param  string $sql
+     * @param  mixed  $arguments
+     * @param  int    $load_mode
+     * @param  int    $return_mode
+     * @param  string $return_class_or_field
+     * @return mixed
      * @throws Query
-     * @throws DBQueryError
-     * @throws DBNotConnectedError
-     * @throws Exception
      */
-    public function execute2($sql, $arguments = null, $load = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null)
+    public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null)
     {
       $query_result = $this->prepareAndExecuteQuery($sql, $arguments);
 
@@ -135,7 +132,7 @@
 
       if ($query_result instanceof mysqli_result) {
         if ($query_result->num_rows > 0) {
-          switch ($load) {
+          switch ($load_mode) {
             case self::LOAD_FIRST_ROW:
               $result = $query_result->fetch_assoc();
               $this->getDefaultCaster()->castRowValues($result);
