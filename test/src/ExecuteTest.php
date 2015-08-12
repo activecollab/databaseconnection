@@ -25,6 +25,14 @@
     }
 
     /**
+     * @expectedException \ActiveCollab\DatabaseConnection\Exception\Query
+     */
+    public function testExceptionOnInvalidQuery()
+    {
+      $this->connection->execute('invalid query 100%');
+    }
+
+    /**
      * Test create table
      */
     public function testCreateTable()
