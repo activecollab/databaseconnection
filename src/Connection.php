@@ -3,6 +3,8 @@
   namespace ActiveCollab\DatabaseConnection;
 
   use ActiveCollab\DatabaseConnection\Exception\Query;
+  use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+  use ActiveCollab\DatabaseConnection\Result\Result;
   use mysqli;
   use mysqli_result;
   use DateTime;
@@ -52,22 +54,41 @@
       $this->link = $link;
     }
 
-
+    /**
+     * Execute a query and return a result
+     *
+     * @return Result|true|null
+     */
     public function execute()
     {
       return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_ALL_ROWS);
     }
 
+    /**
+     * Return first row that provided SQL query returns
+     *
+     * @return array
+     */
     public function executeFirstRow()
     {
       return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_FIRST_ROW);
     }
 
+    /**
+     * Return value from the first cell of each column that provided SQL query returns
+     *
+     * @return array
+     */
     public function executeFirstColumn()
     {
       return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_FIRST_COLUMN);
     }
 
+    /**
+     * Return value from the first cell of the first row that provided SQL query returns
+     *
+     * @return mixed
+     */
     public function executeFirstCell()
     {
       return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_FIRST_CELL);
@@ -108,37 +129,18 @@
         if ($query_result->num_rows > 0) {
           switch ($load) {
             case self::LOAD_FIRST_ROW:
-              $result = self::rowToResult($query_result->fetch_assoc(), $return_mode, $return_class_or_field); break;
+              $result = $query_result->fetch_assoc();
+              $this->getDefaultCaster()->castRowValues($result);
+
+              break;
 
             case self::LOAD_FIRST_COLUMN:
               $result = [];
 
-              if ($query_result->num_rows > 0) {
-                $cast = null;
-
-                while ($row = $query_result->fetch_assoc()) {
-                  foreach ($row as $k => $v) {
-                    if (empty($cast)) {
-                      if ($k == 'id' || str_ends_with($k, '_id')) {
-                        $cast = DBResult::CAST_INT;
-                      } elseif (str_starts_with($k, 'is_')) {
-                        $cast = DBResult::CAST_BOOL;
-                      } else {
-                        $cast = DBResult::CAST_STRING;
-                      }
-                    }
-
-                    if ($cast == DBResult::CAST_INT) {
-                      $result[] = (integer) $v;
-                    } elseif ($cast == DBResult::CAST_BOOL) {
-                      $result[] = (boolean) $v;
-                    } else {
-                      $result[] = $v;
-                    }
-
-                    break;
-                  }
-                  //$result[] = array_shift($row);
+              while ($row = $query_result->fetch_assoc()) {
+                foreach ($row as $k => $v) {
+                  $result[] = $this->getDefaultCaster()->castValue($k, $v);
+                  break; // Done after first cell in a row
                 }
               }
 
@@ -148,20 +150,13 @@
               $result = null;
 
               foreach ($query_result->fetch_assoc() as $k => $v) {
-                if ($k == 'id' || $k == 'row_count' || str_ends_with($k, '_id')) {
-                  $result = (integer) $v;
-                } elseif (str_starts_with($k, 'is_')) {
-                  $result = (boolean) $v;
-                } else {
-                  $result = $v;
-                }
-
-                break;
+                $result = $this->getDefaultCaster()->castValue($k, $v);
+                break; // Done after first cell
               }
 
               break;
             default:
-              return new MySQLDBResult($query_result, $return_mode, $return_class_or_field); // Don't close result, we need it
+              return new Result($query_result, $return_mode, $return_class_or_field); // Don't close result, we need it
           }
         } else {
           $result = null;
@@ -345,6 +340,23 @@
     public function escapeTableName($unescaped)
     {
       return "`$unescaped`";
+    }
+
+    /**
+     * @var ValueCaster
+     */
+    private $default_caster;
+
+    /**
+     * @return ValueCaster
+     */
+    private function &getDefaultCaster()
+    {
+      if (empty($this->default_caster)) {
+        $this->default_caster = new ValueCaster();
+      }
+
+      return $this->default_caster;
     }
 
     // ---------------------------------------------------

@@ -3,6 +3,7 @@
   namespace ActiveCollab\DatabaseConnection\Test;
 
   use ActiveCollab\DatabaseConnection\Connection;
+  use DateTime;
 
   /**
    * @package ActiveCollab\DatabaseConnection\Test
@@ -22,6 +23,27 @@
       parent::setUp();
 
       $this->connection = new Connection($this->link);
+
+      $create_table = $this->connection->execute("CREATE TABLE `writers` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        `birthday` date NOT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+      $this->assertTrue($create_table);
+
+      $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateTime('1828-09-09'), 'Alexander Pushkin', new DateTime('1799-06-06'), 'Fyodor Dostoyevsky', new DateTime('1821-11-11'));
+    }
+
+    /**
+     * Tear down the test environment
+     */
+    public function tearDown()
+    {
+      $this->connection->execute('DROP TABLE `writers`');
+
+      parent::tearDown();
     }
 
     /**
@@ -33,19 +55,46 @@
     }
 
     /**
-     * Test create table
+     * Execute first cell
      */
-    public function testCreateTable()
+    public function testExecuteFirstCell()
     {
-      $create_table = $this->connection->execute("CREATE TABLE `memories` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `key` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-        `value` mediumtext COLLATE utf8mb4_unicode_ci,
-        `updated_on` datetime DEFAULT NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `key` (`key`)
-      ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+      $this->assertEquals(1, $this->connection->executeFirstCell('SELECT `id` FROM `writers` WHERE `name` = ?', 'Leo Tolstoy'));
+      $this->assertEquals(2, $this->connection->executeFirstCell('SELECT `id` FROM `writers` WHERE `name` = ?', 'Alexander Pushkin'));
+      $this->assertEquals(3, $this->connection->executeFirstCell('SELECT `id` FROM `writers` WHERE `name` = ?', 'Fyodor Dostoyevsky'));
 
-      $this->assertTrue($create_table);
+      $this->assertEquals('Leo Tolstoy', $this->connection->executeFirstCell('SELECT `name` FROM `writers` WHERE `id` = ?', 1));
+      $this->assertEquals('Alexander Pushkin', $this->connection->executeFirstCell('SELECT `name` FROM `writers` WHERE `id` = ?', 2));
+      $this->assertEquals('Fyodor Dostoyevsky', $this->connection->executeFirstCell('SELECT `name` FROM `writers` WHERE `id` = ?', 3));
+    }
+
+    /**
+     * Test execute first row
+     */
+    public function testExecuteFirstRow()
+    {
+      $this->assertEquals([
+        'id' => 1,
+        'name' => 'Leo Tolstoy',
+        'birthday' => '1828-09-09'
+      ], $this->connection->executeFirstRow('SELECT * FROM `writers` ORDER BY `id`'));
+    }
+
+    /**
+     * Test execute first column
+     */
+    public function testExecuteFirstColumn()
+    {
+      $this->assertEquals([
+        'Alexander Pushkin',
+        'Fyodor Dostoyevsky',
+        'Leo Tolstoy',
+      ], $this->connection->executeFirstColumn('SELECT `name` FROM `writers` ORDER BY `name`'));
+
+      $this->assertEquals([
+        '1799-06-06',
+        '1821-11-11',
+        '1828-09-09',
+      ], $this->connection->executeFirstColumn('SELECT `birthday` FROM `writers` ORDER BY `name`'));
     }
   }
