@@ -94,6 +94,14 @@
       return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_FIRST_CELL);
     }
 
+    /**
+     * Use arguments to prepare and execute a query, and return it in expected form
+     *
+     * @param  array  $arguments
+     * @param  string $load_mode
+     * @return mixed
+     * @throws Query
+     */
     private function executeBasedOnFunctionArguments($arguments, $load_mode)
     {
       if (empty($arguments)) {

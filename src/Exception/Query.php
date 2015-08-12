@@ -4,6 +4,9 @@
 
   use Exception;
 
+  /**
+   * @package ActiveCollab\DatabaseConnection\Exception
+   */
   class Query extends Exception
   {
     /**
