@@ -25,9 +25,19 @@ if ($database_link->connect_error) {
 
 $connection = new Connection($database_link);
 
-foreach ($connection->execute('SELECT * FROM `writers` ORDER BY `id`') as $row) {
-  print $row['name'] . "\n";
+// List all writers
+foreach ($connection->execute('SELECT `id`, `name` FROM `writers` WHERE `name` = ? ORDER BY `id`', 'Leo Tolstoy') as $row) {
+  print '#' . $row['id'] . ' ' . $row['name'] . "\n";
 }
+
+// Get the first cell of the first row (so we can print Tolstoy's birthday)
+print $connection->executeFirstCell('SELECT `birthday` FROM `writers` WHERE `name` = ? LIMIT 0, 1', 'Leo Tolstoy');
+
+// Get everything that we have on Leo Tolstoy
+print_r($connection->executeFirstRow('SELECT * FROM `writers` WHERE `name` = ?', 'Leo Tolstoy'));
+
+// Show names of all authors
+print_r($connection->executeFirstColumn('SELECT `name` FROM `writers` ORDER BY `name`'));
 ```
 
 ## Casting
