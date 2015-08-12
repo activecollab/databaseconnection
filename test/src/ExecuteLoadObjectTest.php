@@ -3,7 +3,6 @@
   namespace ActiveCollab\DatabaseConnection\Test;
 
   use ActiveCollab\DatabaseConnection\Connection;
-  use ActiveCollab\DatabaseConnection\Result\Result;
   use DateTime;
 
   /**
