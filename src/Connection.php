@@ -186,10 +186,6 @@
      */
     private function prepareAndExecuteQuery($sql, $arguments)
     {
-//      if (empty($this->link)) {
-//        throw new DBNotConnectedError();
-//      }
-
       if ($this->on_log_query) {
         $microtime = microtime(true);
 
