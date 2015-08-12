@@ -6,7 +6,9 @@ Purpose of this library is not to abstract the database, but to make work with M
 
 1. Results that can be easily iterated,
 2. Results can be arrays of rows, or objects, loaded by a known class name, or by a class name read from the row field,
-3. Automatic value casting based on field name
+3. Automatic value casting based on field name.
+
+What's the thinking behind yet another database abstraction layer? Focus and history. This library has been part of [Active Collab](https://www.activecollab.com) for many years, so it works really well. On the other hand, it's simple - works only with MySQL, can be read and understood in an hour and still manages to save you a lot of time.
 
 ## Getting the data
 
@@ -52,9 +54,6 @@ This library enables quick and easy object hydration. To hydrate objects, you'll
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use DateTime;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test\Support
- */
 class Writer implements LoadFromRow
 {
   /**
@@ -150,4 +149,10 @@ Unless specified differently, following conventions apply:
 1. `id` and `row_count` fields are always cast to integers,
 2. Fields with name ending with `_id` are cast to integers,
 3. Fields with name starting with `is_` are cast to boolean,
-4. Fields with name ending with `_at` or `_on` are cast to DateValue,
+4. Fields with name ending with `_at` or `_on` are cast to DateValue.
+
+## To do
+
+1. Use prepared statemenets for all queries that have extra arguments,
+2. Enable library to use two database connections, one for writes, and the other for reads,
+3. Properly handle MySQL has gone away errors and deadlocks (stubbed).
