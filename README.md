@@ -8,6 +8,28 @@ Purpose of this library is not to abstract the database, but to make work with M
 2. Results can be arrays of rows, or objects, loaded by a known class name, or by a class name read from the row field,
 3. Automatic value casting based on field name
 
+## Iterating
+
+```php
+<?php
+
+use ActiveCollab\DatabaseConnection\Connection;
+use MySQLi;
+use RuntimeException;
+
+$database_link = new MySQLi('localhost', 'root', '', 'activecollab_database_connection_test');
+
+if ($database_link->connect_error) {
+  throw new RuntimeException('Failed to connect to database. MySQL said: ' . $database_link->connect_error);
+}
+
+$connection = new Connection($database_link);
+
+foreach ($connection->execute('SELECT * FROM `writers` ORDER BY `id`') as $row) {
+  print $row['name'] . "\n";
+}
+```
+
 ## Casting
 
 Unless specified differently, following conventions apply:

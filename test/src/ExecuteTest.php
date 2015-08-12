@@ -5,7 +5,6 @@
   use ActiveCollab\DatabaseConnection\Connection;
   use ActiveCollab\DatabaseConnection\Record\ValueCaster;
   use DateTime;
-  use DateTimeZone;
 
   /**
    * @package ActiveCollab\DatabaseConnection\Test
