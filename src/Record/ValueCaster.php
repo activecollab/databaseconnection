@@ -17,6 +17,9 @@
     const CAST_DATE = 'date';
     const CAST_DATETIME = 'datetime';
 
+    /**
+     * @var array
+     */
     private $dictated = [ 'id' => self::CAST_INT, 'row_count' => self::CAST_INT ];
 
     /**
@@ -64,7 +67,6 @@
             return (bool) $value;
           case self::CAST_DATE:
           case self::CAST_DATETIME:
-
             return new DateTime($value, new DateTimeZone('UTC'));
           default:
             return (string) $value;
