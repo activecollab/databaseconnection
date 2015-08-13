@@ -173,4 +173,27 @@
         '1828-09-09',
       ], $this->connection->executeFirstColumn('SELECT `birthday` FROM `writers` ORDER BY `name`'));
     }
+
+    /**
+     * Test if last insert ID returns correct value
+     */
+    public function testInsertId()
+    {
+      $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?)', 'Anton Chekhov', new DateTime('1860-01-29'));
+      $this->assertEquals(4, $this->connection->lastInsertId());
+    }
+
+    /**
+     * Test if affected rows returns the correct value
+     */
+    public function testAffectedRows()
+    {
+      $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `name` = ?', 'Leo Tolstoy'));
+
+      $this->connection->execute('UPDATE `writers` SET `name` = ? WHERE `name` = ?', 'Lev Nikolayevich Tolstoy', 'Leo Tolstoy');
+      $this->assertEquals(1, $this->connection->affectedRows());
+
+      $this->connection->execute('UPDATE `writers` SET `name` = ? WHERE `name` = ?', 'Nothing to Update', 'Leo Tolstoy');
+      $this->assertEquals(0, $this->connection->affectedRows());
+    }
   }

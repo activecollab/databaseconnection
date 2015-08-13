@@ -178,6 +178,26 @@
     }
 
     /**
+     * Return number of affected rows
+     *
+     * @return integer
+     */
+    public function affectedRows()
+    {
+      return $this->link->affected_rows;
+    }
+
+    /**
+     * Return last insert ID
+     *
+     * @return integer
+     */
+    public function lastInsertId()
+    {
+      return $this->link->insert_id;
+    }
+
+    /**
      * Prepare (if needed) and execute SQL query
      *
      * @param  string             $sql
