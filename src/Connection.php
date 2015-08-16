@@ -10,6 +10,8 @@
   use DateTime;
   use InvalidArgumentException;
   use BadMethodCallException;
+  use Closure;
+  use Exception;
 
   /**
    * @package ActiveCollab\DatabaseConnection
@@ -195,6 +197,91 @@
     public function lastInsertId()
     {
       return $this->link->insert_id;
+    }
+
+    /**
+     * Run body commands within a transation
+     *
+     * @param  Closure      $body
+     * @param  Closure|null $on_success
+     * @param  CLosure|null $on_error
+     * @throws Exception
+     */
+    public function transact(Closure $body, $on_success = null, $on_error = null)
+    {
+      if ($body instanceof Closure) {
+        try {
+          $this->beginWork();
+          call_user_func($body);
+          $this->commit();
+
+          if ($on_success instanceof Closure) {
+            call_user_func($on_success);
+          }
+        } catch (Exception $e) {
+          $this->rollback();
+
+          if ($on_error instanceof Closure) {
+            call_user_func($on_error, $e);
+          } else {
+            throw $e;
+          }
+        }
+      } else {
+        throw new InvalidArgumentException('Closure expected');
+      }
+    }
+
+    /**
+     * Transaction level
+     *
+     * @var integer
+     */
+    private $transaction_level = 0;
+
+    /**
+     * Begin transaction
+     */
+    public function beginWork()
+    {
+      if ($this->transaction_level == 0) {
+        $this->execute('BEGIN WORK');
+      }
+      $this->transaction_level++;
+    }
+
+    /**
+     * Commit transaction
+     */
+    public function commit()
+    {
+      if ($this->transaction_level) {
+        $this->transaction_level--;
+        if ($this->transaction_level == 0) {
+          $this->execute('COMMIT');
+        }
+      }
+    }
+
+    /**
+     * Rollback transaction
+     */
+    public function rollback()
+    {
+      if ($this->transaction_level) {
+        $this->transaction_level = 0;
+        $this->execute('ROLLBACK');
+      }
+    }
+
+    /**
+     * Return true if system is in transaction
+     *
+     * @return boolean
+     */
+    public function inTransaction()
+    {
+      return $this->transaction_level > 0;
     }
 
     /**
