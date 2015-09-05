@@ -53,22 +53,22 @@ class ValueCaster
     {
         if ($value === null) {
             return; // NULL remains NULL
-        } else {
-            switch ($this->getTypeByFieldName($field_name)) {
-                case self::CAST_INT:
-                    return (int) $value;
-                case self::CAST_FLOAT:
-                    return (float) $value;
-                case self::CAST_STRING:
-                    return (string) $value;
-                case self::CAST_BOOL:
-                    return (bool) $value;
-                case self::CAST_DATE:
-                case self::CAST_DATETIME:
-                    return new DateTime($value, new DateTimeZone('UTC'));
-                default:
-                    return (string) $value;
-            }
+        }
+
+        switch ($this->getTypeByFieldName($field_name)) {
+            case self::CAST_INT:
+                return (int) $value;
+            case self::CAST_FLOAT:
+                return (float) $value;
+            case self::CAST_STRING:
+                return (string) $value;
+            case self::CAST_BOOL:
+                return (bool) $value;
+            case self::CAST_DATE:
+            case self::CAST_DATETIME:
+                return new DateTime($value, new DateTimeZone('UTC'));
+            default:
+                return (string) $value;
         }
     }
 
@@ -85,18 +85,22 @@ class ValueCaster
             return $this->dictated[$field_name];
         }
 
-        if (substr($field_name, 0, 3) == 'is_') {
+        if (substr($field_name, 0, 3) === 'is_') {
             return self::CAST_BOOL;
-        } else {
-            $last_three = substr($field_name, strlen($field_name) - 3);
+        }
 
-            if ($last_three == '_id') {
-                return self::CAST_INT;
-            } elseif ($last_three == '_on') {
-                return self::CAST_DATE;
-            } elseif ($last_three == '_at') {
-                return self::CAST_DATETIME;
-            }
+        $last_three = substr($field_name, -3);
+
+        if ($last_three === '_id') {
+            return self::CAST_INT;
+        }
+
+        if ($last_three === '_on') {
+            return self::CAST_DATE;
+        }
+
+        if ($last_three === '_at') {
+            return self::CAST_DATETIME;
         }
 
         return self::CAST_STRING;
