@@ -12,7 +12,7 @@ What's the thinking behind yet another database abstraction layer? Focus and his
 
 ## Getting the data
 
-This library makes query exacution quick and easy. You can fetch all records, only first record, only first column or only first cell (first column of the first record). Here's a couple of examples:
+This library makes query execution quick and easy. You can fetch all records, only first record, only first column or only first cell (first column of the first record). Here's a couple of examples:
 
 ```php
 <?php
@@ -153,6 +153,6 @@ Unless specified differently, following conventions apply:
 
 ## To do
 
-1. Use prepared statemenets for all queries that have extra arguments,
+1. Use prepared statements for all queries that have extra arguments,
 2. Enable library to use two database connections, one for writes, and the other for reads,
 3. Properly handle MySQL has gone away errors and deadlocks (stubbed).
