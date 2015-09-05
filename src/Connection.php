@@ -46,9 +46,26 @@ class Connection
     private $link;
 
     /**
+     * @var callable|null
+     */
+    private $on_log_query;
+
+    /**
+     * Transaction level.
+     *
+     * @var int
+     */
+    private $transaction_level = 0;
+
+    /**
+     * @var ValueCaster
+     */
+    private $default_caster;
+
+    /**
      * @param mysqli $link
      */
-    public function __construct(mysqli &$link)
+    public function __construct(mysqli $link)
     {
         $this->link = $link;
     }
@@ -94,25 +111,6 @@ class Connection
     }
 
     /**
-     * Use arguments to prepare and execute a query, and return it in expected form.
-     *
-     * @param array  $arguments
-     * @param string $load_mode
-     *
-     * @return mixed
-     *
-     * @throws Query
-     */
-    private function executeBasedOnFunctionArguments($arguments, $load_mode)
-    {
-        if (empty($arguments)) {
-            throw new BadMethodCallException('SQL query with optional list of arguments was expected');
-        } else {
-            return $this->advancedExecute(array_shift($arguments), $arguments, $load_mode);
-        }
-    }
-
-    /**
      * Prepare and execute query, while letting the developer change the load and return modes.
      *
      * @param string $sql
@@ -131,6 +129,10 @@ class Connection
 
         if ($query_result === false) {
             $query_result = $this->tryToRecoverFromFailedQuery($sql, $arguments);
+        }
+
+        if ($query_result === true) {
+            return true;
         }
 
         if ($query_result instanceof mysqli_result) {
@@ -172,11 +174,9 @@ class Connection
             $query_result->close();
 
             return $result;
-        } elseif ($query_result === true) {
-            return true;
-        } else {
-            throw new Query($this->link->error, $this->link->errno);
         }
+
+        throw new Query($this->link->error, $this->link->errno);
     }
 
     /**
@@ -234,13 +234,6 @@ class Connection
     }
 
     /**
-     * Transaction level.
-     *
-     * @var int
-     */
-    private $transaction_level = 0;
-
-    /**
      * Begin transaction.
      */
     public function beginWork()
@@ -286,35 +279,6 @@ class Connection
     }
 
     /**
-     * Prepare (if needed) and execute SQL query.
-     *
-     * @param string     $sql
-     * @param array|null $arguments
-     *
-     * @return mysqli_result|bool
-     */
-    private function prepareAndExecuteQuery($sql, $arguments)
-    {
-        if ($this->on_log_query) {
-            $microtime = microtime(true);
-
-            $prepared_sql = empty($arguments)
-                ? $sql
-                : call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments));
-
-            $result = $this->link->query($prepared_sql);
-
-            call_user_func($this->on_log_query, $prepared_sql, microtime(true) - $microtime);
-
-            return $result;
-        } else {
-            return empty($arguments)
-                ? $this->link->query($sql)
-                : $this->link->query(call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments)));
-        }
-    }
-
-    /**
      * Prepare SQL (replace ? with data from $arguments array).
      *
      * @return string
@@ -325,54 +289,44 @@ class Connection
 
         if (empty($arguments)) {
             throw new InvalidArgumentException('Pattern expected');
-        } elseif (count($arguments) == 1) {
-            return $arguments[0];
-        } else {
-            $sql = array_shift($arguments);
-
-            $offset = 0;
-
-            foreach ($arguments as $argument) {
-                $question_mark_pos = mb_strpos($sql, '?', $offset);
-
-                if ($question_mark_pos !== false) {
-                    $escaped = $this->escapeValue($argument);
-                    $escaped_len = mb_strlen($escaped);
-
-                    $sql = mb_substr($sql, 0, $question_mark_pos).$escaped.mb_substr($sql, $question_mark_pos + 1, mb_strlen($sql));
-
-                    $offset = $question_mark_pos + $escaped_len;
-                }
-            }
-
-            return $sql;
         }
+
+        if (count($arguments) === 1) {
+            return $arguments[0];
+        }
+
+        $sql = array_shift($arguments);
+        $offset = 0;
+
+        foreach ($arguments as $argument) {
+            $question_mark_pos = mb_strpos($sql, '?', $offset);
+
+            if ($question_mark_pos !== false) {
+                $escaped = $this->escapeValue($argument);
+                $escaped_len = mb_strlen($escaped);
+
+                $sql = mb_substr($sql, 0, $question_mark_pos).$escaped.mb_substr($sql, $question_mark_pos + 1, mb_strlen($sql));
+
+                $offset = $question_mark_pos + $escaped_len;
+            }
+        }
+
+        return $sql;
     }
 
     /**
-     * Try to recover from failed query.
+     * Set a callback that will receive every query after we run it.
      *
-     * @param string     $sql
-     * @param array|null $arguments
+     * Callback should accept two parameters: first for SQL that was ran, and second for time that it took to run
      *
-     * @throws Query
+     * @param callable|null $callback
      */
-    private function tryToRecoverFromFailedQuery($sql, $arguments)
+    public function onLogQuery(callable $callback = null)
     {
-        switch ($this->link->errno) {
-            // Non-transactional tables not rolled back!
-            case 1196:
-                break;
-            // Server gone away
-            case 2006:
-            case 2013:
-                return $this->handleMySqlGoneAway($sql, $arguments);
-            // Deadlock detection and retry
-            case 1213:
-                return $this->handleDeadlock($sql, $arguments);
-            // Other error
-            default:
-                throw new Query($this->link->error, $this->link->errno);
+        if ($callback === null || is_callable($callback)) {
+            $this->on_log_query = $callback;
+        } else {
+            throw new InvalidArgumentException('Callback needs to be NULL or callable');
         }
     }
 
@@ -390,19 +344,26 @@ class Connection
         // Date time value
         if ($unescaped instanceof DateTime) {
             return "'".$this->link->real_escape_string(date('Y-m-d H:i:s', $unescaped->getTimestamp()))."'";
+        }
 
         // Float
-        } elseif (is_float($unescaped)) {
+        if (is_float($unescaped)) {
             // replace , with . for locales where comma is used by the system (German for example)
             return "'".str_replace(',', '.', (float) $unescaped)."'";
+        }
+
         // Boolean (maps to TINYINT(1))
-        } elseif (is_bool($unescaped)) {
+        if (is_bool($unescaped)) {
             return $unescaped ? "'1'" : "'0'";
+        }
+
         // NULL
-        } elseif ($unescaped === null) {
+        if ($unescaped === null) {
             return 'NULL';
+        }
+
         // Escape first cell of each row
-        } elseif ($unescaped instanceof Result) {
+        if ($unescaped instanceof Result) {
             if ($unescaped->count() < 1) {
                 throw new InvalidArgumentException("Empty results can't be escaped");
             }
@@ -414,8 +375,10 @@ class Connection
             }
 
             return '('.implode(',', $escaped).')';
+        }
+
         // Escape each array element
-        } elseif (is_array($unescaped)) {
+        if (is_array($unescaped)) {
             if (empty($unescaped)) {
                 throw new InvalidArgumentException("Empty arrays can't be escaped");
             }
@@ -427,12 +390,14 @@ class Connection
             }
 
             return '('.implode(',', $escaped).')';
-        // Regular string and integer escape
-        } elseif (is_scalar($unescaped)) {
-            return "'".$this->link->real_escape_string($unescaped)."'";
-        } else {
-            throw new InvalidArgumentException('Value is expected to be scalar, array, or instance of: DateTime or Result');
         }
+
+        // Regular string and integer escape
+        if (is_scalar($unescaped)) {
+            return "'".$this->link->real_escape_string($unescaped)."'";
+        }
+
+        throw new InvalidArgumentException('Value is expected to be scalar, array, or instance of: DateTime or Result');
     }
 
     /**
@@ -460,14 +425,9 @@ class Connection
     }
 
     /**
-     * @var ValueCaster
-     */
-    private $default_caster;
-
-    /**
      * @return ValueCaster
      */
-    private function &getDefaultCaster()
+    private function getDefaultCaster()
     {
         if (empty($this->default_caster)) {
             $this->default_caster = new ValueCaster();
@@ -476,28 +436,120 @@ class Connection
         return $this->default_caster;
     }
 
-    // ---------------------------------------------------
-    //  Events
-    // ---------------------------------------------------
-
     /**
-     * @var callable|null
-     */
-    private $on_log_query;
-
-    /**
-     * Set a callback that will receive every query after we run it.
+     * Prepare (if needed) and execute SQL query.
      *
-     * Callback should accept two parameters: first for SQL that was ran, and second for time that it took to run
+     * @param string     $sql
+     * @param array|null $arguments
      *
-     * @param callable|null $callback
+     * @return mysqli_result|bool
      */
-    public function onLogQuery(callable $callback = null)
+    private function prepareAndExecuteQuery($sql, $arguments)
     {
-        if ($callback === null || is_callable($callback)) {
-            $this->on_log_query = $callback;
-        } else {
-            throw new InvalidArgumentException('Callback needs to be NULL or callable');
+        if (!$this->on_log_query) {
+            return $this->link->query($this->prepareQuery($sql, $arguments));
         }
+
+        $microtime = microtime(true);
+
+        $prepared_sql = $this->prepareQuery($sql, $arguments);
+
+        $result = $this->link->query($prepared_sql);
+
+        call_user_func($this->on_log_query, $prepared_sql, microtime(true) - $microtime);
+
+        return $result;
+    }
+
+    /**
+     * Prepare SQL query.
+     *
+     * @param string     $sql
+     * @param array|null $arguments
+     *
+     * @return mysqli_stmt|string
+     */
+    private function prepareQuery($sql, $arguments)
+    {
+        if (empty($arguments)) {
+            return $sql;
+        }
+
+        return call_user_func_array([$this, 'prepare'], array_merge([$sql], $arguments));
+    }
+
+    /**
+     * Use arguments to prepare and execute a query, and return it in expected form.
+     *
+     * @param array  $arguments
+     * @param string $load_mode
+     *
+     * @return mixed
+     *
+     * @throws Query
+     */
+    private function executeBasedOnFunctionArguments($arguments, $load_mode)
+    {
+        if (empty($arguments)) {
+            throw new BadMethodCallException(
+                'SQL query with optional list of arguments was expected'
+            );
+        }
+
+        return $this->advancedExecute(array_shift($arguments), $arguments, $load_mode);
+    }
+
+    /**
+     * Try to recover from failed query.
+     *
+     * @param string     $sql
+     * @param array|null $arguments
+     *
+     * @throws Query
+     */
+    private function tryToRecoverFromFailedQuery($sql, $arguments)
+    {
+        switch ($this->link->errno) {
+            // Non-transactional tables not rolled back!
+            case 1196:
+                //NO-OP ATM
+                return;
+            // Server gone away
+            case 2006:
+            case 2013:
+                return $this->handleMySqlGoneAway($sql, $arguments);
+            // Deadlock detection and retry
+            case 1213:
+                return $this->handleDeadlock($sql, $arguments);
+            // Other error
+            default:
+                throw new Query($this->link->error, $this->link->errno);
+        }
+    }
+
+    /**
+     * @param string     $sql
+     * @param array|null $arguments
+     *
+     * @throws BadMethodCallException
+     */
+    private function handleMySqlGoneAway($sql, $arguments)
+    {
+        throw new BadMethodCallException(
+            sprintf('Method %s is not implemented.', __METHOD__)
+        );
+    }
+
+    /**
+     * @param string     $sql
+     * @param array|null $arguments
+     *
+     * @throws BadMethodCallException
+     */
+    private function handleDeadlock($sql, $arguments)
+    {
+        throw new BadMethodCallException(
+            printf('Method %s is not implemented.', __METHOD__)
+        );
     }
 }
