@@ -1,88 +1,85 @@
 <?php
 
-  namespace ActiveCollab\DatabaseConnection\Test;
+namespace ActiveCollab\DatabaseConnection\Test;
 
-  use ActiveCollab\DatabaseConnection\Connection;
-  use DateTime;
-  use DateTimeZone;
+use ActiveCollab\DatabaseConnection\Connection;
+use DateTime;
+use DateTimeZone;
 
-  /**
-   * @package ActiveCollab\DatabaseConnection\Test
-   */
-  class EscapeTest extends TestCase
-  {
+class EscapeTest extends TestCase
+{
     /**
      * @var Connection
      */
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
-      parent::setUp();
+        parent::setUp();
 
-      $this->connection = new Connection($this->link);
+        $this->connection = new Connection($this->link);
     }
 
     /**
-     * Test escape NULL
+     * Test escape NULL.
      */
     public function testEscapeNull()
     {
-      $this->assertEquals('NULL', $this->connection->escapeValue(null));
+        $this->assertEquals('NULL', $this->connection->escapeValue(null));
     }
 
     /**
-     * Test escape boolean
+     * Test escape boolean.
      */
     public function testEscapeBoolean()
     {
-      $this->assertEquals("'1'", $this->connection->escapeValue(true));
-      $this->assertEquals("'0'", $this->connection->escapeValue(false));
+        $this->assertEquals("'1'", $this->connection->escapeValue(true));
+        $this->assertEquals("'0'", $this->connection->escapeValue(false));
     }
 
     /**
-     * Test escape string
+     * Test escape string.
      */
     public function testEscapeString()
     {
-      $this->assertEquals("'123'", $this->connection->escapeValue('123'));
+        $this->assertEquals("'123'", $this->connection->escapeValue('123'));
     }
 
     /**
-     * Test escape integer
+     * Test escape integer.
      */
     public function testEscapeInteger()
     {
-      $this->assertEquals("'123'", $this->connection->escapeValue(123));
-      $this->assertEquals("'-123'", $this->connection->escapeValue(-123));
+        $this->assertEquals("'123'", $this->connection->escapeValue(123));
+        $this->assertEquals("'-123'", $this->connection->escapeValue(-123));
     }
 
     /**
-     * Test escape float
+     * Test escape float.
      */
     public function testEscapeFloat()
     {
-      $this->assertEquals("'123.456'", $this->connection->escapeValue(123.456));
-      $this->assertEquals("'-123.456'", $this->connection->escapeValue(-123.456));
+        $this->assertEquals("'123.456'", $this->connection->escapeValue(123.456));
+        $this->assertEquals("'-123.456'", $this->connection->escapeValue(-123.456));
     }
 
     /**
-     * Test escape DateTime instance
+     * Test escape DateTime instance.
      */
     public function testEscapeDateTime()
     {
-      $this->assertEquals("'2015-08-11 23:05:28'", $this->connection->escapeValue(new DateTime('2015-08-11 23:05:28', new DateTimeZone('UTC'))));
+        $this->assertEquals("'2015-08-11 23:05:28'", $this->connection->escapeValue(new DateTime('2015-08-11 23:05:28', new DateTimeZone('UTC'))));
     }
 
     /**
-     * Test escape array
+     * Test escape array.
      */
     public function testEscapeArray()
     {
-      $this->assertEquals("('1','2','3')", $this->connection->escapeValue([ 1, 2, 3 ]));
+        $this->assertEquals("('1','2','3')", $this->connection->escapeValue([1, 2, 3]));
     }
 
     /**
@@ -90,7 +87,7 @@
      */
     public function testExceptionOnEmptyArray()
     {
-      $this->connection->escapeValue([]);
+        $this->connection->escapeValue([]);
     }
 
     /**
@@ -98,22 +95,22 @@
      */
     public function testExceptionOnUsupportedObject()
     {
-      $this->connection->escapeValue($this->link);
+        $this->connection->escapeValue($this->link);
     }
 
     /**
-     * Test escape field name
+     * Test escape field name.
      */
     public function testEscapeFieldName()
     {
-      $this->assertEquals('`id`', $this->connection->escapeFieldName('id'));
+        $this->assertEquals('`id`', $this->connection->escapeFieldName('id'));
     }
 
     /**
-     * Test escape table name
+     * Test escape table name.
      */
     public function testEscapeTableName()
     {
-      $this->assertEquals('`users`', $this->connection->escapeFieldName('users'));
+        $this->assertEquals('`users`', $this->connection->escapeFieldName('users'));
     }
-  }
+}

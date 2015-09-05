@@ -1,15 +1,12 @@
 <?php
 
-  namespace ActiveCollab\DatabaseConnection\Test\Support;
+namespace ActiveCollab\DatabaseConnection\Test\Support;
 
-  use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
-  use DateTime;
+use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
+use DateTime;
 
-  /**
-   * @package ActiveCollab\DatabaseConnection\Test\Support
-   */
-  class Writer implements LoadFromRow
-  {
+class Writer implements LoadFromRow
+{
     /**
      * @var array
      */
@@ -20,15 +17,15 @@
      */
     public function loadFromRow(array $row)
     {
-      $this->row = $row;
+        $this->row = $row;
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getId()
     {
-      return $this->row['id'];
+        return $this->row['id'];
     }
 
     /**
@@ -36,7 +33,7 @@
      */
     public function getName()
     {
-      return $this->row['name'];
+        return $this->row['name'];
     }
 
     /**
@@ -44,6 +41,6 @@
      */
     public function getBirthday()
     {
-      return new DateTime($this->row['birthday']);
+        return new DateTime($this->row['birthday']);
     }
-  }
+}
