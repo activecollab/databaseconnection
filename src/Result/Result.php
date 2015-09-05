@@ -56,6 +56,11 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     protected $return_class_or_field;
 
     /**
+     * @var ValueCaster
+     */
+    private $value_caser;
+
+    /**
      * Construct a new result object from resource.
      *
      * @param mixed  $resource
@@ -66,32 +71,19 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      */
     public function __construct($resource, $return_mode = Connection::RETURN_ARRAY, $return_class_or_field = null)
     {
-        if ($this->isValidResource($resource)) {
-            $this->resource = $resource;
-
-            if ($return_mode === Connection::RETURN_OBJECT_BY_CLASS) {
-                if (!(new ReflectionClass($return_class_or_field))->implementsInterface('\ActiveCollab\DatabaseConnection\Record\LoadFromRow')) {
-                    throw new InvalidArgumentException("Class '$return_class_or_field' needs to implement LoadFromRow interface");
-                }
-            }
-
-            $this->return_mode = $return_mode;
-            $this->return_class_or_field = $return_class_or_field;
-        } else {
+        if (!$this->isValidResource($resource)) {
             throw new InvalidArgumentException('mysqli_result expected');
         }
-    }
 
-    /**
-     * Returns true if $resource is valid result resource.
-     *
-     * @param mixed $resource
-     *
-     * @return bool
-     */
-    protected function isValidResource($resource)
-    {
-        return $resource instanceof mysqli_result && $resource->num_rows > 0;
+        if ($return_mode === Connection::RETURN_OBJECT_BY_CLASS) {
+            if (!(new ReflectionClass($return_class_or_field))->implementsInterface('\ActiveCollab\DatabaseConnection\Record\LoadFromRow')) {
+                throw new InvalidArgumentException("Class '$return_class_or_field' needs to implement LoadFromRow interface");
+            }
+        }
+
+        $this->resource = $resource;
+        $this->return_mode = $return_mode;
+        $this->return_class_or_field = $return_class_or_field;
     }
 
     /**
@@ -214,34 +206,53 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     }
 
     /**
-     * Set current row.
+     * Returns DBResult indexed by value of a field or by result of specific
+     * getter method.
      *
-     * @param array $row
+     * This function will treat $field_or_getter as field in case or array
+     * return method, or as getter in case of object return method
+     *
+     * @param string $field_or_getter
+     *
+     * @return array
      */
-    protected function setCurrentRow($row)
+    public function toArrayIndexedBy($field_or_getter)
     {
-        switch ($this->return_mode) {
-            // Set object based on class name that we got in constructor
-            case Connection::RETURN_OBJECT_BY_CLASS:
-                $class_name = $this->return_class_or_field;
+        $result = [];
 
-                $this->current_row = new $class_name();
-                $this->current_row->loadFromRow($row);
-                break;
-
-            // Set object based on class name from field
-            case Connection::RETURN_OBJECT_BY_FIELD:
-                $class_name = $row[$this->return_class_or_field];
-
-                $this->current_row = new $class_name();
-                $this->current_row->loadFromRow($row);
-                break;
-
-            // Just return array
-            default:
-                $this->current_row = $row;
-                $this->getValueCaster()->castRowValues($this->current_row);
+        foreach ($this as $row) {
+            if ($this->return_mode === Connection::RETURN_ARRAY) {
+                $result[$row[$field_or_getter]] = $row;
+            } else {
+                $result[$row->$field_or_getter()] = $row;
+            }
         }
+
+        return $result;
+    }
+
+    /**
+     * Return array or property => value pairs that describes this object.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        if (!$this->count()) {
+            return [];
+        }
+
+        $records = [];
+
+        foreach ($this as $record) {
+            if ($record instanceof JsonSerializable) {
+                $records[] = $record->jsonSerialize();
+            } else {
+                $records[] = $record;
+            }
+        }
+
+        return $records;
     }
 
     /**
@@ -259,119 +270,6 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
 
         return $result;
     }
-
-    /**
-     * Returns DBResult indexed by value of a field or by result of specific
-     * getter method.
-     *
-     * This function will treat $field_or_getter as field in case or array
-     * return method, or as getter in case of object return method
-     *
-     * @param string $field_or_getter
-     *
-     * @return array
-     */
-    public function toArrayIndexedBy($field_or_getter)
-    {
-        $result = [];
-
-        foreach ($this as $row) {
-            if ($this->return_mode == Connection::RETURN_ARRAY) {
-                $result[$row[$field_or_getter]] = $row;
-            } else {
-                $result[$row->$field_or_getter()] = $row;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Return array or property => value pairs that describes this object.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        if ($this->count()) {
-            $records = [];
-
-            foreach ($this as $record) {
-                if ($record instanceof JsonSerializable) {
-                    $records[] = $record->jsonSerialize();
-                } else {
-                    $records[] = $record;
-                }
-            }
-
-            return $records;
-        } else {
-            return [];
-        }
-    }
-
-    // ---------------------------------------------------
-    //  Casting
-    // ---------------------------------------------------
-
-    /**
-     * @var ValueCaster
-     */
-    private $value_caser;
-
-    /**
-     * @return ValueCaster
-     */
-    private function &getValueCaster()
-    {
-        if (empty($this->value_caser)) {
-            $this->value_caser = new ValueCaster();
-        }
-
-        return $this->value_caser;
-    }
-
-    /**
-     * Set a custom value caster.
-     *
-     * @param ValueCaster $value_caster
-     */
-    public function setValueCaster(ValueCaster $value_caster)
-    {
-        $this->value_caser = $value_caster;
-    }
-
-    // ---------------------------------------------------
-    //  Return mode
-    // ---------------------------------------------------
-
-    /**
-     * Set result to return objects by class name.
-     *
-     * @param string $class_name
-     */
-    public function returnObjectsByClass($class_name)
-    {
-        $this->return_mode = Connection::RETURN_OBJECT_BY_CLASS;
-
-        $this->return_class_or_field = $class_name;
-    }
-
-    /**
-     * Set result to load objects of class based on filed value.
-     *
-     * @param string $field_name
-     */
-    public function returnObjectsByField($field_name)
-    {
-        $this->return_mode = Connection::RETURN_OBJECT_BY_FIELD;
-
-        $this->return_class_or_field = $field_name;
-    }
-
-    // ---------------------------------------------------
-    //  Interface implementations
-    // ---------------------------------------------------
 
     /**
      * Check if $offset exists.
@@ -430,5 +328,85 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     public function getIterator()
     {
         return new ResultIterator($this);
+    }
+
+    /**
+     * Set a custom value caster.
+     *
+     * @param ValueCaster $value_caster
+     */
+    public function setValueCaster(ValueCaster $value_caster)
+    {
+        $this->value_caser = $value_caster;
+    }
+
+    /**
+     * Set result to return objects by class name.
+     *
+     * @param string $class_name
+     */
+    public function returnObjectsByClass($class_name)
+    {
+        $this->return_mode = Connection::RETURN_OBJECT_BY_CLASS;
+
+        $this->return_class_or_field = $class_name;
+    }
+
+    /**
+     * Set result to load objects of class based on filed value.
+     *
+     * @param string $field_name
+     */
+    public function returnObjectsByField($field_name)
+    {
+        $this->return_mode = Connection::RETURN_OBJECT_BY_FIELD;
+
+        $this->return_class_or_field = $field_name;
+    }
+
+    /**
+     * Returns true if $resource is valid result resource.
+     *
+     * @param mixed $resource
+     *
+     * @return bool
+     */
+    protected function isValidResource($resource)
+    {
+        return $resource instanceof mysqli_result && $resource->num_rows > 0;
+    }
+
+    /**
+     * Set current row.
+     *
+     * @param array $row
+     */
+    protected function setCurrentRow($row)
+    {
+        if (!in_array($this->return_mode, [Connection::RETURN_OBJECT_BY_CLASS, Connection::RETURN_OBJECT_BY_FIELD], true)) {
+            $this->current_row = $row;
+            $this->getValueCaster()->castRowValues($this->current_row);
+
+            return;
+        }
+
+        $class_name = $this->return_mode === Connection::RETURN_OBJECT_BY_CLASS
+            ? $this->return_class_or_field
+            : $row[$this->return_class_or_field];
+
+        $this->current_row = new $class_name();
+        $this->current_row->loadFromRow($row);
+    }
+
+    /**
+     * @return ValueCaster
+     */
+    private function getValueCaster()
+    {
+        if (empty($this->value_caser)) {
+            $this->value_caser = new ValueCaster();
+        }
+
+        return $this->value_caser;
     }
 }
