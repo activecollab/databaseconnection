@@ -49,12 +49,12 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function testExecuteLoadObjectFromClassName()
     {
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Support\Writer');
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer');
 
         $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
 
-        /** @var \ActiveCollab\DatabaseConnection\Test\Support\Writer[] $writers */
+        /** @var \ActiveCollab\DatabaseConnection\Test\Fixture\Writer[] $writers */
         $writers = [];
 
         foreach ($result as $row) {
@@ -63,17 +63,17 @@ class ExecuteLoadObjectTest extends TestCase
 
         $this->assertCount(3, $writers);
 
-        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Support\Writer', $writers[0]);
+        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writers[0]);
         $this->assertEquals(1, $writers[0]->getId());
         $this->assertEquals('Leo Tolstoy', $writers[0]->getName());
         $this->assertEquals('1828-09-09', $writers[0]->getBirthday()->format('Y-m-d'));
 
-        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Support\Writer', $writers[1]);
+        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writers[1]);
         $this->assertEquals(2, $writers[1]->getId());
         $this->assertEquals('Alexander Pushkin', $writers[1]->getName());
         $this->assertEquals('1799-06-06', $writers[1]->getBirthday()->format('Y-m-d'));
 
-        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Support\Writer', $writers[2]);
+        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writers[2]);
         $this->assertEquals(3, $writers[2]->getId());
         $this->assertEquals('Fyodor Dostoyevsky', $writers[2]->getName());
         $this->assertEquals('1821-11-11', $writers[2]->getBirthday()->format('Y-m-d'));
@@ -88,12 +88,12 @@ class ExecuteLoadObjectTest extends TestCase
         //  Add type field
         // ---------------------------------------------------
 
-        $this->connection->execute('ALTER TABLE `writers` ADD `type` VARCHAR(255)  NULL DEFAULT ? AFTER `id`;', '\\ActiveCollab\\DatabaseConnection\\Test\\Support\\Writer');
+        $this->connection->execute('ALTER TABLE `writers` ADD `type` VARCHAR(255)  NULL DEFAULT ? AFTER `id`;', '\\ActiveCollab\\DatabaseConnection\\Test\\Fixture\\Writer');
 
         $this->assertEquals(
             [
                 'id' => 1,
-                'type' => '\ActiveCollab\DatabaseConnection\Test\Support\Writer',
+                'type' => '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer',
                 'name' => 'Leo Tolstoy',
                 'birthday' => '1828-09-09',
             ],
@@ -109,7 +109,7 @@ class ExecuteLoadObjectTest extends TestCase
         $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
 
-        /** @var \ActiveCollab\DatabaseConnection\Test\Support\Writer[] $writers */
+        /** @var \ActiveCollab\DatabaseConnection\Test\Fixture\Writer[] $writers */
         $writers = [];
 
         foreach ($result as $row) {
@@ -118,17 +118,17 @@ class ExecuteLoadObjectTest extends TestCase
 
         $this->assertCount(3, $writers);
 
-        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Support\Writer', $writers[0]);
+        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writers[0]);
         $this->assertEquals(1, $writers[0]->getId());
         $this->assertEquals('Leo Tolstoy', $writers[0]->getName());
         $this->assertEquals('1828-09-09', $writers[0]->getBirthday()->format('Y-m-d'));
 
-        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Support\Writer', $writers[1]);
+        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writers[1]);
         $this->assertEquals(2, $writers[1]->getId());
         $this->assertEquals('Alexander Pushkin', $writers[1]->getName());
         $this->assertEquals('1799-06-06', $writers[1]->getBirthday()->format('Y-m-d'));
 
-        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Support\Writer', $writers[2]);
+        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writers[2]);
         $this->assertEquals(3, $writers[2]->getId());
         $this->assertEquals('Fyodor Dostoyevsky', $writers[2]->getName());
         $this->assertEquals('1821-11-11', $writers[2]->getBirthday()->format('Y-m-d'));

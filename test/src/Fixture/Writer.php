@@ -1,6 +1,6 @@
 <?php
 
-namespace ActiveCollab\DatabaseConnection\Test\Support;
+namespace ActiveCollab\DatabaseConnection\Test\Fixture;
 
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use DateTime;
