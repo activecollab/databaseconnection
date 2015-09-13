@@ -1,14 +1,11 @@
 <?php
 
-  namespace ActiveCollab\DatabaseConnection\Record;
+namespace ActiveCollab\DatabaseConnection\Record;
 
-  /**
-   * @package ActiveCollab\DatabaseConnection\Record
-   */
-  interface LoadFromRow
-  {
+interface LoadFromRow
+{
     /**
      * @param array $row
      */
     public function loadFromRow(array $row);
-  }
+}
