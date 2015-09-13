@@ -173,18 +173,4 @@
         '1828-09-09',
       ], $this->connection->executeFirstColumn('SELECT `birthday` FROM `writers` ORDER BY `name`'));
     }
-
-    /**
-     * Test if affected rows returns the correct value
-     */
-    public function testAffectedRows()
-    {
-      $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `name` = ?', 'Leo Tolstoy'));
-
-      $this->connection->execute('UPDATE `writers` SET `name` = ? WHERE `name` = ?', 'Lev Nikolayevich Tolstoy', 'Leo Tolstoy');
-      $this->assertEquals(1, $this->connection->affectedRows());
-
-      $this->connection->execute('UPDATE `writers` SET `name` = ? WHERE `name` = ?', 'Nothing to Update', 'Leo Tolstoy');
-      $this->assertEquals(0, $this->connection->affectedRows());
-    }
   }

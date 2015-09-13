@@ -189,14 +189,14 @@
      * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set)
      *
      * @param  string                   $table
-     * @param  array                    $values
+     * @param  array                    $field_value_map
      * @param  string                   $mode
      * @return int
      * @throws InvalidArgumentException
      */
-    public function insert($table, array $values, $mode = self::INSERT)
+    public function insert($table, array $field_value_map, $mode = self::INSERT)
     {
-      if (empty($values)) {
+      if (empty($field_value_map)) {
         throw new InvalidArgumentException("Values array can't be empty");
       }
 
@@ -208,9 +208,9 @@
 
       $this->execute("$mode INTO " . $this->escapeTableName($table) . ' (' . implode(',', array_map(function($field_name) {
         return $this->escapeFieldName($field_name);
-      }, array_keys($values))) . ') VALUES (' . implode(',', array_map(function($value) {
+      }, array_keys($field_value_map))) . ') VALUES (' . implode(',', array_map(function($value) {
         return $this->escapeValue($value);
-      }, $values)) . ')');
+      }, $field_value_map)) . ')');
 
       return $this->lastInsertId();
     }
@@ -223,6 +223,48 @@
     public function lastInsertId()
     {
       return $this->link->insert_id;
+    }
+
+    /**
+     * Update one or more rows with the given list of values for fields
+     *
+     * $conditions can be a string, or an array where first element is a patter and other elements are arguments
+     *
+     * @param  string                   $table_name
+     * @param  array                    $field_value_map
+     * @param  string|array|null        $conditions
+     * @return int
+     * @throws InvalidArgumentException
+     */
+    public function update($table_name, array $field_value_map, $conditions = null)
+    {
+      if (empty($field_value_map)) {
+        throw new InvalidArgumentException("Values array can't be empty");
+      }
+
+      if ($conditions !== null) {
+        if (is_array($conditions)) {
+          switch (count($conditions)) {
+            case 0:
+                throw new InvalidArgumentException("Conditions can't be an empty array");
+            case 1:
+                $conditions = ' WHERE ' . array_shift($conditions);
+                break;
+            default:
+                $conditions = ' WHERE ' . call_user_func_array([ &$this, 'prepare' ], $conditions);
+          }
+        } elseif (is_string($conditions)) {
+          $conditions = " WHERE $conditions";
+        } else {
+          throw new InvalidArgumentException('Invalid conditions argument value');
+        }
+      }
+
+      $this->execute('UPDATE ' . $this->escapeTableName($table_name) . ' SET ' . implode(',', array_map(function($field_name, $value) {
+        return $this->escapeFieldName($field_name) . ' = ' . $this->escapeValue($value);
+      }, array_keys($field_value_map), $field_value_map)) . $conditions);
+
+      return $this->affectedRows();
     }
 
     /**
