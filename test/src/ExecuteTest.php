@@ -175,15 +175,6 @@
     }
 
     /**
-     * Test if last insert ID returns correct value
-     */
-    public function testInsertId()
-    {
-      $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?)', 'Anton Chekhov', new DateTime('1860-01-29'));
-      $this->assertEquals(4, $this->connection->lastInsertId());
-    }
-
-    /**
      * Test if affected rows returns the correct value
      */
     public function testAffectedRows()

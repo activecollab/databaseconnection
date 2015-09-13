@@ -44,6 +44,12 @@
     const RETURN_OBJECT_BY_FIELD = 2;
 
     /**
+     * Insert mode, used by insert() method
+     */
+    const INSERT = 'INSERT';
+    const REPLACE = 'REPLACE';
+
+    /**
      * @var mysqli
      */
     private $link;
@@ -180,13 +186,33 @@
     }
 
     /**
-     * Return number of affected rows
+     * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set)
      *
-     * @return integer
+     * @param  string                   $table
+     * @param  array                    $values
+     * @param  string                   $mode
+     * @return int
+     * @throws InvalidArgumentException
      */
-    public function affectedRows()
+    public function insert($table, array $values, $mode = self::INSERT)
     {
-      return $this->link->affected_rows;
+      if (empty($values)) {
+        throw new InvalidArgumentException("Values array can't be empty");
+      }
+
+      $mode = strtoupper($mode);
+
+      if ($mode != self::INSERT && $mode != self::REPLACE) {
+        throw new InvalidArgumentException("Mode '$mode' is not a valid insert mode");
+      }
+
+      $this->execute("$mode INTO " . $this->escapeTableName($table) . ' (' . implode(',', array_map(function($field_name) {
+        return $this->escapeFieldName($field_name);
+      }, array_keys($values))) . ') VALUES (' . implode(',', array_map(function($value) {
+        return $this->escapeValue($value);
+      }, $values)) . ')');
+
+      return $this->lastInsertId();
     }
 
     /**
@@ -197,6 +223,16 @@
     public function lastInsertId()
     {
       return $this->link->insert_id;
+    }
+
+    /**
+     * Return number of affected rows
+     *
+     * @return integer
+     */
+    public function affectedRows()
+    {
+      return $this->link->affected_rows;
     }
 
     /**
