@@ -230,9 +230,9 @@ class Connection
      *
      * $conditions can be a string, or an array where first element is a patter and other elements are arguments
      *
-     * @param  string            $table_name
-     * @param  array             $field_value_map
-     * @param  string|array|null $conditions
+     * @param  string                   $table_name
+     * @param  array                    $field_value_map
+     * @param  string|array|null        $conditions
      * @return int
      * @throws InvalidArgumentException
      */
@@ -242,27 +242,34 @@ class Connection
             throw new InvalidArgumentException("Values array can't be empty");
         }
 
-        if ($conditions !== null) {
-            if (is_array($conditions)) {
-                switch (count($conditions)) {
-                    case 0:
-                        throw new InvalidArgumentException("Conditions can't be an empty array");
-                    case 1:
-                        $conditions = ' WHERE ' . array_shift($conditions);
-                        break;
-                    default:
-                        $conditions = ' WHERE ' . call_user_func_array([&$this, 'prepare'], $conditions);
-                }
-            } elseif (is_string($conditions)) {
-                $conditions = " WHERE $conditions";
-            } else {
-                throw new InvalidArgumentException('Invalid conditions argument value');
-            }
+        if ($conditions = $this->prepareConditions($conditions)) {
+            $conditions = " WHERE $conditions";
         }
 
         $this->execute('UPDATE ' . $this->escapeTableName($table_name) . ' SET ' . implode(',', array_map(function ($field_name, $value) {
             return $this->escapeFieldName($field_name) . ' = ' . $this->escapeValue($value);
         }, array_keys($field_value_map), $field_value_map)) . $conditions);
+
+        return $this->affectedRows();
+    }
+
+    /**
+     * Delete one or more records from the table
+     *
+     * $conditions can be a string, or an array where first element is a patter and other elements are arguments
+     *
+     * @param  string            $table_name
+     * @param  string|array|null $conditions
+     * @return int
+     * @throws InvalidArgumentException
+     */
+    public function delete($table_name, $conditions = null)
+    {
+        if ($conditions = $this->prepareConditions($conditions)) {
+            $conditions = " WHERE $conditions";
+        }
+
+        $this->execute('DELETE FROM ' . $this->escapeTableName($table_name) . $conditions);
 
         return $this->affectedRows();
     }
@@ -275,6 +282,24 @@ class Connection
     public function affectedRows()
     {
         return $this->link->affected_rows;
+    }
+
+    private function prepareConditions($conditions)
+    {
+        if ($conditions === null || is_string($conditions)) {
+            return $conditions;
+        } elseif (is_array($conditions)) {
+            switch (count($conditions)) {
+                case 0:
+                    throw new InvalidArgumentException("Conditions can't be an empty array");
+                case 1:
+                    return array_shift($conditions);
+                default:
+                    return  call_user_func_array([&$this, 'prepare'], $conditions);
+            }
+        } else {
+            throw new InvalidArgumentException('Invalid conditions argument value');
+        }
     }
 
     /**
