@@ -57,7 +57,7 @@ class Connection
     /**
      * @param mysqli $link
      */
-    public function __construct(mysqli &$link)
+    public function __construct(mysqli $link)
     {
         $this->link = $link;
     }
