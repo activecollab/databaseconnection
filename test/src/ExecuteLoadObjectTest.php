@@ -102,26 +102,26 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function testExecuteLoadObjectWithConstructorArguments()
     {
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, Writer::class);
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer');
 
-        $this->assertInstanceOf(Result::class, $result);
+        $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
 
         /** @var Writer $writer */
         foreach ($result as $writer) {
-            $this->assertInstanceOf(Writer::class, $writer);
+            $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writer);
             $this->assertNull($writer->constructor_argument_1);
             $this->assertNull($writer->constructor_argument_2);
         }
 
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, Writer::class, [12,34]);
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer', [12,34]);
 
-        $this->assertInstanceOf(Result::class, $result);
+        $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
 
         /** @var Writer $writer */
         foreach ($result as $writer) {
-            $this->assertInstanceOf(Writer::class, $writer);
+            $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Test\Fixture\Writer', $writer);
             $this->assertSame(12, $writer->constructor_argument_1);
             $this->assertSame(34, $writer->constructor_argument_2);
         }
@@ -154,7 +154,7 @@ class ExecuteLoadObjectTest extends TestCase
 
         $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_FIELD, 'type');
 
-        $this->assertInstanceOf('ActiveCollab\DatabaseConnection\Result\Result', $result);
+        $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
 
         /** @var \ActiveCollab\DatabaseConnection\Test\Fixture\Writer[] $writers */
