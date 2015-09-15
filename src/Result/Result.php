@@ -406,7 +406,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
         if (empty($this->constructor_arguments)) {
             $this->current_row = new $class_name();
         } else {
-            $this->current_row = new $class_name(...$this->constructor_arguments);
+            $this->current_row = (new ReflectionClass($class_name))->newInstanceArgs($this->constructor_arguments);
         }
 
         $this->current_row->loadFromRow($row);
