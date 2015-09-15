@@ -122,16 +122,23 @@ class Connection
     /**
      * Prepare and execute query, while letting the developer change the load and return modes
      *
-     * @param  string $sql
-     * @param  mixed  $arguments
-     * @param  int    $load_mode
-     * @param  int    $return_mode
-     * @param  string $return_class_or_field
+     * @param  string     $sql
+     * @param  mixed      $arguments
+     * @param  int        $load_mode
+     * @param  int        $return_mode
+     * @param  string     $return_class_or_field
+     * @param  array|null $constructor_arguments
      * @return mixed
      * @throws Query
      */
-    public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null)
+    public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
     {
+        if ($return_mode == self::RETURN_OBJECT_BY_CLASS && empty($return_class_or_field)) {
+            throw new InvalidArgumentException('Class is required');
+        } elseif ($return_mode == self::RETURN_OBJECT_BY_FIELD && empty($return_class_or_field)) {
+            throw new InvalidArgumentException('Field name is required');
+        }
+
         $query_result = $this->prepareAndExecuteQuery($sql, $arguments);
 
         if ($query_result === false) {
@@ -169,7 +176,7 @@ class Connection
 
                         break;
                     default:
-                        return new Result($query_result, $return_mode, $return_class_or_field); // Don't close result, we need it
+                        return new Result($query_result, $return_mode, $return_class_or_field, $constructor_arguments); // Don't close result, we need it
                 }
             } else {
                 $result = null;

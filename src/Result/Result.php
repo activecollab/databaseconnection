@@ -24,28 +24,28 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      *
      * @var int
      */
-    protected $cursor_position = 0;
+    private $cursor_position = 0;
 
     /**
      * Current row, set by.
      *
      * @var int|LoadFromRow
      */
-    protected $current_row;
+    private $current_row;
 
     /**
      * Database result resource.
      *
-     * @var resource
+     * @var mysqli_result
      */
-    protected $resource;
+    private $resource;
 
     /**
      * Return mode.
      *
      * @var int
      */
-    protected $return_mode;
+    private $return_mode;
 
     /**
      * Name of the class or field for return, if this result is returning
@@ -53,7 +53,14 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      *
      * @var string
      */
-    protected $return_class_or_field;
+    private $return_class_or_field;
+
+    /**
+     * Constructor arguments (when objects are constructed from rows)
+     *
+     * @var array|null
+     */
+    private $constructor_arguments;
 
     /**
      * @var ValueCaster
@@ -63,13 +70,13 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     /**
      * Construct a new result object from resource.
      *
-     * @param mixed  $resource
-     * @param int    $return_mode
-     * @param string $return_class_or_field
-     *
+     * @param  mysqli_result            $resource
+     * @param  int                      $return_mode
+     * @param  string                   $return_class_or_field
+     * @param  array|null               $constructor_arguments
      * @throws InvalidArgumentException
      */
-    public function __construct($resource, $return_mode = Connection::RETURN_ARRAY, $return_class_or_field = null)
+    public function __construct($resource, $return_mode = Connection::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
     {
         if (!$this->isValidResource($resource)) {
             throw new InvalidArgumentException('mysqli_result expected');
@@ -84,6 +91,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
         $this->resource = $resource;
         $this->return_mode = $return_mode;
         $this->return_class_or_field = $return_class_or_field;
+        $this->constructor_arguments = $constructor_arguments;
     }
 
     /**
@@ -107,9 +115,8 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     /**
      * Set cursor to a given position in the record set.
      *
-     * @param int $num
-     *
-     * @return bool
+     * @param  integer $num
+     * @return boolean
      */
     public function seek($num)
     {
@@ -174,7 +181,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      *
      * @param int $row_num
      *
-     * @return mixed
+     * @return array|LoadFromRow
      */
     public function getRowAt($row_num)
     {
@@ -182,6 +189,8 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
             $this->next();
 
             return $this->getCurrentRow();
+        } else {
+            return null;
         }
     }
 
@@ -394,7 +403,12 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
             ? $this->return_class_or_field
             : $row[$this->return_class_or_field];
 
-        $this->current_row = new $class_name();
+        if (empty($this->constructor_arguments)) {
+            $this->current_row = new $class_name();
+        } else {
+            $this->current_row = new $class_name(...$this->constructor_arguments);
+        }
+
         $this->current_row->loadFromRow($row);
     }
 

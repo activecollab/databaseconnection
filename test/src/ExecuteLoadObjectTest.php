@@ -3,6 +3,8 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseConnection\Test\Fixture\Writer;
 use DateTime;
 
 class ExecuteLoadObjectTest extends TestCase
@@ -45,6 +47,22 @@ class ExecuteLoadObjectTest extends TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionWhenLoadingByObjectClassAndClassNameIsEmpty()
+    {
+        $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionWhenLoadingByFieldAndFieldNameIsEmpty()
+    {
+        $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_FIELD);
+    }
+
+    /**
      * Test if objects are properly create by known class name.
      */
     public function testExecuteLoadObjectFromClassName()
@@ -77,6 +95,36 @@ class ExecuteLoadObjectTest extends TestCase
         $this->assertEquals(3, $writers[2]->getId());
         $this->assertEquals('Fyodor Dostoyevsky', $writers[2]->getName());
         $this->assertEquals('1821-11-11', $writers[2]->getBirthday()->format('Y-m-d'));
+    }
+
+    /**
+     * Test if constructor arguments are properly set to instances when provided
+     */
+    public function testExecuteLoadObjectWithConstructorArguments()
+    {
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, Writer::class);
+
+        $this->assertInstanceOf(Result::class, $result);
+        $this->assertCount(3, $result);
+
+        /** @var Writer $writer */
+        foreach ($result as $writer) {
+            $this->assertInstanceOf(Writer::class, $writer);
+            $this->assertNull($writer->constructor_argument_1);
+            $this->assertNull($writer->constructor_argument_2);
+        }
+
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, Writer::class, [12,34]);
+
+        $this->assertInstanceOf(Result::class, $result);
+        $this->assertCount(3, $result);
+
+        /** @var Writer $writer */
+        foreach ($result as $writer) {
+            $this->assertInstanceOf(Writer::class, $writer);
+            $this->assertSame(12, $writer->constructor_argument_1);
+            $this->assertSame(34, $writer->constructor_argument_2);
+        }
     }
 
     /**
