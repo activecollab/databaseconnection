@@ -284,24 +284,6 @@ class Connection
         return $this->link->affected_rows;
     }
 
-    private function prepareConditions($conditions)
-    {
-        if ($conditions === null || is_string($conditions)) {
-            return $conditions;
-        } elseif (is_array($conditions)) {
-            switch (count($conditions)) {
-                case 0:
-                    throw new InvalidArgumentException("Conditions can't be an empty array");
-                case 1:
-                    return array_shift($conditions);
-                default:
-                    return  call_user_func_array([&$this, 'prepare'], $conditions);
-            }
-        } else {
-            throw new InvalidArgumentException('Invalid conditions argument value');
-        }
-    }
-
     /**
      * Run body commands within a transation
      *
@@ -449,6 +431,30 @@ class Connection
 
                 return $sql;
             }
+        }
+    }
+
+    /**
+     * Prepare conditions and return them as string
+     *
+     * @param  array|string|null $conditions
+     * @return string
+     */
+    public function prepareConditions($conditions)
+    {
+        if ($conditions === null || is_string($conditions)) {
+            return $conditions;
+        } elseif (is_array($conditions)) {
+            switch (count($conditions)) {
+                case 0:
+                    throw new InvalidArgumentException("Conditions can't be an empty array");
+                case 1:
+                    return array_shift($conditions);
+                default:
+                    return  call_user_func_array([&$this, 'prepare'], $conditions);
+            }
+        } else {
+            throw new InvalidArgumentException('Invalid conditions argument value');
         }
     }
 
