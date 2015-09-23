@@ -377,6 +377,43 @@ class Connection
     }
 
     /**
+     * Return true if table named $table_name exists in the selected database
+     *
+     * @param  string $table_name
+     * @return bool
+     */
+    public function tableExists($table_name)
+    {
+        return in_array($table_name, $this->getTableNames());
+    }
+
+    /**
+     * Return array of table names
+     *
+     * @return array
+     */
+    public function getTableNames()
+    {
+        $tables = $this->executeFirstColumn('SHOW TABLES');
+
+        if (empty($tables)) {
+            $tables = [];
+        }
+
+        return $tables;
+    }
+
+    /**
+     * Drop a table named $table_name from selected database
+     *
+     * @param string $table_name
+     */
+    public function dropTable($table_name)
+    {
+        $this->execute('DROP TABLE ' . $this->escapeTableName($table_name));
+    }
+
+    /**
      * Prepare (if needed) and execute SQL query
      *
      * @param  string     $sql
