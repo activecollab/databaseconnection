@@ -16,39 +16,8 @@ use Exception;
 /**
  * @package ActiveCollab\DatabaseConnection
  */
-class Connection
+class Connection implements ConnectionInterface
 {
-    /**
-     * Load mode
-     *
-     * LOAD_ALL_ROWS - Load all rows
-     * LOAD_FIRST_ROW - Limit result set to first row and load it
-     * LOAD_FIRST_COLUMN - Return content of first column
-     * LOAD_FIRST_CELL - Load only first cell of first row
-     */
-    const LOAD_ALL_ROWS = 0;
-    const LOAD_FIRST_ROW = 1;
-    const LOAD_FIRST_COLUMN = 2;
-    const LOAD_FIRST_CELL = 3;
-
-    /**
-     * Return method for DB results
-     *
-     * RETURN_ARRAY - Return fields as associative array
-     * RETURN_OBJECT_BY_CLASS - Create new object instance and hydrate it
-     * RETURN_OBJECT_BY_FIELD - Read class from record field, create instance
-     *   and hydrate it
-     */
-    const RETURN_ARRAY = 0;
-    const RETURN_OBJECT_BY_CLASS = 1;
-    const RETURN_OBJECT_BY_FIELD = 2;
-
-    /**
-     * Insert mode, used by insert() method
-     */
-    const INSERT = 'INSERT';
-    const REPLACE = 'REPLACE';
-
     /**
      * @var mysqli
      */
@@ -69,7 +38,7 @@ class Connection
      */
     public function execute()
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_ALL_ROWS);
+        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_ALL_ROWS);
     }
 
     /**
@@ -79,7 +48,7 @@ class Connection
      */
     public function executeFirstRow()
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_FIRST_ROW);
+        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_FIRST_ROW);
     }
 
     /**
@@ -89,7 +58,7 @@ class Connection
      */
     public function executeFirstColumn()
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_FIRST_COLUMN);
+        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_FIRST_COLUMN);
     }
 
     /**
@@ -99,7 +68,7 @@ class Connection
      */
     public function executeFirstCell()
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), self::LOAD_FIRST_CELL);
+        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_FIRST_CELL);
     }
 
     /**
@@ -131,11 +100,11 @@ class Connection
      * @return mixed
      * @throws Query
      */
-    public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
+    public function advancedExecute($sql, $arguments = null, $load_mode = ConnectionInterface::LOAD_ALL_ROWS, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
     {
-        if ($return_mode == self::RETURN_OBJECT_BY_CLASS && empty($return_class_or_field)) {
+        if ($return_mode == ConnectionInterface::RETURN_OBJECT_BY_CLASS && empty($return_class_or_field)) {
             throw new InvalidArgumentException('Class is required');
-        } elseif ($return_mode == self::RETURN_OBJECT_BY_FIELD && empty($return_class_or_field)) {
+        } elseif ($return_mode == ConnectionInterface::RETURN_OBJECT_BY_FIELD && empty($return_class_or_field)) {
             throw new InvalidArgumentException('Field name is required');
         }
 
@@ -148,13 +117,13 @@ class Connection
         if ($query_result instanceof mysqli_result) {
             if ($query_result->num_rows > 0) {
                 switch ($load_mode) {
-                    case self::LOAD_FIRST_ROW:
+                    case ConnectionInterface::LOAD_FIRST_ROW:
                         $result = $query_result->fetch_assoc();
                         $this->getDefaultCaster()->castRowValues($result);
 
                         break;
 
-                    case self::LOAD_FIRST_COLUMN:
+                    case ConnectionInterface::LOAD_FIRST_COLUMN:
                         $result = [];
 
                         while ($row = $query_result->fetch_assoc()) {
@@ -166,7 +135,7 @@ class Connection
 
                         break;
 
-                    case self::LOAD_FIRST_CELL:
+                    case ConnectionInterface::LOAD_FIRST_CELL:
                         $result = null;
 
                         foreach ($query_result->fetch_assoc() as $k => $v) {
@@ -201,7 +170,7 @@ class Connection
      * @return int
      * @throws InvalidArgumentException
      */
-    public function insert($table, array $field_value_map, $mode = self::INSERT)
+    public function insert($table, array $field_value_map, $mode = ConnectionInterface::INSERT)
     {
         if (empty($field_value_map)) {
             throw new InvalidArgumentException("Values array can't be empty");
@@ -209,7 +178,7 @@ class Connection
 
         $mode = strtoupper($mode);
 
-        if ($mode != self::INSERT && $mode != self::REPLACE) {
+        if ($mode != ConnectionInterface::INSERT && $mode != ConnectionInterface::REPLACE) {
             throw new InvalidArgumentException("Mode '$mode' is not a valid insert mode");
         }
 

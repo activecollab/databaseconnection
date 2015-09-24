@@ -2,7 +2,7 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use DateTime;
 
 /**
@@ -88,7 +88,7 @@ class InsertTest extends TestCase
             'id' => 1,
             'name' => 'Anton Chekhov',
             'birthday' => new DateTime('1860-01-29'),
-        ], Connection::REPLACE);
+        ], ConnectionInterface::REPLACE);
 
         $this->assertEquals(1, $last_insert_id);
         $this->assertEquals(3, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers`'));

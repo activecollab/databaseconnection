@@ -113,7 +113,7 @@ if ($database_link->connect_error) {
 
 $connection = new Connection($database_link);
 
-foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer') as $writer) {
+foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer') as $writer) {
   print '#' . $writer->getId() . ' ' . $writer->getName() . ' (' . $writer->getBirthday()->format('Y-m-d') . ')';
 }
 ```
@@ -136,7 +136,7 @@ if ($database_link->connect_error) {
 
 $connection = new Connection($database_link);
 
-foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_FIELD, 'type') as $writer) {
+foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_FIELD, 'type') as $writer) {
   print '#' . $writer->getId() . ' ' . $writer->getName() . ' (' . $writer->getBirthday()->format('Y-m-d') . ')';
 }
 ```

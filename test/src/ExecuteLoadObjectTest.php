@@ -3,7 +3,7 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Writer;
 use DateTime;
 
@@ -51,7 +51,7 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function testExceptionWhenLoadingByObjectClassAndClassNameIsEmpty()
     {
-        $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS);
+        $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS);
     }
 
     /**
@@ -59,7 +59,7 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function testExceptionWhenLoadingByFieldAndFieldNameIsEmpty()
     {
-        $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_FIELD);
+        $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_FIELD);
     }
 
     /**
@@ -67,7 +67,7 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function testExecuteLoadObjectFromClassName()
     {
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer');
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer');
 
         $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
@@ -102,7 +102,7 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function testExecuteLoadObjectWithConstructorArguments()
     {
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer');
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer');
 
         $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
@@ -114,7 +114,7 @@ class ExecuteLoadObjectTest extends TestCase
             $this->assertNull($writer->constructor_argument_2);
         }
 
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer', [12,34]);
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer', [12,34]);
 
         $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);
@@ -152,7 +152,7 @@ class ExecuteLoadObjectTest extends TestCase
         //  Use type field to know which objects to create
         // ---------------------------------------------------
 
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_FIELD, 'type');
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_FIELD, 'type');
 
         $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);

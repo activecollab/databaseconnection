@@ -2,7 +2,7 @@
 
 namespace ActiveCollab\DatabaseConnection\Result;
 
-use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ArrayAccess;
@@ -76,13 +76,13 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      * @param  array|null               $constructor_arguments
      * @throws InvalidArgumentException
      */
-    public function __construct($resource, $return_mode = Connection::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
+    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
     {
         if (!$this->isValidResource($resource)) {
             throw new InvalidArgumentException('mysqli_result expected');
         }
 
-        if ($return_mode === Connection::RETURN_OBJECT_BY_CLASS) {
+        if ($return_mode === ConnectionInterface::RETURN_OBJECT_BY_CLASS) {
             if (!(new ReflectionClass($return_class_or_field))->implementsInterface('\ActiveCollab\DatabaseConnection\Record\LoadFromRow')) {
                 throw new InvalidArgumentException("Class '$return_class_or_field' needs to implement LoadFromRow interface");
             }
@@ -230,7 +230,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
         $result = [];
 
         foreach ($this as $row) {
-            if ($this->return_mode === Connection::RETURN_ARRAY) {
+            if ($this->return_mode === ConnectionInterface::RETURN_ARRAY) {
                 $result[$row[$field_or_getter]] = $row;
             } else {
                 $result[$row->$field_or_getter()] = $row;
@@ -356,7 +356,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      */
     public function returnObjectsByClass($class_name)
     {
-        $this->return_mode = Connection::RETURN_OBJECT_BY_CLASS;
+        $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
 
         $this->return_class_or_field = $class_name;
     }
@@ -368,7 +368,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      */
     public function returnObjectsByField($field_name)
     {
-        $this->return_mode = Connection::RETURN_OBJECT_BY_FIELD;
+        $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
 
         $this->return_class_or_field = $field_name;
     }
@@ -392,14 +392,14 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
      */
     protected function setCurrentRow($row)
     {
-        if (!in_array($this->return_mode, [Connection::RETURN_OBJECT_BY_CLASS, Connection::RETURN_OBJECT_BY_FIELD], true)) {
+        if (!in_array($this->return_mode, [ConnectionInterface::RETURN_OBJECT_BY_CLASS, ConnectionInterface::RETURN_OBJECT_BY_FIELD], true)) {
             $this->current_row = $row;
             $this->getValueCaster()->castRowValues($this->current_row);
 
             return;
         }
 
-        $class_name = $this->return_mode === Connection::RETURN_OBJECT_BY_CLASS
+        $class_name = $this->return_mode === ConnectionInterface::RETURN_OBJECT_BY_CLASS
             ? $this->return_class_or_field
             : $row[$this->return_class_or_field];
 
