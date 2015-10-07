@@ -154,8 +154,10 @@ $batch_insert->insert('Alexander Pushkin', new DateTime('1799-06-06')); // No in
 $batch_insert->insert('Fyodor Dostoyevsky', new DateTime('1821-11-11')); // Insert
 $batch_insert->insert('Anton Chekhov', new DateTime('1860-01-29')); // No insert
 
-$batch_insert->done(); // Flush remaining rows and close the batch insert
+$batch_insert->done(); // Insert remaining rows and close the batch insert
 ```
+
+Note: Calling `insert`, `insertEscaped`, `flush` or `done` methods once batch is done will throw `RuntimeException`.
 
 Batch insert can also be used to replace records (uses `REPLACE INTO` instead of INSERT INTO queries):
 
