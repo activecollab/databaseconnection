@@ -47,30 +47,38 @@ interface ConnectionInterface
     /**
      * Execute a query and return a result
      *
+     * @param  string           $sql
+     * @param  mixed            ...$arguments
      * @return Result|true|null
      */
-    public function execute();
+    public function execute($sql, ...$arguments);
 
     /**
      * Return first row that provided SQL query returns
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return array
      */
-    public function executeFirstRow();
+    public function executeFirstRow($sql, ...$arguments);
 
     /**
      * Return value from the first cell of each column that provided SQL query returns
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return array
      */
-    public function executeFirstColumn();
+    public function executeFirstColumn($sql, ...$arguments);
 
     /**
      * Return value from the first cell of the first row that provided SQL query returns
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return mixed
      */
-    public function executeFirstCell();
+    public function executeFirstCell($sql, ...$arguments);
 
     /**
      * Prepare and execute query, while letting the developer change the load and return modes

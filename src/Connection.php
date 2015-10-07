@@ -8,10 +8,9 @@ use ActiveCollab\DatabaseConnection\Result\Result;
 use mysqli;
 use mysqli_result;
 use DateTime;
-use InvalidArgumentException;
-use BadMethodCallException;
 use Closure;
 use Exception;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseConnection
@@ -34,58 +33,49 @@ class Connection implements ConnectionInterface
     /**
      * Execute a query and return a result
      *
+     * @param  string           $sql
+     * @param  mixed            ...$arguments
      * @return Result|true|null
      */
-    public function execute()
+    public function execute($sql, ...$arguments)
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_ALL_ROWS);
+        return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS);
     }
 
     /**
      * Return first row that provided SQL query returns
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return array
      */
-    public function executeFirstRow()
+    public function executeFirstRow($sql, ...$arguments)
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_FIRST_ROW);
+        return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_FIRST_ROW);
     }
 
     /**
      * Return value from the first cell of each column that provided SQL query returns
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return array
      */
-    public function executeFirstColumn()
+    public function executeFirstColumn($sql, ...$arguments)
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_FIRST_COLUMN);
+        return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_FIRST_COLUMN);
     }
 
     /**
      * Return value from the first cell of the first row that provided SQL query returns
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return mixed
      */
-    public function executeFirstCell()
+    public function executeFirstCell($sql, ...$arguments)
     {
-        return $this->executeBasedOnFunctionArguments(func_get_args(), ConnectionInterface::LOAD_FIRST_CELL);
-    }
-
-    /**
-     * Use arguments to prepare and execute a query, and return it in expected form
-     *
-     * @param  array  $arguments
-     * @param  string $load_mode
-     * @return mixed
-     * @throws Query
-     */
-    private function executeBasedOnFunctionArguments($arguments, $load_mode)
-    {
-        if (empty($arguments)) {
-            throw new BadMethodCallException('SQL query with optional list of arguments was expected');
-        } else {
-            return $this->advancedExecute(array_shift($arguments), $arguments, $load_mode);
-        }
+        return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_FIRST_CELL);
     }
 
     /**
