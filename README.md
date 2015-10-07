@@ -145,7 +145,7 @@ foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `i
 
 Batch insert utility helps you prepare and insert a lot of rows of the same type. Example:
 
-```
+```php
 // Insert 3 rows per INSERT query in `writers` table
 $batch_insert = $this->connection->batchInsert('writers', ['name', 'birthday'], 3);
 
@@ -159,7 +159,7 @@ $batch_insert->done(); // Flush remaining rows and close the batch insert
 
 Batch insert can also be used to replace records (uses `REPLACE INTO` instead of INSERT INTO queries):
 
-```
+```php
 $batch_replace = $this->connection->batchInsert('writers', ['name', 'birthday'], 3, ConnectionInterface::REPLACE);
 ```
 
