@@ -141,6 +141,27 @@ foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `i
 }
 ```
 
+## Batch Inserts
+
+Batch insert utility helps you prepare and insert a lot of rows of the same type. Example:
+
+```
+// Insert 3 rows per INSERT query in `writers` table
+$batch_insert = $this->connection->batchInsert('writers', ['name', 'birthday'], 3);
+
+$batch_insert->insert('Leo Tolstoy', new DateTime('1828-09-09')); // No insert
+$batch_insert->insert('Alexander Pushkin', new DateTime('1799-06-06')); // No insert
+$batch_insert->insert('Fyodor Dostoyevsky', new DateTime('1821-11-11')); // Insert
+$batch_insert->insert('Anton Chekhov', new DateTime('1860-01-29')); // No insert
+
+$batch_insert->done(); // Flush remaining rows and close the batch insert
+```
+
+Batch insert can also be used to replace records (uses `REPLACE INTO` instead of INSERT INTO queries):
+
+```
+$batch_replace = $this->connection->batchInsert('writers', ['name', 'birthday'], 3, ConnectionInterface::REPLACE);
+```
 
 ## Casting
 
