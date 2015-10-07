@@ -4,6 +4,7 @@ namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\Exception\Query;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use InvalidArgumentException;
 use Closure;
 use Exception;
@@ -106,6 +107,17 @@ interface ConnectionInterface
     public function insert($table, array $field_value_map, $mode = self::INSERT);
 
     /**
+     * Prepare a batch insert utility instance
+     *
+     * @param  string               $table_name
+     * @param  array                $fields
+     * @param  int                  $rows_per_batch
+     * @param  string               $mode
+     * @return BatchInsertInterface
+     */
+    public function batchInsert($table_name, array $fields, $rows_per_batch = 50, $mode = self::INSERT);
+
+    /**
      * Return last insert ID
      *
      * @return integer
@@ -201,9 +213,11 @@ interface ConnectionInterface
     /**
      * Prepare SQL (replace ? with data from $arguments array)
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return string
      */
-    public function prepare();
+    public function prepare($sql, ...$arguments);
 
     /**
      * Prepare conditions and return them as string

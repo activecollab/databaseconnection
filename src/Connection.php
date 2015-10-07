@@ -7,6 +7,8 @@ use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
+use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use mysqli;
 use mysqli_result;
 use DateTime;
@@ -181,6 +183,20 @@ class Connection implements ConnectionInterface
         }, $field_value_map)) . ')');
 
         return $this->lastInsertId();
+    }
+
+    /**
+     * Prepare a batch insert utility instance
+     *
+     * @param  string               $table_name
+     * @param  array                $fields
+     * @param  int                  $rows_per_batch
+     * @param  string               $mode
+     * @return BatchInsertInterface
+     */
+    public function batchInsert($table_name, array $fields, $rows_per_batch = 50, $mode = self::INSERT)
+    {
+        return new BatchInsert($this, $table_name, $fields, $rows_per_batch, $mode);
     }
 
     /**
@@ -405,37 +421,31 @@ class Connection implements ConnectionInterface
     /**
      * Prepare SQL (replace ? with data from $arguments array)
      *
+     * @param  string $sql
+     * @param  mixed  ...$arguments
      * @return string
      */
-    public function prepare()
+    public function prepare($sql, ...$arguments)
     {
-        $arguments = func_get_args();
-
         if (empty($arguments)) {
-            throw new InvalidArgumentException('Pattern expected');
+            return $sql;
         } else {
-            if (count($arguments) == 1) {
-                return $arguments[0];
-            } else {
-                $sql = array_shift($arguments);
+            $offset = 0;
 
-                $offset = 0;
+            foreach ($arguments as $argument) {
+                $question_mark_pos = mb_strpos($sql, '?', $offset);
 
-                foreach ($arguments as $argument) {
-                    $question_mark_pos = mb_strpos($sql, '?', $offset);
+                if ($question_mark_pos !== false) {
+                    $escaped = $this->escapeValue($argument);
+                    $escaped_len = mb_strlen($escaped);
 
-                    if ($question_mark_pos !== false) {
-                        $escaped = $this->escapeValue($argument);
-                        $escaped_len = mb_strlen($escaped);
+                    $sql = mb_substr($sql, 0, $question_mark_pos) . $escaped . mb_substr($sql, $question_mark_pos + 1, mb_strlen($sql));
 
-                        $sql = mb_substr($sql, 0, $question_mark_pos) . $escaped . mb_substr($sql, $question_mark_pos + 1, mb_strlen($sql));
-
-                        $offset = $question_mark_pos + $escaped_len;
-                    }
+                    $offset = $question_mark_pos + $escaped_len;
                 }
-
-                return $sql;
             }
+
+            return $sql;
         }
     }
 

@@ -22,14 +22,6 @@ class PrepareTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testExceptionOnPrepareWithNoArguments()
-    {
-        $this->connection->prepare();
-    }
-
-    /**
      * Test that prepare work when there are no arguments.
      */
     public function testPrepareOnlyPattern()
