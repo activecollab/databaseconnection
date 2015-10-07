@@ -4,7 +4,9 @@ namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\Exception\Query;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use mysqli;
 use mysqli_result;
 use DateTime;
@@ -33,9 +35,9 @@ class Connection implements ConnectionInterface
     /**
      * Execute a query and return a result
      *
-     * @param  string           $sql
-     * @param  mixed            ...$arguments
-     * @return Result|true|null
+     * @param  string                    $sql
+     * @param  mixed                     ...$arguments
+     * @return ResultInterface|true|null
      */
     public function execute($sql, ...$arguments)
     {
@@ -524,7 +526,7 @@ class Connection implements ConnectionInterface
 
                     // Escape first cell of each row
                     } else {
-                        if ($unescaped instanceof Result) {
+                        if ($unescaped instanceof ResultInterface) {
                             if ($unescaped->count() < 1) {
                                 throw new InvalidArgumentException("Empty results can't be escaped");
                             }
@@ -590,12 +592,12 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * @var ValueCaster
+     * @var ValueCasterInterface
      */
     private $default_caster;
 
     /**
-     * @return ValueCaster
+     * @return ValueCasterInterface
      */
     private function &getDefaultCaster()
     {

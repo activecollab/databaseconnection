@@ -12,16 +12,16 @@ class ResultIterator implements Iterator
     /**
      * Result set that is iterated.
      *
-     * @var Result
+     * @var ResultInterface
      */
     private $result;
 
     /**
      * Construct the iterator.
      *
-     * @param Result $result
+     * @param ResultInterface $result
      */
-    public function __construct(Result $result)
+    public function __construct(ResultInterface $result)
     {
         $this->result = $result;
     }

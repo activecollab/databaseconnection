@@ -5,11 +5,9 @@ namespace ActiveCollab\DatabaseConnection\Result;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
-use ArrayAccess;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use BadMethodCallException;
-use Countable;
 use InvalidArgumentException;
-use IteratorAggregate;
 use JsonSerializable;
 use mysqli_result;
 use ReflectionClass;
@@ -17,7 +15,7 @@ use ReflectionClass;
 /**
  * Abstraction of database query result.
  */
-class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializable
+class Result implements ResultInterface
 {
     /**
      * Cursor position.
@@ -63,7 +61,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     private $constructor_arguments;
 
     /**
-     * @var ValueCaster
+     * @var ValueCasterInterface
      */
     private $value_caser;
 
@@ -342,9 +340,9 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     /**
      * Set a custom value caster.
      *
-     * @param ValueCaster $value_caster
+     * @param ValueCasterInterface $value_caster
      */
-    public function setValueCaster(ValueCaster $value_caster)
+    public function setValueCaster(ValueCasterInterface $value_caster)
     {
         $this->value_caser = $value_caster;
     }
@@ -413,7 +411,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     }
 
     /**
-     * @return ValueCaster
+     * @return ValueCasterInterface
      */
     private function getValueCaster()
     {

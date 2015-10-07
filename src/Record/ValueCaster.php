@@ -5,15 +5,11 @@ namespace ActiveCollab\DatabaseConnection\Record;
 use DateTime;
 use DateTimeZone;
 
-class ValueCaster
+/**
+ * @package ActiveCollab\DatabaseConnection\Record
+ */
+class ValueCaster implements ValueCasterInterface
 {
-    const CAST_INT = 'int';
-    const CAST_FLOAT = 'float';
-    const CAST_STRING = 'string';
-    const CAST_BOOL = 'bool';
-    const CAST_DATE = 'date';
-    const CAST_DATETIME = 'datetime';
-
     /**
      * @var array
      */
@@ -52,7 +48,7 @@ class ValueCaster
     public function castValue($field_name, $value)
     {
         if ($value === null) {
-            return; // NULL remains NULL
+            return null; // NULL remains NULL
         }
 
         switch ($this->getTypeByFieldName($field_name)) {

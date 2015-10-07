@@ -3,7 +3,7 @@
 namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\Exception\Query;
-use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use InvalidArgumentException;
 use Closure;
 use Exception;
@@ -47,9 +47,9 @@ interface ConnectionInterface
     /**
      * Execute a query and return a result
      *
-     * @param  string           $sql
-     * @param  mixed            ...$arguments
-     * @return Result|true|null
+     * @param  string                    $sql
+     * @param  mixed                     ...$arguments
+     * @return ResultInterface|true|null
      */
     public function execute($sql, ...$arguments);
 
