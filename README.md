@@ -147,7 +147,7 @@ Batch insert utility helps you prepare and insert a lot of rows of the same type
 
 ```php
 // Insert 3 rows per INSERT query in `writers` table
-$batch_insert = $this->connection->batchInsert('writers', ['name', 'birthday'], 3);
+$batch_insert = $connection->batchInsert('writers', ['name', 'birthday'], 3);
 
 $batch_insert->insert('Leo Tolstoy', new DateTime('1828-09-09')); // No insert
 $batch_insert->insert('Alexander Pushkin', new DateTime('1799-06-06')); // No insert
