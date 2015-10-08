@@ -96,6 +96,18 @@ interface ConnectionInterface
     public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null);
 
     /**
+     * Return number of records from $table_name that match $conditions
+     *
+     * Fields that COUNT() targets can be specified after $conditions. If they are omitted, COUNT(`id`) will be ran
+     *
+     * @param  string            $table_name
+     * @param  array|string|null $conditions
+     * @param  string            $field
+     * @return integer
+     */
+    public function count($table_name, $conditions = null, $field = 'id');
+
+    /**
      * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set)
      *
      * @param  string $table

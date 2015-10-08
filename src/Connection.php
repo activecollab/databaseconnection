@@ -156,6 +156,37 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Return number of records from $table_name that match $conditions
+     *
+     * Fields that COUNT() targets can be specified after $conditions. If they are omitted, COUNT(`id`) will be ran
+     *
+     * @param  string            $table_name
+     * @param  array|string|null $conditions
+     * @param  string            $field
+     * @return integer
+     */
+    public function count($table_name, $conditions = null, $field = 'id')
+    {
+        if (empty($table_name)) {
+            throw new InvalidArgumentException('Table name is required');
+        }
+
+        if (empty($field)) {
+            throw new InvalidArgumentException('Field name is required');
+        }
+
+        if ($conditions) {
+            $where = ' WHERE ' . $this->prepareConditions($conditions);
+        } else {
+            $where = '';
+        }
+
+        $count = $field == '*' ?  'COUNT(*)' :  'COUNT(' . $this->escapeFieldName($field) . ')';
+
+        return $this->executeFirstCell("SELECT $count AS 'row_count' FROM " . $this->escapeTableName($table_name) . $where);
+    }
+
+    /**
      * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set)
      *
      * @param  string $table
