@@ -2,8 +2,10 @@
 
 namespace ActiveCollab\DatabaseConnection\Record;
 
-use DateTime;
-use DateTimeZone;
+use ActiveCollab\DateValue\DateValueInterface;
+use ActiveCollab\DateValue\DateValue;
+use ActiveCollab\DateValue\DateTimeValueInterface;
+use ActiveCollab\DateValue\DateTimeValue;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Record
@@ -40,10 +42,10 @@ class ValueCaster implements ValueCasterInterface
     /**
      * Cast a single value.
      *
-     * @param string $field_name
-     * @param mixed  $value
+     * @param  string $field_name
+     * @param  mixed  $value
      *
-     * @return bool|DateTime|float|int|mixed|null|string
+     * @return mixed
      */
     public function castValue($field_name, $value)
     {
@@ -61,8 +63,9 @@ class ValueCaster implements ValueCasterInterface
             case self::CAST_BOOL:
                 return (bool) $value;
             case self::CAST_DATE:
+                return new DateValue($value, 'UTC');
             case self::CAST_DATETIME:
-                return new DateTime($value, new DateTimeZone('UTC'));
+                return new DateTimeValue($value, 'UTC');
             default:
                 return (string) $value;
         }

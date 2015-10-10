@@ -3,6 +3,8 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DateValue\DateValueInterface;
+use ActiveCollab\DateValue\DateTimeValueInterface;
 
 class ValueCasterTest extends TestCase
 {
@@ -80,7 +82,7 @@ class ValueCasterTest extends TestCase
      */
     public function testRowValuesCasting()
     {
-        $row = ['id' => '456', 'project_leader_id' => '123', 'name' => 'Project name', 'created_at' => '2015-08-12 20:00:15', 'is_important' => '1', 'completed_at' => null, 'budget' => '1200.50'];
+        $row = ['id' => '456', 'project_leader_id' => '123', 'name' => 'Project name', 'created_at' => '2015-08-12 20:00:15', 'updated_on' => '2015-10-10', 'is_important' => '1', 'completed_at' => null, 'budget' => '1200.50'];
 
         (new ValueCaster(['budget' => ValueCaster::CAST_FLOAT]))->castRowValues($row);
 
@@ -93,7 +95,8 @@ class ValueCasterTest extends TestCase
         $this->assertInternalType('string', $row['name']);
         $this->assertEquals('Project name', $row['name']);
 
-        $this->assertInstanceOf('\DateTime', $row['created_at']);
+        $this->assertInstanceOf(DateTimeValueInterface::class, $row['created_at']);
+        $this->assertInstanceOf(DateValueInterface::class, $row['updated_on']);
 
         $this->assertInternalType('boolean', $row['is_important']);
         $this->assertTrue($row['is_important']);

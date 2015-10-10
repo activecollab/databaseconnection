@@ -14,7 +14,7 @@
   ],
   "require" : {
     "php": ">=5.6.0",
-    "activecollab/datevalue" : "dev-master", 
+    "activecollab/datevalue" : "dev-master",
     "ext-mysqli" : "*"
   },
   "require-dev" : {
