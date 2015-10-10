@@ -3,6 +3,8 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DateValue\DateValue;
+use ActiveCollab\DateValue\DateTimeValue;
 use DateTime;
 use DateTimeZone;
 
@@ -64,6 +66,22 @@ class EscapeTest extends TestCase
     {
         $this->assertEquals("'123.456'", $this->connection->escapeValue(123.456));
         $this->assertEquals("'-123.456'", $this->connection->escapeValue(-123.456));
+    }
+
+    /**
+     * Test escape DateValue instance.
+     */
+    public function testEscapeDateValue()
+    {
+        $this->assertEquals("'2015-08-11'", $this->connection->escapeValue(new DateValue('2015-08-11')));
+    }
+
+    /**
+     * Test escape DateTimeValue instance.
+     */
+    public function testEscapeDateTimeValue()
+    {
+        $this->assertEquals("'2015-08-11 23:05:28'", $this->connection->escapeValue(new DateTimeValue('2015-08-11 23:05:28', 'UTC')));
     }
 
     /**

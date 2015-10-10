@@ -9,6 +9,7 @@ use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
+use ActiveCollab\DateValue\DateValue;
 use mysqli;
 use mysqli_result;
 use DateTime;
@@ -546,8 +547,12 @@ class Connection implements ConnectionInterface
      */
     public function escapeValue($unescaped)
     {
-        // Date time value
-        if ($unescaped instanceof DateTime) {
+        // Date value
+        if ($unescaped instanceof DateValue) {
+            return "'" . $this->link->real_escape_string(date('Y-m-d', $unescaped->getTimestamp())) . "'";
+
+        // Date time value (including DateTimeValue)
+        } elseif ($unescaped instanceof DateTime) {
             return "'" . $this->link->real_escape_string(date('Y-m-d H:i:s', $unescaped->getTimestamp())) . "'";
 
         // Float
