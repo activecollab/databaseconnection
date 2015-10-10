@@ -2,9 +2,7 @@
 
 namespace ActiveCollab\DatabaseConnection\Record;
 
-use ActiveCollab\DateValue\DateValueInterface;
 use ActiveCollab\DateValue\DateValue;
-use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateTimeValue;
 
 /**
