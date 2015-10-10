@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "310af9d30cd5f99482ca3b3dfeeb76ff",
+    "hash": "c02d6420efd00d2614e1839c1cea8479",
     "content-hash": "0ca404de5452c86e7bf339d3c75a965c",
     "packages": [
         {
@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/datevalue.git",
-                "reference": "b9b790021ab899bba22c26deaac3550ed74fb8b2"
+                "reference": "ad728d079dd99788d771f47bf0000fbd7ca9c2e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/datevalue/zipball/b9b790021ab899bba22c26deaac3550ed74fb8b2",
-                "reference": "b9b790021ab899bba22c26deaac3550ed74fb8b2",
+                "url": "https://api.github.com/repos/activecollab/datevalue/zipball/ad728d079dd99788d771f47bf0000fbd7ca9c2e7",
+                "reference": "ad728d079dd99788d771f47bf0000fbd7ca9c2e7",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "date",
                 "datetime"
             ],
-            "time": "2015-10-10 12:43:25"
+            "time": "2015-10-10 13:10:03"
         },
         {
             "name": "nesbot/carbon",
