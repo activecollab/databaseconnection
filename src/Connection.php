@@ -549,11 +549,11 @@ class Connection implements ConnectionInterface
     {
         // Date value
         if ($unescaped instanceof DateValue) {
-            return "'" . $this->link->real_escape_string(date('Y-m-d', $unescaped->getTimestamp())) . "'";
+            return "'" . $this->link->real_escape_string($unescaped->format("Y-m-d")) . "'";
 
         // Date time value (including DateTimeValue)
         } elseif ($unescaped instanceof DateTime) {
-            return "'" . $this->link->real_escape_string(date('Y-m-d H:i:s', $unescaped->getTimestamp())) . "'";
+            return "'" . $this->link->real_escape_string($unescaped->format('Y-m-d H:i:s')) . "'";
 
         // Float
         } else {
