@@ -48,6 +48,13 @@ interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, Jso
     public function getCurrentRow();
 
     /**
+     * Return cursor position.
+     *
+     * @return int
+     */
+    public function getCursorPosition();
+
+    /**
      * Returns DBResult indexed by value of a field or by result of specific
      * getter method.
      *
