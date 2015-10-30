@@ -154,7 +154,9 @@ Unless specified differently, following conventions apply:
 ## Tests
 To test a library you need to create manually a database:
 
-```CREATE DATABASE activecollab_database_connection_test DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;```
+```sql
+CREATE DATABASE activecollab_database_connection_test DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+```
 
 Then from a project root execute following command:
 
