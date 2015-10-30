@@ -41,6 +41,21 @@ interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, Jso
     public function getRowAt($row_num);
 
     /**
+     * Set cursor to a given position in the record set.
+     *
+     * @param  integer $num
+     * @return boolean
+     */
+    public function seek($num);
+
+    /**
+     * Return next record in result set.
+     *
+     * @return array
+     */
+    public function next();
+
+    /**
      * Return current row.
      *
      * @return mixed
