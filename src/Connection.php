@@ -10,12 +10,13 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DateValue\DateValue;
-use mysqli;
-use mysqli_result;
-use DateTime;
 use Closure;
+use DateTime;
 use Exception;
 use InvalidArgumentException;
+use mysqli;
+use mysqli_result;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseConnection
@@ -28,11 +29,18 @@ class Connection implements ConnectionInterface
     private $link;
 
     /**
-     * @param mysqli $link
+     * @var LoggerInterface
      */
-    public function __construct(mysqli $link)
+    private $log;
+
+    /**
+     * @param mysqli               $link
+     * @param LoggerInterface|null $log
+     */
+    public function __construct(mysqli $link, LoggerInterface &$log = null)
     {
         $this->link = $link;
+        $this->log = $log;
     }
 
     /**
@@ -435,8 +443,8 @@ class Connection implements ConnectionInterface
             $microtime = microtime(true);
 
             $prepared_sql = empty($arguments) ?
-            $sql :
-            call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments));
+                $sql :
+                call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments));
 
             $result = $this->link->query($prepared_sql);
 
@@ -445,8 +453,8 @@ class Connection implements ConnectionInterface
             return $result;
         } else {
             return empty($arguments) ?
-            $this->link->query($sql) :
-            $this->link->query(call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments)));
+                $this->link->query($sql) :
+                $this->link->query(call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments)));
         }
     }
 
@@ -525,12 +533,10 @@ class Connection implements ConnectionInterface
             case 2006:
             case 2013:
                 return $this->handleMySqlGoneAway($sql, $arguments);
-                break;
 
             // Deadlock detection and retry
             case 1213:
                 return $this->handleDeadlock($sql, $arguments);
-                break;
 
             // Other error
             default:
