@@ -439,7 +439,7 @@ class Connection implements ConnectionInterface
      */
     private function prepareAndExecuteQuery($sql, $arguments)
     {
-        if ($this->on_log_query) {
+        if ($this->log || $this->on_log_query) {
             $microtime = microtime(true);
 
             $prepared_sql = empty($arguments) ?
@@ -448,7 +448,27 @@ class Connection implements ConnectionInterface
 
             $result = $this->link->query($prepared_sql);
 
-            call_user_func($this->on_log_query, $prepared_sql, microtime(true) - $microtime);
+            $execution_time = microtime(true) - $microtime;
+
+            if ($this->log) {
+                if ($result === false) {
+                    $this->log->error('SQL query error' . $this->link->error, [
+                        'error_message' => $this->link->error,
+                        'error_code' => $this->link->errno,
+                        'sql' => $prepared_sql,
+                        'exec_time' => $execution_time,
+                    ]);
+                } else {
+                    $this->log->debug('SQL query executed', [
+                        'sql' => $prepared_sql,
+                        'exec_time' => $execution_time,
+                    ]);
+                }
+            }
+
+            if ($this->on_log_query) {
+                call_user_func($this->on_log_query, $prepared_sql, $execution_time);
+            }
 
             return $result;
         } else {
