@@ -14,11 +14,12 @@
   ],
   "require" : {
     "php": ">=5.6.0",
-    "activecollab/datevalue" : "dev-master",
-    "ext-mysqli" : "*"
+    "ext-mysqli" : "*",
+    "activecollab/datevalue" : "~1.0.0",
+    "psr/log" : "~1.0.0"
   },
   "require-dev" : {
-    "phpunit/phpunit": "~4.8"
+    "phpunit/phpunit": "~5.0"
   },
   "minimum-stability": "dev",
   "autoload": {
