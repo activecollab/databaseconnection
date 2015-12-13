@@ -448,18 +448,18 @@ class Connection implements ConnectionInterface
 
             $result = $this->link->query($prepared_sql);
 
-            $execution_time = microtime(true) - $microtime;
+            $execution_time = round(microtime(true) - $microtime, 5);
 
             if ($this->log) {
                 if ($result === false) {
-                    $this->log->error('SQL query error' . $this->link->error, [
+                    $this->log->error('Query error' . $this->link->error, [
                         'error_message' => $this->link->error,
                         'error_code' => $this->link->errno,
                         'sql' => $prepared_sql,
                         'exec_time' => $execution_time,
                     ]);
                 } else {
-                    $this->log->debug('SQL query executed', [
+                    $this->log->debug('Query executed', [
                         'sql' => $prepared_sql,
                         'exec_time' => $execution_time,
                     ]);
