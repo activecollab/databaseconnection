@@ -4,16 +4,22 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ec13e9e589092b5c6b2a0490ec8aee7e",
-    "content-hash": "202e004f8df35088b4a8f66c4b2e884e",
+    "hash": "b07fc16496c29f264226cba025aea9dd",
+    "content-hash": "d2794ee14bc4a4dacd8f363b46c13177",
     "packages": [
         {
             "name": "activecollab/containeraccess",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "/Users/ilija/Projects/Components/ContainerAccess",
+                "url": "https://github.com/activecollab/containeraccess.git",
                 "reference": "640a9742f29b62ace7dfe68b7f92deb76b130908"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/activecollab/containeraccess/zipball/640a9742f29b62ace7dfe68b7f92deb76b130908",
+                "reference": "640a9742f29b62ace7dfe68b7f92deb76b130908",
+                "shasum": ""
             },
             "require": {
                 "container-interop/container-interop": "~1.1.0",
@@ -28,11 +34,7 @@
                     "ActiveCollab\\ContainerAccess\\": "src"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "ActiveCollab\\ContainerAccess\\Test\\": "test/src"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1417,9 +1419,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "activecollab/containeraccess": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
