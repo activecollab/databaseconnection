@@ -200,7 +200,7 @@ foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `i
 
 ## Object Hydration + DIC
 
-If objects that you are hydrating implement `ActiveCollab\ContainerAccess` interface, and you pass an `Interop\Container\ContainerInterface` instance to `advancedExecute()` method, container will be provided to all instances that result hydrates:
+If objects that you are hydrating implement `ActiveCollab\ContainerAccess\ContainerAccessInterface` interface, and you pass an `Interop\Container\ContainerInterface` instance to `advancedExecute()` method, container will be provided to all instances that result hydrates:
 
 ```php
 use ActiveCollab\DatabaseConnection\Test\Fixture\Container;
