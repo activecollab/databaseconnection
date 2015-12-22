@@ -15,17 +15,17 @@ use Closure;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
-use mysqli as MysqliResource;
+use mysqli;
 use mysqli_result;
 use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseConnection
  */
-class Mysqli implements ConnectionInterface
+class MysqliConnection implements ConnectionInterface
 {
     /**
-     * @var mysqli
+     * @var MysqliConnection
      */
     private $link;
 
@@ -35,10 +35,10 @@ class Mysqli implements ConnectionInterface
     private $log;
 
     /**
-     * @param MysqliResource       $link
+     * @param mysqli               $link
      * @param LoggerInterface|null $log
      */
-    public function __construct(MysqliResource $link, LoggerInterface &$log = null)
+    public function __construct(mysqli $link, LoggerInterface &$log = null)
     {
         $this->link = $link;
         $this->log = $log;

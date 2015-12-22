@@ -23,6 +23,10 @@ class ExecuteLoadObjectTest extends TestCase
 
         $this->connection = new Connection($this->link);
 
+        if ($this->connection->tableExists('writers')) {
+            $this->connection->dropTable('writers');
+        }
+
         $create_table = $this->connection->execute("CREATE TABLE `writers` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -41,7 +45,9 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function tearDown()
     {
-        $this->connection->execute('DROP TABLE `writers`');
+        if ($this->connection->tableExists('writers')) {
+            $this->connection->dropTable('writers');
+        }
 
         parent::tearDown();
     }
