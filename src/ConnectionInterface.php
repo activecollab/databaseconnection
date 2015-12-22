@@ -5,6 +5,7 @@ namespace ActiveCollab\DatabaseConnection;
 use ActiveCollab\DatabaseConnection\Exception\Query;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
+use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use Closure;
 use Exception;
@@ -84,16 +85,17 @@ interface ConnectionInterface
     /**
      * Prepare and execute query, while letting the developer change the load and return modes
      *
-     * @param  string     $sql
-     * @param  mixed      $arguments
-     * @param  int        $load_mode
-     * @param  int        $return_mode
-     * @param  string     $return_class_or_field
-     * @param  array|null $constructor_arguments
+     * @param  string                  $sql
+     * @param  mixed                   $arguments
+     * @param  int                     $load_mode
+     * @param  int                     $return_mode
+     * @param  string                  $return_class_or_field
+     * @param  array|null              $constructor_arguments
+     * @param  ContainerInterface|null $container
      * @return mixed
      * @throws Query
      */
-    public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null);
+    public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null);
 
     /**
      * Return number of records from $table_name that match $conditions

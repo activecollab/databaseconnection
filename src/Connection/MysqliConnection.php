@@ -14,6 +14,7 @@ use ActiveCollab\DateValue\DateValue;
 use Closure;
 use DateTime;
 use Exception;
+use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use mysqli;
 use mysqli_result;
@@ -95,16 +96,17 @@ class MysqliConnection implements ConnectionInterface
     /**
      * Prepare and execute query, while letting the developer change the load and return modes
      *
-     * @param  string     $sql
-     * @param  mixed      $arguments
-     * @param  int        $load_mode
-     * @param  int        $return_mode
-     * @param  string     $return_class_or_field
-     * @param  array|null $constructor_arguments
+     * @param  string                  $sql
+     * @param  mixed                   $arguments
+     * @param  int                     $load_mode
+     * @param  int                     $return_mode
+     * @param  string                  $return_class_or_field
+     * @param  array|null              $constructor_arguments
+     * @param  ContainerInterface|null $container
      * @return mixed
      * @throws Query
      */
-    public function advancedExecute($sql, $arguments = null, $load_mode = ConnectionInterface::LOAD_ALL_ROWS, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
+    public function advancedExecute($sql, $arguments = null, $load_mode = ConnectionInterface::LOAD_ALL_ROWS, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
     {
         if ($return_mode == ConnectionInterface::RETURN_OBJECT_BY_CLASS && empty($return_class_or_field)) {
             throw new InvalidArgumentException('Class is required');
@@ -149,7 +151,7 @@ class MysqliConnection implements ConnectionInterface
 
                         break;
                     default:
-                        return new Result($query_result, $return_mode, $return_class_or_field, $constructor_arguments); // Don't close result, we need it
+                        return new Result($query_result, $return_mode, $return_class_or_field, $constructor_arguments, $container); // Don't close result, we need it
                 }
             } else {
                 $result = null;

@@ -2,11 +2,13 @@
 
 namespace ActiveCollab\DatabaseConnection\Result;
 
+use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use BadMethodCallException;
+use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use JsonSerializable;
 use mysqli_result;
@@ -61,6 +63,11 @@ class Result implements ResultInterface
     private $constructor_arguments;
 
     /**
+     * @var ContainerInterface|null
+     */
+    private $container;
+
+    /**
      * @var ValueCasterInterface
      */
     private $value_caser;
@@ -68,13 +75,13 @@ class Result implements ResultInterface
     /**
      * Construct a new result object from resource.
      *
-     * @param  mysqli_result            $resource
-     * @param  int                      $return_mode
-     * @param  string                   $return_class_or_field
-     * @param  array|null               $constructor_arguments
-     * @throws InvalidArgumentException
+     * @param  mysqli_result          $resource
+     * @param  int                    $return_mode
+     * @param  string                 $return_class_or_field
+     * @param  array|null             $constructor_arguments
+     * @param ContainerInterface|null $container
      */
-    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
+    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
     {
         if (!$this->isValidResource($resource)) {
             throw new InvalidArgumentException('mysqli_result expected');
@@ -90,6 +97,7 @@ class Result implements ResultInterface
         $this->return_mode = $return_mode;
         $this->return_class_or_field = $return_class_or_field;
         $this->constructor_arguments = $constructor_arguments;
+        $this->container = $container;
     }
 
     /**
@@ -405,6 +413,10 @@ class Result implements ResultInterface
             $this->current_row = new $class_name();
         } else {
             $this->current_row = (new ReflectionClass($class_name))->newInstanceArgs($this->constructor_arguments);
+        }
+
+        if ($this->current_row instanceof ContainerAccessInterface && $this->container) {
+            $this->current_row->setContainer($this->container);
         }
 
         $this->current_row->loadFromRow($row);
