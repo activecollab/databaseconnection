@@ -198,15 +198,35 @@ foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `i
 }
 ```
 
+## Object Hydration + DIC
+
+If objects that you are hydrating implement `ActiveCollab\ContainerAccess` interface, and you pass an `Interop\Container\ContainerInterface` instance to `advancedExecute()` method, container will be provided to all instances that result hydrates:
+
+```php
+use ActiveCollab\DatabaseConnection\Test\Fixture\Container;
+use ActiveCollab\DatabaseConnection\Test\Fixture\WriterWithContainer;
+use Interop\Container\ContainerInterface;
+
+$container = new Container([
+    'dependency' => 'it works!'
+]);
+
+$result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, WriterWithContainer::class, null, $container);
+
+foreach ($result as $writer) {
+    print $writer->dependency . "\n"; // Prints 'it works!'
+}
+```
+
 ## Tests
-To test a library you need to create manually a database:
+
+To test a library you need to manually create a database:
 
 ```CREATE DATABASE activecollab_database_connection_test DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;```
 
 Then from a project root execute following command:
 
 ```databaseconnection$ phpunit -c test```
-
 
 ## To do
 
