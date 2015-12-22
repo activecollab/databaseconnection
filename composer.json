@@ -12,9 +12,16 @@
       "email": "ilija.studen@activecollab.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "/Users/ilija/Projects/Components/ContainerAccess"
+    }
+  ],
   "require" : {
     "php": ">=5.6.0",
     "ext-mysqli" : "*",
+    "activecollab/containeraccess" : "dev-master",
     "activecollab/datevalue" : "~1.0.0",
     "psr/log" : "~1.0.0"
   },

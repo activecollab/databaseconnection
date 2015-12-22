@@ -4,9 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "217913230f12c9c0b53d04ef4ab2ca9c",
-    "content-hash": "b1e09fbd23e6faead865b5e04ad2de81",
+    "hash": "6866a5131c84532b1f61708094839d57",
+    "content-hash": "453f36f55cfca57698c2bf4204739eba",
     "packages": [
+        {
+            "name": "activecollab/containeraccess",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "/Users/ilija/Projects/Components/ContainerAccess",
+                "reference": "640a9742f29b62ace7dfe68b7f92deb76b130908"
+            },
+            "require": {
+                "container-interop/container-interop": "~1.1.0",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ActiveCollab\\ContainerAccess\\": "src"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "ActiveCollab\\ContainerAccess\\Test\\": "test/src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ilija Studen",
+                    "email": "ilija.studen@activecollab.com"
+                }
+            ],
+            "description": "Interface that implement objects that have access DIC access",
+            "homepage": "https://labs.activecollab.com",
+            "keywords": [
+                "activecollab",
+                "dic"
+            ],
+            "time": "2015-12-22 21:47:02"
+        },
         {
             "name": "activecollab/datevalue",
             "version": "1.0.0",
@@ -53,6 +96,33 @@
                 "datetime"
             ],
             "time": "2015-11-26 14:01:05"
+        },
+        {
+            "name": "container-interop/container-interop",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/container-interop/container-interop.git",
+                "reference": "fc08354828f8fd3245f77a66b9e23a6bca48297e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/container-interop/container-interop/zipball/fc08354828f8fd3245f77a66b9e23a6bca48297e",
+                "reference": "fc08354828f8fd3245f77a66b9e23a6bca48297e",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Interop\\Container\\": "src/Interop/Container/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
+            "time": "2014-12-30 15:22:37"
         },
         {
             "name": "nesbot/carbon",
@@ -1301,7 +1371,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "activecollab/containeraccess": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
