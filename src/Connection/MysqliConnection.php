@@ -428,11 +428,17 @@ class MysqliConnection implements ConnectionInterface
     /**
      * Return array of table names
      *
+     * @param  string $database_name
      * @return array
      */
-    public function getTableNames()
+    public function getTableNames($database_name = '')
     {
-        $tables = $this->executeFirstColumn('SHOW TABLES');
+        if ($database_name) {
+            $tables = $this->executeFirstColumn('SHOW TABLES FROM ' . $this->escapeTableName($database_name));
+        } else {
+            $tables = $this->executeFirstColumn('SHOW TABLES');
+        }
+
 
         if (empty($tables)) {
             $tables = [];

@@ -69,6 +69,26 @@ class TablesTest extends TestCase
     }
 
     /**
+     * Test list tables from a specified database (user needs to have proper permissions over that database)
+     */
+    public function testListTablesFromAnotherDatabase()
+    {
+        if ($this->connection->databaseExists('test_another_database')) {
+            $this->connection->execute('DROP DATABASE `test_another_database`');
+        }
+
+        $this->connection->execute('CREATE DATABASE `test_another_database`');
+        $this->assertTrue($this->connection->databaseExists('test_another_database'));
+
+        $this->connection->execute('CREATE TABLE `test_another_database`.`test_table` (id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT)');
+
+        $this->assertEquals(['test_table'], $this->connection->getTableNames('test_another_database'));
+
+        $this->connection->execute('DROP DATABASE `test_another_database`');
+        $this->assertFalse($this->connection->databaseExists('test_another_database'));
+    }
+
+    /**
      * Test if we can check if table exists or not
      */
     public function testTableExists()

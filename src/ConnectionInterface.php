@@ -225,9 +225,10 @@ interface ConnectionInterface
     /**
      * Return array of table names
      *
+     * @param  string $database_name
      * @return array
      */
-    public function getTableNames();
+    public function getTableNames($database_name = '');
 
     /**
      * Drop a table named $table_name from selected database
