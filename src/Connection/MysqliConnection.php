@@ -397,6 +397,24 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
+     * @param  string  $database_name
+     * @return boolean
+     */
+    public function databaseExists($database_name)
+    {
+        return $this->executeFirstCell('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?', $database_name) == $database_name;
+    }
+
+    /**
+     * @param  string  $user_name
+     * @return boolean
+     */
+    public function userExists($user_name)
+    {
+        return (boolean) $this->executeFirstCell("SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS 'is_present'", $user_name);
+    }
+
+    /**
      * Return true if table named $table_name exists in the selected database
      *
      * @param  string $table_name

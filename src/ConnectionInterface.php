@@ -203,6 +203,18 @@ interface ConnectionInterface
     public function inTransaction();
 
     /**
+     * @param  string  $database_name
+     * @return boolean
+     */
+    public function databaseExists($database_name);
+
+    /**
+     * @param  string  $user_name
+     * @return boolean
+     */
+    public function userExists($user_name);
+
+    /**
      * Return true if table named $table_name exists in the selected database
      *
      * @param  string $table_name

@@ -1,9 +1,8 @@
 <?php
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Record\ValueCaster;
-use DateTime;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -11,7 +10,7 @@ use DateTime;
 class TablesTest extends TestCase
 {
     /**
-     * @var Connection
+     * @var MysqliConnection
      */
     private $connection;
 
@@ -22,7 +21,7 @@ class TablesTest extends TestCase
     {
         parent::setUp();
 
-        $this->connection = new Connection($this->link);
+        $this->connection = new MysqliConnection($this->link);
 
         $this->connection->execute('DROP TABLE IF EXISTS `writers1`');
         $this->connection->execute("CREATE TABLE `writers1` (
