@@ -218,6 +218,16 @@ foreach ($result as $writer) {
 }
 ```
 
+## Helper Methods
+
+Database connection instance offers a couple of methods that are helpful in everyday development:
+
+1. `databaseExists($database_name)` - Return `TRUE` if database with a given name exists,
+1. `userExists($user_name)` - Return `TRUE` if user with a given name exists.
+1. `getTableNames()` - Return names of all tables that are in a database taht we are connected to,
+1. `tableExists($table_name)` - Return `TRUE` if table with a given name exists in a database that we are connected to,
+1. `dropTable($table_name)` - Drop a table.
+
 ## Tests
 
 To test a library you need to manually create a database:

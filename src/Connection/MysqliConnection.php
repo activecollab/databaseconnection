@@ -448,7 +448,7 @@ class MysqliConnection implements ConnectionInterface
      */
     public function dropTable($table_name)
     {
-        $this->execute('DROP TABLE ' . $this->escapeTableName($table_name));
+        $this->execute('DROP TABLE IF EXISTS ' . $this->escapeTableName($table_name));
     }
 
     /**
