@@ -209,10 +209,21 @@ interface ConnectionInterface
     public function databaseExists($database_name);
 
     /**
+     * @param string $database_name
+     */
+    public function dropDatabase($database_name);
+
+    /**
      * @param  string  $user_name
      * @return boolean
      */
     public function userExists($user_name);
+
+    /**
+     * @param string $user_name
+     * @param string $hostname
+     */
+    public function dropUser($user_name, $hostname = '%');
 
     /**
      * Return true if table named $table_name exists in the selected database

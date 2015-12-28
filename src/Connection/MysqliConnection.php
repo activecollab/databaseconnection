@@ -406,12 +406,31 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
+     * @param string $database_name
+     */
+    public function dropDatabase($database_name)
+    {
+        $this->execute('DROP DATABASE IF EXISTS ' . $this->escapeTableName($database_name));
+    }
+
+    /**
      * @param  string  $user_name
      * @return boolean
      */
     public function userExists($user_name)
     {
         return (boolean) $this->executeFirstCell("SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS 'is_present'", $user_name);
+    }
+
+    /**
+     * @param string $user_name
+     * @param string $hostname
+     */
+    public function dropUser($user_name, $hostname = '%')
+    {
+        if ($this->userExists($user_name)) {
+            $this->execute('DROP USER ?@?', $user_name, $hostname);
+        }
     }
 
     /**

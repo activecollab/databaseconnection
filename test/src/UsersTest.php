@@ -27,9 +27,21 @@ class UsersTest extends TestCase
     /**
      * Test user exists call
      */
-    public function testDatabaseExists()
+    public function testUserExists()
     {
         $this->assertTrue($this->connection->userExists('root'));
         $this->assertFalse($this->connection->databaseExists('this one does not exist'));
+    }
+
+    /**
+     * Test drop user account
+     */
+    public function testDropUser()
+    {
+        $this->connection->execute('CREATE USER ?@? IDENTIFIED BY ?', 'monty', '%', 'some_pass');
+
+        $this->assertTrue($this->connection->userExists('monty'));
+        $this->connection->dropUser('monty');
+        $this->assertFalse($this->connection->userExists('monty'));
     }
 }
