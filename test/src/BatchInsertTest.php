@@ -1,4 +1,5 @@
 <?php
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
