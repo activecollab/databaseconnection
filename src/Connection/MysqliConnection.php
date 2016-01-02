@@ -3,13 +3,13 @@
 namespace ActiveCollab\DatabaseConnection\Connection;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Exception\Query;
+use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
+use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
-use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DateValue\DateValue;
 use Closure;
 use DateTime;
@@ -36,6 +36,11 @@ class MysqliConnection implements ConnectionInterface
     private $log;
 
     /**
+     * @var string
+     */
+    private $database_name;
+
+    /**
      * @param mysqli               $link
      * @param LoggerInterface|null $log
      */
@@ -46,11 +51,34 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Execute a query and return a result
+     * Set database name and optionally select that database
      *
-     * @param  string                    $sql
-     * @param  mixed                     ...$arguments
-     * @return ResultInterface|true|null
+     * @param  string       $database_name
+     * @param  boolean|true $select_database
+     * @return $this
+     * @throws ConnectionException
+     */
+    public function &setDatabaseName($database_name, $select_database = true)
+    {
+        if (empty($select_database) || $this->link->select_db($database_name)) {
+            $this->database_name = $database_name;
+        } else {
+            throw new ConnectionException("Failed to select database '$database_name'");
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function disconnect()
+    {
+        $this->link->close();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function execute($sql, ...$arguments)
     {
@@ -58,11 +86,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return first row that provided SQL query returns
-     *
-     * @param  string $sql
-     * @param  mixed  ...$arguments
-     * @return array
+     * {@inheritdoc}
      */
     public function executeFirstRow($sql, ...$arguments)
     {
@@ -70,11 +94,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return value from the first cell of each column that provided SQL query returns
-     *
-     * @param  string $sql
-     * @param  mixed  ...$arguments
-     * @return array
+     * {@inheritdoc}
      */
     public function executeFirstColumn($sql, ...$arguments)
     {
@@ -82,11 +102,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return value from the first cell of the first row that provided SQL query returns
-     *
-     * @param  string $sql
-     * @param  mixed  ...$arguments
-     * @return mixed
+     * {@inheritdoc}
      */
     public function executeFirstCell($sql, ...$arguments)
     {
@@ -94,17 +110,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Prepare and execute query, while letting the developer change the load and return modes
-     *
-     * @param  string                  $sql
-     * @param  mixed                   $arguments
-     * @param  int                     $load_mode
-     * @param  int                     $return_mode
-     * @param  string                  $return_class_or_field
-     * @param  array|null              $constructor_arguments
-     * @param  ContainerInterface|null $container
-     * @return mixed
-     * @throws Query
+     * {@inheritdoc}
      */
     public function advancedExecute($sql, $arguments = null, $load_mode = ConnectionInterface::LOAD_ALL_ROWS, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
     {
@@ -163,19 +169,12 @@ class MysqliConnection implements ConnectionInterface
         } elseif ($query_result === true) {
             return true;
         } else {
-            throw new Query($this->link->error, $this->link->errno);
+            throw new QueryException($this->link->error, $this->link->errno);
         }
     }
 
     /**
-     * Return number of records from $table_name that match $conditions
-     *
-     * Fields that COUNT() targets can be specified after $conditions. If they are omitted, COUNT(`id`) will be ran
-     *
-     * @param  string            $table_name
-     * @param  array|string|null $conditions
-     * @param  string            $field
-     * @return integer
+     * {@inheritdoc}
      */
     public function count($table_name, $conditions = null, $field = 'id')
     {
@@ -199,13 +198,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set)
-     *
-     * @param  string $table
-     * @param  array  $field_value_map
-     * @param  string $mode
-     * @return int
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function insert($table, array $field_value_map, $mode = ConnectionInterface::INSERT)
     {
@@ -229,13 +222,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Prepare a batch insert utility instance
-     *
-     * @param  string               $table_name
-     * @param  array                $fields
-     * @param  int                  $rows_per_batch
-     * @param  string               $mode
-     * @return BatchInsertInterface
+     * {@inheritdoc}
      */
     public function batchInsert($table_name, array $fields, $rows_per_batch = 50, $mode = self::INSERT)
     {
@@ -243,9 +230,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return last insert ID
-     *
-     * @return integer
+     * {@inheritdoc}
      */
     public function lastInsertId()
     {
@@ -253,15 +238,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Update one or more rows with the given list of values for fields
-     *
-     * $conditions can be a string, or an array where first element is a patter and other elements are arguments
-     *
-     * @param  string                   $table_name
-     * @param  array                    $field_value_map
-     * @param  string|array|null        $conditions
-     * @return int
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function update($table_name, array $field_value_map, $conditions = null)
     {
@@ -281,14 +258,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Delete one or more records from the table
-     *
-     * $conditions can be a string, or an array where first element is a patter and other elements are arguments
-     *
-     * @param  string            $table_name
-     * @param  string|array|null $conditions
-     * @return int
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function delete($table_name, $conditions = null)
     {
@@ -302,9 +272,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return number of affected rows
-     *
-     * @return integer
+     * {@inheritdoc}
      */
     public function affectedRows()
     {
@@ -312,12 +280,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Run body commands within a transation
-     *
-     * @param  Closure      $body
-     * @param  Closure|null $on_success
-     * @param  CLosure|null $on_error
-     * @throws Exception
+     * {@inheritdoc}
      */
     public function transact(Closure $body, $on_success = null, $on_error = null)
     {
@@ -352,7 +315,7 @@ class MysqliConnection implements ConnectionInterface
     private $transaction_level = 0;
 
     /**
-     * Begin transaction
+     * {@inheritdoc}
      */
     public function beginWork()
     {
@@ -363,7 +326,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Commit transaction
+     * {@inheritdoc}
      */
     public function commit()
     {
@@ -376,7 +339,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Rollback transaction
+     * {@inheritdoc}
      */
     public function rollback()
     {
@@ -387,9 +350,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return true if system is in transaction
-     *
-     * @return boolean
+     * {@inheritdoc}
      */
     public function inTransaction()
     {
@@ -397,8 +358,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * @param  string  $database_name
-     * @return boolean
+     * {@inheritdoc}
      */
     public function databaseExists($database_name)
     {
@@ -406,7 +366,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * @param string $database_name
+     * {@inheritdoc}
      */
     public function dropDatabase($database_name)
     {
@@ -414,8 +374,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * @param  string  $user_name
-     * @return boolean
+     * {@inheritdoc}
      */
     public function userExists($user_name)
     {
@@ -423,8 +382,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * @param string $user_name
-     * @param string $hostname
+     * {@inheritdoc}
      */
     public function dropUser($user_name, $hostname = '%')
     {
@@ -434,10 +392,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return true if table named $table_name exists in the selected database
-     *
-     * @param  string $table_name
-     * @return bool
+     * {@inheritdoc}
      */
     public function tableExists($table_name)
     {
@@ -445,19 +400,17 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Return array of table names
-     *
-     * @param  string $database_name
-     * @return array
+     * {@inheritdoc}
      */
     public function getTableNames($database_name = '')
     {
         if ($database_name) {
-            $tables = $this->executeFirstColumn('SHOW TABLES FROM ' . $this->escapeTableName($database_name));
+            $tables = $this->executeFirstColumn('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME', $database_name);
+        } elseif ($this->database_name) {
+            $tables = $this->executeFirstColumn('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME', $this->database_name);
         } else {
             $tables = $this->executeFirstColumn('SHOW TABLES');
         }
-
 
         if (empty($tables)) {
             $tables = [];
@@ -467,9 +420,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Drop a table named $table_name from selected database
-     *
-     * @param string $table_name
+     * {@inheritdoc}
      */
     public function dropTable($table_name)
     {
@@ -525,11 +476,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Prepare SQL (replace ? with data from $arguments array)
-     *
-     * @param  string $sql
-     * @param  mixed  ...$arguments
-     * @return string
+     * {@inheritdoc}
      */
     public function prepare($sql, ...$arguments)
     {
@@ -556,10 +503,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Prepare conditions and return them as string
-     *
-     * @param  array|string|null $conditions
-     * @return string
+     * {@inheritdoc}
      */
     public function prepareConditions($conditions)
     {
@@ -585,7 +529,7 @@ class MysqliConnection implements ConnectionInterface
      * @param  string     $sql
      * @param  array|null $arguments
      * @return null
-     * @throws Query
+     * @throws QueryException
      */
     private function tryToRecoverFromFailedQuery($sql, $arguments)
     {
@@ -606,16 +550,12 @@ class MysqliConnection implements ConnectionInterface
 
             // Other error
             default:
-                throw new Query($this->link->error, $this->link->errno);
+                throw new QueryException($this->link->error, $this->link->errno);
         }
     }
 
     /**
-     * Escape string before we use it in query...
-     *
-     * @param  mixed $unescaped
-     * @return string
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function escapeValue($unescaped)
     {
@@ -688,10 +628,7 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Escape table field name
-     *
-     * @param  string $unescaped
-     * @return string
+     * {@inheritdoc}
      */
     public function escapeFieldName($unescaped)
     {
@@ -699,12 +636,17 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Escape table name
-     *
-     * @param  string $unescaped
-     * @return string
+     * {@inheritdoc}
      */
     public function escapeTableName($unescaped)
+    {
+        return "`$unescaped`";
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function escapeDatabaseName($unescaped)
     {
         return "`$unescaped`";
     }

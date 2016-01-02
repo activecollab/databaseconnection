@@ -47,7 +47,7 @@ class ExecuteTest extends TestCase
     }
 
     /**
-     * @expectedException \ActiveCollab\DatabaseConnection\Exception\Query
+     * @expectedException \ActiveCollab\DatabaseConnection\Exception\QueryException
      */
     public function testExceptionOnInvalidQuery()
     {

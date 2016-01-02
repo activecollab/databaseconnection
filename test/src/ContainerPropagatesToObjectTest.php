@@ -64,7 +64,7 @@ class ContainerPropagatesToObjectTest extends TestCase
     }
 
     /**
-     * @throws \ActiveCollab\DatabaseConnection\Exception\Query
+     * @throws \ActiveCollab\DatabaseConnection\Exception\QueryException
      */
     public function testExceptionWhenLoadingByObjectClassAndClassNameIsEmpty()
     {

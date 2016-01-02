@@ -2,7 +2,7 @@
 
 namespace ActiveCollab\DatabaseConnection;
 
-use ActiveCollab\DatabaseConnection\Exception\Query;
+use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use Interop\Container\ContainerInterface;
@@ -45,6 +45,11 @@ interface ConnectionInterface
      */
     const INSERT = 'INSERT';
     const REPLACE = 'REPLACE';
+
+    /**
+     * Close connection
+     */
+    public function disconnect();
 
     /**
      * Execute a query and return a result
@@ -93,7 +98,7 @@ interface ConnectionInterface
      * @param  array|null              $constructor_arguments
      * @param  ContainerInterface|null $container
      * @return mixed
-     * @throws Query
+     * @throws QueryException
      */
     public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null);
 
@@ -289,6 +294,14 @@ interface ConnectionInterface
      * @return string
      */
     public function escapeTableName($unescaped);
+
+    /**
+     * Escape database name
+     *
+     * @param  string $unescaped
+     * @return string
+     */
+    public function escapeDatabaseName($unescaped);
 
     // ---------------------------------------------------
     //  Events
