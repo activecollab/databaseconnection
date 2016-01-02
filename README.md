@@ -44,6 +44,25 @@ print_r($connection->executeFirstRow('SELECT * FROM `writers` WHERE `name` = ?',
 print_r($connection->executeFirstColumn('SELECT `name` FROM `writers` ORDER BY `name`'));
 ```
 
+## Connection Factory
+
+Quickest way to connect is to use `ConnectionFactory` class:
+
+```php
+<?php
+
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\ConnectionFactory;
+
+$connection = (new ConnectionFactory())->mysqli('localhost', 'root', '', 'activecollab_database_connection_test', 'utf8mb4');
+
+if ($connection instanceof MysqliConnection) {
+    print_r($connection->getTableNames());
+}
+```
+
+First three arguments are required (MySQL hostname, username and password). Fourth is name of the database that should be selected, and it is optional. Fifth is connection encoding that we would like to enforce (if not present, default connection encoding will be used).
+
 ## Counting Records
 
 DatabaseConnection lets you easily count records from the table:
