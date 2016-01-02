@@ -61,7 +61,10 @@ if ($connection instanceof MysqliConnection) {
 }
 ```
 
-First three arguments are required (MySQL hostname, username and password). Fourth is name of the database that should be selected, and it is optional. Fifth is connection encoding that we would like to enforce (if not present, default connection encoding will be used).
+First three arguments are required (MySQL hostname, username and password). Additionally, this function accepts:
+
+1. Name of the database that needs to be selected. When not specified, database will not be selected,
+2. Connection encoding that we would like to enforce. When not specified, default connection encoding will be used.
 
 ## Counting Records
 
