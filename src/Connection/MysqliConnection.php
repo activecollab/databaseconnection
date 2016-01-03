@@ -445,7 +445,7 @@ class MysqliConnection implements ConnectionInterface
 
             $result = $this->link->query($prepared_sql);
 
-            $execution_time = number_format(microtime(true) - $microtime, 5, '.', '');
+            $execution_time = rtrim(number_format(microtime(true) - $microtime, 5, '.', ''), '0');
 
             if ($this->log) {
                 if ($result === false) {
