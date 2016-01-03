@@ -456,7 +456,7 @@ class MysqliConnection implements ConnectionInterface
                         'exec_time' => $execution_time,
                     ]);
                 } else {
-                    $this->log->debug('Query executed', [
+                    $this->log->debug('Query {sql} executed in {exec_time}s', [
                         'sql' => $prepared_sql,
                         'exec_time' => $execution_time,
                     ]);
