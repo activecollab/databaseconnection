@@ -26,21 +26,19 @@ class ConnectionFactory
     }
 
     /**
-     * Connect to MySQL using mysqli extension
-     *
-     * @param  string           $host
-     * @param  string           $user
-     * @param  string           $pass
-     * @param  string           $select_database
-     * @param  string|null      $set_connection_encoding
-     * @return MysqliConnection
-     * @throws ConnectionException
+     * {@inheritdoc}
      */
-    public function mysqli($host, $user, $pass, $select_database = '', $set_connection_encoding = null)
+    public function mysqli($host, $user, $pass, $select_database = '', $set_connection_encoding = null, $set_connection_encoding_with_query = false)
     {
-        $connection = new MysqliConnection($this->mysqliConnectFromParams($host, $user, $pass), $this->log);
+        $link = $this->mysqliConnectFromParams($host, $user, $pass);
 
-        if ($select_database) {
+        if ($set_connection_encoding && !$set_connection_encoding_with_query) {
+            $link->set_charset($set_connection_encoding);
+        }
+
+        $connection = new MysqliConnection($link, $this->log);
+
+        if ($select_database && $set_connection_encoding_with_query) {
             $connection->setDatabaseName($select_database);
         }
 

@@ -3,7 +3,6 @@
 namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
-use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
 
 /**
  * @package ActiveCollab\DatabaseConnection
@@ -18,8 +17,8 @@ interface ConnectionFactoryInterface
      * @param  string           $pass
      * @param  string           $select_database
      * @param  string|null      $set_connection_encoding
+     * @param  boolean          $set_connection_encoding_with_query
      * @return MysqliConnection
-     * @throws ConnectionException
      */
-    public function mysqli($host, $user, $pass, $select_database = '', $set_connection_encoding = null);
+    public function mysqli($host, $user, $pass, $select_database = '', $set_connection_encoding = null, $set_connection_encoding_with_query = false);
 }
