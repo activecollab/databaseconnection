@@ -38,11 +38,11 @@ class ConnectionFactory
 
         $connection = new MysqliConnection($link, $this->log);
 
-        if ($select_database && $set_connection_encoding_with_query) {
+        if ($select_database) {
             $connection->setDatabaseName($select_database);
         }
 
-        if ($set_connection_encoding) {
+        if ($set_connection_encoding && $set_connection_encoding_with_query) {
             $connection->execute('SET NAMES ' . $set_connection_encoding);
         }
 
