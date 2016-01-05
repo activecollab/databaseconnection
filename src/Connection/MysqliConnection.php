@@ -449,7 +449,7 @@ class MysqliConnection implements ConnectionInterface
 
             if ($this->log) {
                 if ($result === false) {
-                    $this->log->error('Query error' . $this->link->error, [
+                    $this->log->error('Query error {error_message}', [
                         'error_message' => $this->link->error,
                         'error_code' => $this->link->errno,
                         'sql' => $prepared_sql,
