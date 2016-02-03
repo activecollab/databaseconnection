@@ -152,7 +152,7 @@ class ValueCasterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Failed to parse JSON. Reason: Control character error, possibly incorrectly encoded
+     * @expectedExceptionMessageRegExp /Failed to parse JSON. Reason: (.*)\w+/
      */
     public function testInvalidJsonBreaksCasting()
     {
