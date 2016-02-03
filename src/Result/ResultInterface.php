@@ -1,13 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Result;
 
-use IteratorAggregate;
-use ArrayAccess;
-use Countable;
-use JsonSerializable;
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
+use JsonSerializable;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Result
@@ -43,8 +52,8 @@ interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, Jso
     /**
      * Set cursor to a given position in the record set.
      *
-     * @param  integer $num
-     * @return boolean
+     * @param  int  $num
+     * @return bool
      */
     public function seek($num);
 
@@ -92,21 +101,24 @@ interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, Jso
     /**
      * Set a custom value caster.
      *
-     * @param ValueCasterInterface $value_caster
+     * @param  ValueCasterInterface $value_caster
+     * @return $this
      */
-    public function setValueCaster(ValueCasterInterface $value_caster);
+    public function &setValueCaster(ValueCasterInterface $value_caster);
 
     /**
      * Set result to return objects by class name.
      *
-     * @param string $class_name
+     * @param  string $class_name
+     * @return $this
      */
-    public function returnObjectsByClass($class_name);
+    public function &returnObjectsByClass($class_name);
 
     /**
      * Set result to load objects of class based on filed value.
      *
-     * @param string $field_name
+     * @param  string $field_name
+     * @return $this
      */
-    public function returnObjectsByField($field_name);
+    public function &returnObjectsByField($field_name);
 }

@@ -346,37 +346,35 @@ class Result implements ResultInterface
     }
 
     /**
-     * Set a custom value caster.
-     *
-     * @param ValueCasterInterface $value_caster
+     * {@inheritdoc}
      */
-    public function setValueCaster(ValueCasterInterface $value_caster)
+    public function &setValueCaster(ValueCasterInterface $value_caster)
     {
         $this->value_caser = $value_caster;
+
+        return $this;
     }
 
     /**
-     * Set result to return objects by class name.
-     *
-     * @param string $class_name
+     * {@inheritdoc}
      */
-    public function returnObjectsByClass($class_name)
+    public function &returnObjectsByClass($class_name)
     {
         $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
-
         $this->return_class_or_field = $class_name;
+
+        return $this;
     }
 
     /**
-     * Set result to load objects of class based on filed value.
-     *
-     * @param string $field_name
+     * {@inheritdoc}
      */
-    public function returnObjectsByField($field_name)
+    public function &returnObjectsByField($field_name)
     {
         $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
-
         $this->return_class_or_field = $field_name;
+
+        return $this;
     }
 
     /**
