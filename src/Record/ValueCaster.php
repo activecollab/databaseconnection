@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Record;
 
-use ActiveCollab\DateValue\DateValue;
 use ActiveCollab\DateValue\DateTimeValue;
+use ActiveCollab\DateValue\DateValue;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Record
@@ -40,8 +50,8 @@ class ValueCaster implements ValueCasterInterface
     /**
      * Cast a single value.
      *
-     * @param  string $field_name
-     * @param  mixed  $value
+     * @param string $field_name
+     * @param mixed  $value
      *
      * @return mixed
      */
@@ -64,6 +74,18 @@ class ValueCaster implements ValueCasterInterface
                 return new DateValue($value, 'UTC');
             case self::CAST_DATETIME:
                 return new DateTimeValue($value, 'UTC');
+            case self::CAST_JSON:
+                if (empty($value)) {
+                    return null;
+                } else {
+                    $result = json_decode($value, true);
+
+                    if (empty($result) && json_last_error()) {
+                        throw new RuntimeException('Failed to parse JSON. Reason: ' . json_last_error_msg(), json_last_error());
+                    }
+
+                    return $result;
+                }
             default:
                 return (string) $value;
         }

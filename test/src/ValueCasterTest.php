@@ -1,11 +1,23 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
-use ActiveCollab\DateValue\DateValueInterface;
 use ActiveCollab\DateValue\DateTimeValueInterface;
+use ActiveCollab\DateValue\DateValueInterface;
 
+/**
+ * @package ActiveCollab\DatabaseConnection\Test
+ */
 class ValueCasterTest extends TestCase
 {
     /**
@@ -82,9 +94,28 @@ class ValueCasterTest extends TestCase
      */
     public function testRowValuesCasting()
     {
-        $row = ['id' => '456', 'project_leader_id' => '123', 'name' => 'Project name', 'created_at' => '2015-08-12 20:00:15', 'updated_on' => '2015-10-10', 'is_important' => '1', 'completed_at' => null, 'budget' => '1200.50'];
+        $row = [
+            'id' => '456',
+            'project_leader_id' => '123',
+            'name' => 'Project name',
+            'created_at' => '2015-08-12 20:00:15',
+            'updated_on' => '2015-10-10',
+            'is_important' => '1',
+            'completed_at' => null,
+            'budget' => '1200.50',
+            'json_empty' => '',
+            'json_object' => '{"first": 12,"second": "13"}',
+            'json_array' => '[1,2,3,4,5]',
+            'json_scalar' => '12345',
+        ];
 
-        (new ValueCaster(['budget' => ValueCaster::CAST_FLOAT]))->castRowValues($row);
+        (new ValueCaster([
+            'budget' => ValueCaster::CAST_FLOAT,
+            'json_empty' => ValueCaster::CAST_JSON,
+            'json_object' => ValueCaster::CAST_JSON,
+            'json_array' => ValueCaster::CAST_JSON,
+            'json_scalar' => ValueCaster::CAST_JSON,
+        ]))->castRowValues($row);
 
         $this->assertInternalType('integer', $row['id']);
         $this->assertEquals(456, $row['id']);
@@ -106,5 +137,40 @@ class ValueCasterTest extends TestCase
 
         $this->assertInternalType('float', $row['budget']);
         $this->assertEquals(1200.50, $row['budget']);
+
+        $this->assertNull($row['json_empty']);
+
+        $this->assertInternalType('array', $row['json_object']);
+        $this->assertEquals(['first' => 12, 'second' => '13'], $row['json_object']);
+
+        $this->assertInternalType('array', $row['json_array']);
+        $this->assertEquals([1, 2, 3, 4, 5], $row['json_array']);
+
+        $this->assertInternalType('integer', $row['json_scalar']);
+        $this->assertEquals(12345, $row['json_scalar']);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Failed to parse JSON. Reason: Control character error, possibly incorrectly encoded
+     */
+    public function testInvalidJsonBreaksCasting()
+    {
+        $row = ['broken_json' => '{"broken":"object'];
+
+        (new ValueCaster(['broken_json' => ValueCaster::CAST_JSON]))->castRowValues($row);
+    }
+
+    /**
+     * Confirm that previous JSON decoding does not affect value decoding done by value caster.
+     */
+    public function testOldJsonErrorDoesNotAffectCasting()
+    {
+        json_decode('{"broken":"object');
+        $this->assertNotEmpty(json_last_error());
+
+        $row = ['ok_json' => '{"ok":"json"}'];
+
+        (new ValueCaster(['ok_json' => ValueCaster::CAST_JSON]))->castRowValues($row);
     }
 }
