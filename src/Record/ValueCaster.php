@@ -104,7 +104,7 @@ class ValueCaster implements ValueCasterInterface
             return $this->dictated[$field_name];
         }
 
-        if (substr($field_name, 0, 3) === 'is_') {
+        if (substr($field_name, 0, 3) === 'is_' || in_array(substr($field_name, 0, 4), ['has_', 'had_', 'was_']) || in_array(substr($field_name, 0, 5), ['were_', 'have_'])) {
             return self::CAST_BOOL;
         }
 

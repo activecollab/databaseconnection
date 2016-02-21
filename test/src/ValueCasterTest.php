@@ -69,6 +69,10 @@ class ValueCasterTest extends TestCase
         $this->assertEquals(ValueCaster::CAST_DATETIME, $caster->getTypeByFieldName('created_at'));
         $this->assertEquals(ValueCaster::CAST_DATE, $caster->getTypeByFieldName('due_on'));
         $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('is_important'));
+        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('was_extracted'));
+        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('had_trial'));
+        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('were_imported'));
+        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('have_been_reported'));
         $this->assertEquals(ValueCaster::CAST_STRING, $caster->getTypeByFieldName('regular_field'));
     }
 

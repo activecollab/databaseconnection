@@ -120,7 +120,7 @@ Unless specified differently, following conventions apply:
 
 1. `id` and `row_count` fields are always cast to integers,
 2. Fields with name ending with `_id` are cast to integers,
-3. Fields with name starting with `is_` are cast to boolean,
+3. Fields with name starting with `is_`, `had_`, `was_`, `were_` and `have_` are cast to boolean,
 4. Fields with name ending with `_at` or `_on` are cast to DateValue.
 
 ## Object Hydration
