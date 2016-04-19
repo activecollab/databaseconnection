@@ -1,14 +1,23 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection;
 
+use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
-use Interop\Container\ContainerInterface;
-use InvalidArgumentException;
 use Closure;
 use Exception;
+use Interop\Container\ContainerInterface;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseConnection
@@ -16,7 +25,7 @@ use Exception;
 interface ConnectionInterface
 {
     /**
-     * Load mode
+     * Load mode.
      *
      * LOAD_ALL_ROWS - Load all rows
      * LOAD_FIRST_ROW - Limit result set to first row and load it
@@ -29,7 +38,7 @@ interface ConnectionInterface
     const LOAD_FIRST_CELL = 3;
 
     /**
-     * Return method for DB results
+     * Return method for DB results.
      *
      * RETURN_ARRAY - Return fields as associative array
      * RETURN_OBJECT_BY_CLASS - Create new object instance and hydrate it
@@ -41,54 +50,54 @@ interface ConnectionInterface
     const RETURN_OBJECT_BY_FIELD = 2;
 
     /**
-     * Insert mode, used by insert() method
+     * Insert mode, used by insert() method.
      */
     const INSERT = 'INSERT';
     const REPLACE = 'REPLACE';
 
     /**
-     * Close connection
+     * Close connection.
      */
     public function disconnect();
 
     /**
-     * Execute a query and return a result
+     * Execute a query and return a result.
      *
-     * @param  string                    $sql
+     * @param string $sql
      * @param  mixed                     ...$arguments
      * @return ResultInterface|true|null
      */
     public function execute($sql, ...$arguments);
 
     /**
-     * Return first row that provided SQL query returns
+     * Return first row that provided SQL query returns.
      *
-     * @param  string $sql
+     * @param string $sql
      * @param  mixed  ...$arguments
      * @return array
      */
     public function executeFirstRow($sql, ...$arguments);
 
     /**
-     * Return value from the first cell of each column that provided SQL query returns
+     * Return value from the first cell of each column that provided SQL query returns.
      *
-     * @param  string $sql
+     * @param string $sql
      * @param  mixed  ...$arguments
      * @return array
      */
     public function executeFirstColumn($sql, ...$arguments);
 
     /**
-     * Return value from the first cell of the first row that provided SQL query returns
+     * Return value from the first cell of the first row that provided SQL query returns.
      *
-     * @param  string $sql
+     * @param string $sql
      * @param  mixed  ...$arguments
      * @return mixed
      */
     public function executeFirstCell($sql, ...$arguments);
 
     /**
-     * Prepare and execute query, while letting the developer change the load and return modes
+     * Prepare and execute query, while letting the developer change the load and return modes.
      *
      * @param  string                  $sql
      * @param  mixed                   $arguments
@@ -103,30 +112,30 @@ interface ConnectionInterface
     public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null);
 
     /**
-     * Return number of records from $table_name that match $conditions
+     * Return number of records from $table_name that match $conditions.
      *
      * Fields that COUNT() targets can be specified after $conditions. If they are omitted, COUNT(`id`) will be ran
      *
      * @param  string            $table_name
      * @param  array|string|null $conditions
      * @param  string            $field
-     * @return integer
+     * @return int
      */
     public function count($table_name, $conditions = null, $field = 'id');
 
     /**
-     * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set)
+     * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set).
      *
-     * @param  string $table
-     * @param  array  $field_value_map
-     * @param  string $mode
+     * @param  string                   $table
+     * @param  array                    $field_value_map
+     * @param  string                   $mode
      * @return int
      * @throws InvalidArgumentException
      */
     public function insert($table, array $field_value_map, $mode = self::INSERT);
 
     /**
-     * Prepare a batch insert utility instance
+     * Prepare a batch insert utility instance.
      *
      * @param  string               $table_name
      * @param  array                $fields
@@ -137,14 +146,14 @@ interface ConnectionInterface
     public function batchInsert($table_name, array $fields, $rows_per_batch = 50, $mode = self::INSERT);
 
     /**
-     * Return last insert ID
+     * Return last insert ID.
      *
-     * @return integer
+     * @return int
      */
     public function lastInsertId();
 
     /**
-     * Update one or more rows with the given list of values for fields
+     * Update one or more rows with the given list of values for fields.
      *
      * $conditions can be a string, or an array where first element is a patter and other elements are arguments
      *
@@ -157,26 +166,26 @@ interface ConnectionInterface
     public function update($table_name, array $field_value_map, $conditions = null);
 
     /**
-     * Delete one or more records from the table
+     * Delete one or more records from the table.
      *
      * $conditions can be a string, or an array where first element is a patter and other elements are arguments
      *
-     * @param  string            $table_name
-     * @param  string|array|null $conditions
+     * @param  string                   $table_name
+     * @param  string|array|null        $conditions
      * @return int
      * @throws InvalidArgumentException
      */
     public function delete($table_name, $conditions = null);
 
     /**
-     * Return number of affected rows
+     * Return number of affected rows.
      *
-     * @return integer
+     * @return int
      */
     public function affectedRows();
 
     /**
-     * Run body commands within a transation
+     * Run body commands within a transation.
      *
      * @param  Closure      $body
      * @param  Closure|null $on_success
@@ -186,30 +195,30 @@ interface ConnectionInterface
     public function transact(Closure $body, $on_success = null, $on_error = null);
 
     /**
-     * Begin transaction
+     * Begin transaction.
      */
     public function beginWork();
 
     /**
-     * Commit transaction
+     * Commit transaction.
      */
     public function commit();
 
     /**
-     * Rollback transaction
+     * Rollback transaction.
      */
     public function rollback();
 
     /**
-     * Return true if system is in transaction
+     * Return true if system is in transaction.
      *
-     * @return boolean
+     * @return bool
      */
     public function inTransaction();
 
     /**
-     * @param  string  $database_name
-     * @return boolean
+     * @param  string $database_name
+     * @return bool
      */
     public function databaseExists($database_name);
 
@@ -219,8 +228,8 @@ interface ConnectionInterface
     public function dropDatabase($database_name);
 
     /**
-     * @param  string  $user_name
-     * @return boolean
+     * @param  string $user_name
+     * @return bool
      */
     public function userExists($user_name);
 
@@ -231,15 +240,7 @@ interface ConnectionInterface
     public function dropUser($user_name, $hostname = '%');
 
     /**
-     * Return true if table named $table_name exists in the selected database
-     *
-     * @param  string $table_name
-     * @return bool
-     */
-    public function tableExists($table_name);
-
-    /**
-     * Return array of table names
+     * Return array of table names.
      *
      * @param  string $database_name
      * @return array
@@ -247,23 +248,124 @@ interface ConnectionInterface
     public function getTableNames($database_name = '');
 
     /**
-     * Drop a table named $table_name from selected database
+     * Return true if table named $table_name exists in the selected database.
+     *
+     * @param  string $table_name
+     * @return bool
+     */
+    public function tableExists($table_name);
+
+    /**
+     * Drop a table named $table_name from selected database.
      *
      * @param string $table_name
      */
     public function dropTable($table_name);
 
     /**
-     * Prepare SQL (replace ? with data from $arguments array)
+     * Return a list of field name.
      *
-     * @param  string $sql
+     * @param  string $table_name
+     * @return array
+     */
+    public function getFieldNames($table_name);
+
+    /**
+     * Return true if $field_name exists in $table_name.
+     *
+     * @param string $table_name
+     * @param string $field_name
+     */
+    public function fieldExists($table_name, $field_name);
+
+    /**
+     * Drop a field from the database.
+     *
+     * @param string $table_name
+     * @param string $field_name
+     * @param bool   $check_if_exists
+     */
+    public function dropField($table_name, $field_name, $check_if_exists = true);
+
+    /**
+     * Return a list of index names for the given table.
+     *
+     * @param  string $table_name
+     * @return array
+     */
+    public function getIndexNames($table_name);
+
+    /**
+     * Return true if index exists in the table.
+     *
+     * @param string $table_name
+     * @param string $index_name
+     */
+    public function indexExists($table_name, $index_name);
+
+    /**
+     * Drop an individual index.
+     *
+     * @param string $table_name
+     * @param string $index_name
+     * @param bool   $check_if_exists
+     */
+    public function dropIndex($table_name, $index_name, $check_if_exists = true);
+
+    /**
+     * Return true if foreign key checks are on.
+     *
+     * @return bool
+     */
+    public function areForeignKeyChecksOn();
+
+    /**
+     * Turn on FK checks.
+     */
+    public function turnOnForeignKeyChecks();
+
+    /**
+     * Turn off FK checks.
+     */
+    public function turnOffForeignKeyChecks();
+
+    /**
+     * Return a list of FK-s for a given table.
+     *
+     * @param  string $table_name
+     * @return array
+     */
+    public function getForeignKeyNames($table_name);
+
+    /**
+     * Return true if foreign key exists in a given table.
+     *
+     * @param  string $table_name
+     * @param  string $fk_name
+     * @return bool
+     */
+    public function foreignKeyExists($table_name, $fk_name);
+
+    /**
+     * Drop a foreign key.
+     *
+     * @param string $table_name
+     * @param string $fk_name
+     * @param bool   $check_if_exists
+     */
+    public function dropForeignKey($table_name, $fk_name, $check_if_exists = true);
+
+    /**
+     * Prepare SQL (replace ? with data from $arguments array).
+     *
+     * @param string $sql
      * @param  mixed  ...$arguments
      * @return string
      */
     public function prepare($sql, ...$arguments);
 
     /**
-     * Prepare conditions and return them as string
+     * Prepare conditions and return them as string.
      *
      * @param  array|string|null $conditions
      * @return string
@@ -273,14 +375,14 @@ interface ConnectionInterface
     /**
      * Escape string before we use it in query...
      *
-     * @param  mixed $unescaped
+     * @param  mixed                    $unescaped
      * @return string
      * @throws InvalidArgumentException
      */
     public function escapeValue($unescaped);
 
     /**
-     * Escape table field name
+     * Escape table field name.
      *
      * @param  string $unescaped
      * @return string
@@ -288,7 +390,7 @@ interface ConnectionInterface
     public function escapeFieldName($unescaped);
 
     /**
-     * Escape table name
+     * Escape table name.
      *
      * @param  string $unescaped
      * @return string
@@ -296,7 +398,7 @@ interface ConnectionInterface
     public function escapeTableName($unescaped);
 
     /**
-     * Escape database name
+     * Escape database name.
      *
      * @param  string $unescaped
      * @return string
@@ -308,7 +410,7 @@ interface ConnectionInterface
     // ---------------------------------------------------
 
     /**
-     * Set a callback that will receive every query after we run it
+     * Set a callback that will receive every query after we run it.
      *
      * Callback should accept two parameters: first for SQL that was ran, and second for time that it took to run
      *

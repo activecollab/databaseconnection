@@ -1,7 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Connection;
 
+use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
@@ -9,7 +19,6 @@ use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
 use ActiveCollab\DateValue\DateValue;
 use Closure;
 use DateTime;
@@ -51,10 +60,10 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Set database name and optionally select that database
+     * Set database name and optionally select that database.
      *
-     * @param  string       $database_name
-     * @param  boolean|true $select_database
+     * @param  string              $database_name
+     * @param  bool|true           $select_database
      * @return $this
      * @throws ConnectionException
      */
@@ -308,9 +317,9 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Transaction level
+     * Transaction level.
      *
-     * @var integer
+     * @var int
      */
     private $transaction_level = 0;
 
@@ -322,7 +331,7 @@ class MysqliConnection implements ConnectionInterface
         if ($this->transaction_level == 0) {
             $this->execute('BEGIN WORK');
         }
-        $this->transaction_level++;
+        ++$this->transaction_level;
     }
 
     /**
@@ -331,7 +340,7 @@ class MysqliConnection implements ConnectionInterface
     public function commit()
     {
         if ($this->transaction_level) {
-            $this->transaction_level--;
+            --$this->transaction_level;
             if ($this->transaction_level == 0) {
                 $this->execute('COMMIT');
             }
@@ -394,14 +403,6 @@ class MysqliConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function tableExists($table_name)
-    {
-        return in_array($table_name, $this->getTableNames());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getTableNames($database_name = '')
     {
         if ($database_name) {
@@ -422,16 +423,164 @@ class MysqliConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function tableExists($table_name)
+    {
+        return in_array($table_name, $this->getTableNames());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function dropTable($table_name)
     {
         $this->execute('DROP TABLE IF EXISTS ' . $this->escapeTableName($table_name));
     }
 
     /**
-     * Prepare (if needed) and execute SQL query
+     * {@inheritdoc}
+     */
+    public function getFieldNames($table_name)
+    {
+        $result = [];
+
+        if ($rows = $this->execute("DESCRIBE {$this->escapeTableName($table_name)}")) {
+            foreach ($rows as $row) {
+                $result[] = $row['Field'];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fieldExists($table_name, $field_name)
+    {
+        return in_array($field_name, $this->getFieldNames($table_name)); // @TODO may be a better way to do this
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dropField($table_name, $field_name, $check_if_exists = true)
+    {
+        if ($check_if_exists && !$this->fieldExists($table_name, $field_name)) {
+            return;
+        }
+
+        $this->execute("ALTER TABLE {$this->escapeTableName($table_name)} DROP {$this->escapeFieldName($field_name)}");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndexNames($table_name)
+    {
+        $result = [];
+
+        if ($rows = $this->execute("SHOW INDEXES FROM {$this->escapeTableName($table_name)}")) {
+            foreach ($rows as $row) {
+                $key_name = $row['Key_name'];
+
+                if (!in_array($key_name, $result)) {
+                    $result[] = $key_name;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function indexExists($table_name, $index_name)
+    {
+        return in_array($index_name, $this->getIndexNames($table_name)); // @TODO may be a better way to do this
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dropIndex($table_name, $index_name, $check_if_exists = true)
+    {
+        if ($check_if_exists && !$this->indexExists($table_name, $index_name)) {
+            return;
+        }
+
+        $this->execute("ALTER TABLE {$this->escapeTableName($table_name)} DROP INDEX {$this->escapeFieldName($index_name)}");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function areForeignKeyChecksOn()
+    {
+        if ($row = $this->executeFirstRow("SHOW VARIABLES LIKE 'FOREIGN_KEY_CHECKS'")) {
+            return in_array(strtolower($row['Value']), ['on', '1']);
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function turnOnForeignKeyChecks()
+    {
+        $this->execute('SET foreign_key_checks = 1;');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function turnOffForeignKeyChecks()
+    {
+        $this->execute('SET foreign_key_checks = 0;');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForeignKeyNames($table_name)
+    {
+        $result = [];
+
+        if ($rows = $this->execute('SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_NAME = ? AND CONSTRAINT_NAME != ?', $table_name, 'PRIMARY')) {
+            foreach ($rows as $row) {
+                $result[] = $row['CONSTRAINT_NAME'];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function foreignKeyExists($table_name, $fk_name)
+    {
+        return in_array($fk_name, $this->getForeignKeyNames($table_name));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dropForeignKey($table_name, $fk_name, $check_if_exists = true)
+    {
+        if ($check_if_exists && !$this->foreignKeyExists($table_name, $fk_name)) {
+            return;
+        }
+
+        $this->execute("ALTER TABLE {$this->escapeTableName($table_name)} DROP FOREIGN KEY {$this->escapeFieldName($fk_name)}");
+    }
+
+    /**
+     * Prepare (if needed) and execute SQL query.
      *
-     * @param  string     $sql
-     * @param  array|null $arguments
+     * @param  string             $sql
+     * @param  array|null         $arguments
      * @return mysqli_result|bool
      */
     private function prepareAndExecuteQuery($sql, $arguments)
@@ -524,11 +673,10 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
-     * Try to recover from failed query
+     * Try to recover from failed query.
      *
-     * @param  string     $sql
-     * @param  array|null $arguments
-     * @return null
+     * @param  string         $sql
+     * @param  array|null     $arguments
      * @throws QueryException
      */
     private function tryToRecoverFromFailedQuery($sql, $arguments)
@@ -561,7 +709,7 @@ class MysqliConnection implements ConnectionInterface
     {
         // Date value
         if ($unescaped instanceof DateValue) {
-            return "'" . $this->link->real_escape_string($unescaped->format("Y-m-d")) . "'";
+            return "'" . $this->link->real_escape_string($unescaped->format('Y-m-d')) . "'";
 
         // Date time value (including DateTimeValue)
         } elseif ($unescaped instanceof DateTime) {
@@ -570,7 +718,7 @@ class MysqliConnection implements ConnectionInterface
         // Float
         } else {
             if (is_float($unescaped)) {
-                return "'" . str_replace(',', '.', (float)$unescaped) . "'"; // replace , with . for locales where comma is used by the system (German for example)
+                return "'" . str_replace(',', '.', (float) $unescaped) . "'"; // replace , with . for locales where comma is used by the system (German for example)
 
             // Boolean (maps to TINYINT(1))
             } else {
@@ -678,7 +826,7 @@ class MysqliConnection implements ConnectionInterface
     private $on_log_query;
 
     /**
-     * Set a callback that will receive every query after we run it
+     * Set a callback that will receive every query after we run it.
      *
      * Callback should accept two parameters: first for SQL that was ran, and second for time that it took to run
      *
