@@ -18,8 +18,8 @@
     "require": {
         "php": ">=5.6.0",
         "ext-mysqli": "*",
-        "activecollab/containeraccess": "~1.0.0",
-        "activecollab/datevalue": "~1.0.0",
+        "activecollab/containeraccess": "dev-master",
+        "activecollab/datevalue": "dev-master",
         "psr/log": "~1.0.0"
     },
     "require-dev": {
