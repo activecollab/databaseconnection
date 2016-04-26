@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "64e7e8a10ae8620f78ee2a721584ef14",
-    "content-hash": "8c503f2adc5e53923c7f0ebda9707fa4",
+    "hash": "e1a3770ff989d33c642094d83e63f4c6",
+    "content-hash": "9c8d1d0fd392e3ad89c2757de1be9c83",
     "packages": [
         {
             "name": "activecollab/containeraccess",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/containeraccess.git",
-                "reference": "9f0916adae56821cae7a32c955a01e7e8f235b2f"
+                "reference": "a3d615c6f123c17458b10dde106bd717a12c73ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/containeraccess/zipball/9f0916adae56821cae7a32c955a01e7e8f235b2f",
-                "reference": "9f0916adae56821cae7a32c955a01e7e8f235b2f",
+                "url": "https://api.github.com/repos/activecollab/containeraccess/zipball/a3d615c6f123c17458b10dde106bd717a12c73ba",
+                "reference": "a3d615c6f123c17458b10dde106bd717a12c73ba",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "ioc",
                 "service-container"
             ],
-            "time": "2016-04-26 15:02:23"
+            "time": "2016-04-26 15:18:08"
         },
         {
             "name": "activecollab/datevalue",
