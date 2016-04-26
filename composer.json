@@ -3,7 +3,6 @@
     "type": "library",
     "description": "A couple of simple helper methods wrapped around MySQLi connection",
     "license": "MIT",
-    "prefer-stable": true,
     "keywords": [
         "mysql",
         "activecollab"
@@ -27,7 +26,6 @@
         "phpunit/phpunit": "~5.0",
         "pimple/pimple": "~3.0.0"
     },
-    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "ActiveCollab\\DatabaseConnection\\": "src",
