@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d8f3344e22bce2d10f087055835e968d",
-    "content-hash": "70ad412edbf6d41738247b5165ab2a7d",
+    "hash": "e1a3770ff989d33c642094d83e63f4c6",
+    "content-hash": "9c8d1d0fd392e3ad89c2757de1be9c83",
     "packages": [
         {
             "name": "activecollab/containeraccess",
@@ -56,16 +56,16 @@
         },
         {
             "name": "activecollab/datevalue",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/datevalue.git",
-                "reference": "1c2a1d7b2704315d8cb0462f7a9dbd9bf5eb9ba4"
+                "reference": "c7b0af1ca57e82a529368a0038c79fbe015d07a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/datevalue/zipball/1c2a1d7b2704315d8cb0462f7a9dbd9bf5eb9ba4",
-                "reference": "1c2a1d7b2704315d8cb0462f7a9dbd9bf5eb9ba4",
+                "url": "https://api.github.com/repos/activecollab/datevalue/zipball/c7b0af1ca57e82a529368a0038c79fbe015d07a3",
+                "reference": "c7b0af1ca57e82a529368a0038c79fbe015d07a3",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "date",
                 "datetime"
             ],
-            "time": "2015-11-26 14:01:05"
+            "time": "2016-04-26 07:51:26"
         },
         {
             "name": "container-interop/container-interop",
@@ -1896,9 +1896,9 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [],
-    "prefer-stable": true,
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=5.6.0",
