@@ -17,7 +17,7 @@ This library makes query execution quick and easy. You can fetch all records, on
 ```php
 <?php
 
-use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use MySQLi;
 use RuntimeException;
 
@@ -27,7 +27,7 @@ if ($database_link->connect_error) {
   throw new RuntimeException('Failed to connect to database. MySQL said: ' . $database_link->connect_error);
 }
 
-$connection = new Connection($database_link);
+$connection = new MysqliConnection($database_link);
 
 // List all writers
 foreach ($connection->execute('SELECT `id`, `name` FROM `writers` WHERE `name` = ? ORDER BY `id`', 'Leo Tolstoy') as $row) {
@@ -179,7 +179,7 @@ You can get a list of hydrated objects by passing the name of the class to `adva
 ```php
 <?php
 
-use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use DateTime;
 use MySQLi;
 use RuntimeException;
@@ -190,7 +190,7 @@ if ($database_link->connect_error) {
   throw new RuntimeException('Failed to connect to database. MySQL said: ' . $database_link->connect_error);
 }
 
-$connection = new Connection($database_link);
+$connection = new MysqliConnection($database_link);
 
 foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer') as $writer) {
   print '#' . $writer->getId() . ' ' . $writer->getName() . ' (' . $writer->getBirthday()->format('Y-m-d') . ')';
@@ -202,7 +202,7 @@ If you store objects of multiple types in the same table, you can tell `advanced
 ```php
 <?php
 
-use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use DateTime;
 use MySQLi;
 use RuntimeException;
@@ -213,7 +213,7 @@ if ($database_link->connect_error) {
   throw new RuntimeException('Failed to connect to database. MySQL said: ' . $database_link->connect_error);
 }
 
-$connection = new Connection($database_link);
+$connection = new MysqliConnection($database_link);
 
 foreach ($this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_FIELD, 'type') as $writer) {
   print '#' . $writer->getId() . ' ' . $writer->getName() . ' (' . $writer->getBirthday()->format('Y-m-d') . ')';
