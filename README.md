@@ -261,7 +261,7 @@ CREATE DATABASE activecollab_database_connection_test DEFAULT CHARACTER SET utf8
 Then from a project root execute following command:
 
 ```bash
-databaseconnection$ phpunit -c test
+phpunit
 ```
 
 ## To do
