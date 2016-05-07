@@ -269,3 +269,4 @@ phpunit
 1. Use prepared statements for all queries that have extra arguments,
 2. Enable library to use two database connections, one for writes, and the other for reads,
 3. Properly handle MySQL has gone away errors and deadlocks (stubbed).
+4. Consider support MySQL Native Driver, and features that it enables
