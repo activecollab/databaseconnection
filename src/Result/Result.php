@@ -2,14 +2,14 @@
 
 namespace ActiveCollab\DatabaseConnection\Result;
 
+use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
-use ArrayAccess;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use BadMethodCallException;
-use Countable;
+use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
-use IteratorAggregate;
 use JsonSerializable;
 use mysqli_result;
 use ReflectionClass;
@@ -17,7 +17,7 @@ use ReflectionClass;
 /**
  * Abstraction of database query result.
  */
-class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializable
+class Result implements ResultInterface
 {
     /**
      * Cursor position.
@@ -63,20 +63,25 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     private $constructor_arguments;
 
     /**
-     * @var ValueCaster
+     * @var ContainerInterface|null
+     */
+    private $container;
+
+    /**
+     * @var ValueCasterInterface
      */
     private $value_caser;
 
     /**
      * Construct a new result object from resource.
      *
-     * @param  mysqli_result            $resource
-     * @param  int                      $return_mode
-     * @param  string                   $return_class_or_field
-     * @param  array|null               $constructor_arguments
-     * @throws InvalidArgumentException
+     * @param  mysqli_result          $resource
+     * @param  int                    $return_mode
+     * @param  string                 $return_class_or_field
+     * @param  array|null             $constructor_arguments
+     * @param ContainerInterface|null $container
      */
-    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null)
+    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
     {
         if (!$this->isValidResource($resource)) {
             throw new InvalidArgumentException('mysqli_result expected');
@@ -92,6 +97,7 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
         $this->return_mode = $return_mode;
         $this->return_class_or_field = $return_class_or_field;
         $this->constructor_arguments = $constructor_arguments;
+        $this->container = $container;
     }
 
     /**
@@ -340,37 +346,35 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
     }
 
     /**
-     * Set a custom value caster.
-     *
-     * @param ValueCaster $value_caster
+     * {@inheritdoc}
      */
-    public function setValueCaster(ValueCaster $value_caster)
+    public function &setValueCaster(ValueCasterInterface $value_caster)
     {
         $this->value_caser = $value_caster;
+
+        return $this;
     }
 
     /**
-     * Set result to return objects by class name.
-     *
-     * @param string $class_name
+     * {@inheritdoc}
      */
-    public function returnObjectsByClass($class_name)
+    public function &returnObjectsByClass($class_name)
     {
         $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
-
         $this->return_class_or_field = $class_name;
+
+        return $this;
     }
 
     /**
-     * Set result to load objects of class based on filed value.
-     *
-     * @param string $field_name
+     * {@inheritdoc}
      */
-    public function returnObjectsByField($field_name)
+    public function &returnObjectsByField($field_name)
     {
         $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
-
         $this->return_class_or_field = $field_name;
+
+        return $this;
     }
 
     /**
@@ -409,11 +413,15 @@ class Result implements IteratorAggregate, ArrayAccess, Countable, JsonSerializa
             $this->current_row = (new ReflectionClass($class_name))->newInstanceArgs($this->constructor_arguments);
         }
 
+        if ($this->current_row instanceof ContainerAccessInterface && $this->container) {
+            $this->current_row->setContainer($this->container);
+        }
+
         $this->current_row->loadFromRow($row);
     }
 
     /**
-     * @return ValueCaster
+     * @return ValueCasterInterface
      */
     private function getValueCaster()
     {

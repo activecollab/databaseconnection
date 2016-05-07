@@ -4,6 +4,8 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Writer;
 use DateTime;
 
@@ -21,7 +23,11 @@ class ExecuteLoadObjectTest extends TestCase
     {
         parent::setUp();
 
-        $this->connection = new Connection($this->link);
+        $this->connection = new MysqliConnection($this->link);
+
+        if ($this->connection->tableExists('writers')) {
+            $this->connection->dropTable('writers');
+        }
 
         $create_table = $this->connection->execute("CREATE TABLE `writers` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -41,7 +47,9 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function tearDown()
     {
-        $this->connection->execute('DROP TABLE `writers`');
+        if ($this->connection->tableExists('writers')) {
+            $this->connection->dropTable('writers');
+        }
 
         parent::tearDown();
     }
@@ -67,9 +75,9 @@ class ExecuteLoadObjectTest extends TestCase
      */
     public function testExecuteLoadObjectFromClassName()
     {
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer');
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, Writer::class);
 
-        $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
+        $this->assertInstanceOf(Result::class, $result);
         $this->assertCount(3, $result);
 
         /** @var \ActiveCollab\DatabaseConnection\Test\Fixture\Writer[] $writers */

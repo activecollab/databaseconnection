@@ -1,19 +1,25 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Record;
 
-use DateTime;
-use DateTimeZone;
+use ActiveCollab\DateValue\DateTimeValue;
+use ActiveCollab\DateValue\DateValue;
+use RuntimeException;
 
-class ValueCaster
+/**
+ * @package ActiveCollab\DatabaseConnection\Record
+ */
+class ValueCaster implements ValueCasterInterface
 {
-    const CAST_INT = 'int';
-    const CAST_FLOAT = 'float';
-    const CAST_STRING = 'string';
-    const CAST_BOOL = 'bool';
-    const CAST_DATE = 'date';
-    const CAST_DATETIME = 'datetime';
-
     /**
      * @var array
      */
@@ -47,12 +53,12 @@ class ValueCaster
      * @param string $field_name
      * @param mixed  $value
      *
-     * @return bool|DateTime|float|int|mixed|null|string
+     * @return mixed
      */
     public function castValue($field_name, $value)
     {
         if ($value === null) {
-            return; // NULL remains NULL
+            return null; // NULL remains NULL
         }
 
         switch ($this->getTypeByFieldName($field_name)) {
@@ -65,8 +71,21 @@ class ValueCaster
             case self::CAST_BOOL:
                 return (bool) $value;
             case self::CAST_DATE:
+                return new DateValue($value, 'UTC');
             case self::CAST_DATETIME:
-                return new DateTime($value, new DateTimeZone('UTC'));
+                return new DateTimeValue($value, 'UTC');
+            case self::CAST_JSON:
+                if (empty($value)) {
+                    return null;
+                } else {
+                    $result = json_decode($value, true);
+
+                    if (empty($result) && json_last_error()) {
+                        throw new RuntimeException('Failed to parse JSON. Reason: ' . json_last_error_msg(), json_last_error());
+                    }
+
+                    return $result;
+                }
             default:
                 return (string) $value;
         }
@@ -85,7 +104,7 @@ class ValueCaster
             return $this->dictated[$field_name];
         }
 
-        if (substr($field_name, 0, 3) === 'is_') {
+        if (substr($field_name, 0, 3) === 'is_' || in_array(substr($field_name, 0, 4), ['has_', 'had_', 'was_']) || in_array(substr($field_name, 0, 5), ['were_', 'have_'])) {
             return self::CAST_BOOL;
         }
 

@@ -1,9 +1,8 @@
 <?php
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Record\ValueCaster;
-use DateTime;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -11,7 +10,7 @@ use DateTime;
 class TablesTest extends TestCase
 {
     /**
-     * @var Connection
+     * @var MysqliConnection
      */
     private $connection;
 
@@ -22,7 +21,7 @@ class TablesTest extends TestCase
     {
         parent::setUp();
 
-        $this->connection = new Connection($this->link);
+        $this->connection = new MysqliConnection($this->link);
 
         $this->connection->execute('DROP TABLE IF EXISTS `writers1`');
         $this->connection->execute("CREATE TABLE `writers1` (
@@ -67,6 +66,26 @@ class TablesTest extends TestCase
     public function testListTables()
     {
         $this->assertEquals(['writers1', 'writers2', 'writers3'], $this->connection->getTableNames());
+    }
+
+    /**
+     * Test list tables from a specified database (user needs to have proper permissions over that database)
+     */
+    public function testListTablesFromAnotherDatabase()
+    {
+        if ($this->connection->databaseExists('test_another_database')) {
+            $this->connection->execute('DROP DATABASE `test_another_database`');
+        }
+
+        $this->connection->execute('CREATE DATABASE `test_another_database`');
+        $this->assertTrue($this->connection->databaseExists('test_another_database'));
+
+        $this->connection->execute('CREATE TABLE `test_another_database`.`test_table` (id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT)');
+
+        $this->assertEquals(['test_table'], $this->connection->getTableNames('test_another_database'));
+
+        $this->connection->execute('DROP DATABASE `test_another_database`');
+        $this->assertFalse($this->connection->databaseExists('test_another_database'));
     }
 
     /**

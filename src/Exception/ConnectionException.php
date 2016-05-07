@@ -4,14 +4,13 @@ namespace ActiveCollab\DatabaseConnection\Exception;
 
 use Exception;
 
-class Query extends Exception
+/**
+ * @package ActiveCollab\DatabaseConnection\Exception
+ */
+class ConnectionException extends Exception implements ExceptionInterface
 {
     /**
-     * Construct the exception.
-     *
-     * @param string    $message
-     * @param int       $code
-     * @param Exception $previous
+     * {@inheritdoc}
      */
     public function __construct($message = '', $code = 0, Exception $previous = null)
     {

@@ -2,6 +2,9 @@
 
 namespace ActiveCollab\DatabaseConnection\Record;
 
+/**
+ * @package ActiveCollab\DatabaseConnection\Record
+ */
 interface LoadFromRow
 {
     /**

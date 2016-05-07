@@ -1,8 +1,17 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use DateTime;
 
 /**
@@ -11,18 +20,18 @@ use DateTime;
 class UpdateTest extends TestCase
 {
     /**
-     * @var Connection
+     * @var MysqliConnection
      */
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->connection = new Connection($this->link);
+        $this->connection = new MysqliConnection($this->link);
 
         $this->connection->execute('DROP TABLE IF EXISTS `writers`');
 
@@ -41,7 +50,7 @@ class UpdateTest extends TestCase
     }
 
     /**
-     * Tear down the test environment
+     * Tear down the test environment.
      */
     public function tearDown()
     {
@@ -51,7 +60,7 @@ class UpdateTest extends TestCase
     }
 
     /**
-     * Test if affected rows returns the correct value
+     * Test if affected rows returns the correct value.
      */
     public function testAffectedRows()
     {
@@ -65,7 +74,7 @@ class UpdateTest extends TestCase
     }
 
     /**
-     * Test update all records
+     * Test update all records.
      */
     public function testUpdate()
     {
@@ -79,7 +88,7 @@ class UpdateTest extends TestCase
     }
 
     /**
-     * Test update with prepared conditions
+     * Test update with prepared conditions.
      */
     public function testUpdateWithPreparedConditions()
     {
@@ -94,14 +103,14 @@ class UpdateTest extends TestCase
     }
 
     /**
-     * Test update prepared conditions, as array
+     * Test update prepared conditions, as array.
      */
     public function testUpdateWithPreparedConditionsAsOnlyElement()
     {
         $affected_rows = $this->connection->update('writers', [
             'name' => 'Anton Chekhov',
             'birthday' => new DateTime('1860-01-29'),
-        ], [ "`name` = 'Leo Tolstoy'" ]);
+        ], ["`name` = 'Leo Tolstoy'"]);
 
         $this->assertEquals(1, $affected_rows);
         $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `name` = ?', 'Anton Chekhov'));
@@ -109,14 +118,14 @@ class UpdateTest extends TestCase
     }
 
     /**
-     * Test update where conditions are an array that needs to be prepared
+     * Test update where conditions are an array that needs to be prepared.
      */
     public function testUpdateWithConditionsThatNeedToBePrepared()
     {
         $affected_rows = $this->connection->update('writers', [
             'name' => 'Anton Chekhov',
             'birthday' => new DateTime('1860-01-29'),
-        ], [ '`name` = ?', 'Leo Tolstoy' ]);
+        ], ['`name` = ?', 'Leo Tolstoy']);
 
         $this->assertEquals(1, $affected_rows);
         $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `name` = ?', 'Anton Chekhov'));
