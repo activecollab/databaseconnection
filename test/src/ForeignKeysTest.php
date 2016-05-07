@@ -143,7 +143,6 @@ class ForeignKeysTest extends TestCase
 
     /**
      * @expectedException \ActiveCollab\DatabaseConnection\Exception\QueryException
-     * @expectedExceptionMessage Can't DROP 'FK that does not exist'; check that column/key exists
      */
     public function testUnsafeDropNonExistingFk()
     {
