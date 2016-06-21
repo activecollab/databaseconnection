@@ -28,6 +28,7 @@ use InvalidArgumentException;
 use mysqli;
 use mysqli_result;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseConnection
@@ -132,7 +133,7 @@ class MysqliConnection implements ConnectionInterface
         $query_result = $this->prepareAndExecuteQuery($sql, $arguments);
 
         if ($query_result === false) {
-            $query_result = $this->tryToRecoverFromFailedQuery($sql, $arguments);
+            $query_result = $this->tryToRecoverFromFailedQuery($sql, $arguments, $load_mode, $return_mode);
         }
 
         if ($query_result instanceof mysqli_result) {
@@ -675,11 +676,14 @@ class MysqliConnection implements ConnectionInterface
     /**
      * Try to recover from failed query.
      *
-     * @param  string         $sql
-     * @param  array|null     $arguments
+     * @param string     $sql
+     * @param array|null $arguments
+     * @param $load_mode
+     * @param $return_mode
+     * @return array|bool|DateTime|float|int|mixed|null|string|void
      * @throws QueryException
      */
-    private function tryToRecoverFromFailedQuery($sql, $arguments)
+    private function tryToRecoverFromFailedQuery($sql, $arguments, $load_mode, $return_mode)
     {
         switch ($this->link->errno) {
 
@@ -690,16 +694,40 @@ class MysqliConnection implements ConnectionInterface
             // Server gone away
             case 2006:
             case 2013:
-                return $this->handleMySqlGoneAway($sql, $arguments);
+                return $this->handleMySqlGoneAway($sql, $arguments, $load_mode, $return_mode);
 
             // Deadlock detection and retry
             case 1213:
-                return $this->handleDeadlock($sql, $arguments);
+                return $this->handleDeadlock();
 
             // Other error
             default:
                 throw new QueryException($this->link->error, $this->link->errno);
         }
+    }
+
+    /**
+     * @param $sql
+     * @param $arguments
+     * @param $load_mode
+     * @param $return_mode
+     * @return array|bool|DateTime|float|int|mixed|null|string
+     * @throws QueryException
+     */
+    private function handleMySqlGoneAway($sql, $arguments, $load_mode, $return_mode)
+    {
+        if (!$this->link->ping()) {
+            $this->log->notice('Mysql reconnect failed');
+
+            throw new QueryException($this->link->error, $this->link->errno);
+        }
+
+        return $this->advancedExecute($sql, $arguments, $load_mode, $return_mode);
+    }
+
+    private function handleDeadlock()
+    {
+        throw new RuntimeException('Not implemented.');
     }
 
     /**
