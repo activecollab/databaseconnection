@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Result;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
@@ -56,7 +65,7 @@ class Result implements ResultInterface
     private $return_class_or_field;
 
     /**
-     * Constructor arguments (when objects are constructed from rows)
+     * Constructor arguments (when objects are constructed from rows).
      *
      * @var array|null
      */
@@ -75,10 +84,10 @@ class Result implements ResultInterface
     /**
      * Construct a new result object from resource.
      *
-     * @param  mysqli_result          $resource
-     * @param  int                    $return_mode
-     * @param  string                 $return_class_or_field
-     * @param  array|null             $constructor_arguments
+     * @param mysqli_result           $resource
+     * @param int                     $return_mode
+     * @param string                  $return_class_or_field
+     * @param array|null              $constructor_arguments
      * @param ContainerInterface|null $container
      */
     public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
@@ -121,8 +130,8 @@ class Result implements ResultInterface
     /**
      * Set cursor to a given position in the record set.
      *
-     * @param  integer $num
-     * @return boolean
+     * @param  int  $num
+     * @return bool
      */
     public function seek($num)
     {

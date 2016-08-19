@@ -1,8 +1,17 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use DateTime;
 
 /**
@@ -16,7 +25,7 @@ class DeleteTest extends TestCase
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -41,7 +50,7 @@ class DeleteTest extends TestCase
     }
 
     /**
-     * Tear down the test environment
+     * Tear down the test environment.
      */
     public function tearDown()
     {
@@ -51,7 +60,7 @@ class DeleteTest extends TestCase
     }
 
     /**
-     * Test delete all records
+     * Test delete all records.
      */
     public function testDelete()
     {
@@ -62,7 +71,7 @@ class DeleteTest extends TestCase
     }
 
     /**
-     * Test delete with prepared conditions
+     * Test delete with prepared conditions.
      */
     public function testDeleteWithPreparedConditions()
     {
@@ -74,11 +83,11 @@ class DeleteTest extends TestCase
     }
 
     /**
-     * Test delete prepared conditions, as array
+     * Test delete prepared conditions, as array.
      */
     public function testDeleteWithPreparedConditionsAsOnlyElement()
     {
-        $affected_rows = $this->connection->delete('writers', [ "`name` = 'Leo Tolstoy'" ]);
+        $affected_rows = $this->connection->delete('writers', ["`name` = 'Leo Tolstoy'"]);
 
         $this->assertEquals(1, $affected_rows);
         $this->assertEquals(2, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers`'));
@@ -86,11 +95,11 @@ class DeleteTest extends TestCase
     }
 
     /**
-     * Test delete where conditions are an array that needs to be prepared
+     * Test delete where conditions are an array that needs to be prepared.
      */
     public function testDeleteWithConditionsThatNeedToBePrepared()
     {
-        $affected_rows = $this->connection->delete('writers', [ '`name` = ?', 'Leo Tolstoy' ]);
+        $affected_rows = $this->connection->delete('writers', ['`name` = ?', 'Leo Tolstoy']);
 
         $this->assertEquals(1, $affected_rows);
         $this->assertEquals(2, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers`'));

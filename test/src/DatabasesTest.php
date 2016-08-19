@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
@@ -15,7 +24,7 @@ class DatabasesTest extends TestCase
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -25,7 +34,7 @@ class DatabasesTest extends TestCase
     }
 
     /**
-     * Test database exists call
+     * Test database exists call.
      */
     public function testDatabaseExists()
     {
@@ -34,7 +43,7 @@ class DatabasesTest extends TestCase
     }
 
     /**
-     * Test drop database
+     * Test drop database.
      */
     public function testDropDatabase()
     {

@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
@@ -15,7 +25,7 @@ class CountTest extends TestCase
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -36,7 +46,7 @@ class CountTest extends TestCase
     }
 
     /**
-     * Tear down the test environment
+     * Tear down the test environment.
      */
     public function tearDown()
     {
@@ -46,7 +56,7 @@ class CountTest extends TestCase
     }
 
     /**
-     * Test cound all records in the table
+     * Test cound all records in the table.
      */
     public function testCountAll()
     {
@@ -54,7 +64,7 @@ class CountTest extends TestCase
     }
 
     /**
-     * Test cound with conditions provided as string
+     * Test cound with conditions provided as string.
      */
     public function testCountWithStringConditions()
     {
@@ -62,7 +72,7 @@ class CountTest extends TestCase
     }
 
     /**
-     * Test count with conditions that need to be prepared first
+     * Test count with conditions that need to be prepared first.
      */
     public function testCountWithConditionsThatNeedToBePrepared()
     {
@@ -70,7 +80,7 @@ class CountTest extends TestCase
     }
 
     /**
-     * Test count(*)
+     * Test count(*).
      */
     public function testCountAsterisk()
     {
@@ -78,7 +88,7 @@ class CountTest extends TestCase
     }
 
     /**
-     * Test count by field
+     * Test count by field.
      */
     public function testCountField()
     {

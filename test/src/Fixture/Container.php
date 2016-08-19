@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test\Fixture;
 
 use Interop\Container\ContainerInterface;
@@ -24,6 +33,7 @@ class Container extends \Pimple\Container implements ContainerInterface
         if (!$this->offsetExists($id)) {
             throw new InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
         }
+
         return $this->offsetGet($id);
     }
 
@@ -33,7 +43,7 @@ class Container extends \Pimple\Container implements ContainerInterface
      *
      * @param string $id Identifier of the entry to look for.
      *
-     * @return boolean
+     * @return bool
      */
     public function has($id)
     {
