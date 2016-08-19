@@ -1,10 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Writer;
 use DateTime;
@@ -106,7 +115,7 @@ class ExecuteLoadObjectTest extends TestCase
     }
 
     /**
-     * Test if constructor arguments are properly set to instances when provided
+     * Test if constructor arguments are properly set to instances when provided.
      */
     public function testExecuteLoadObjectWithConstructorArguments()
     {
@@ -122,7 +131,7 @@ class ExecuteLoadObjectTest extends TestCase
             $this->assertNull($writer->constructor_argument_2);
         }
 
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer', [12,34]);
+        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, '\ActiveCollab\DatabaseConnection\Test\Fixture\Writer', [12, 34]);
 
         $this->assertInstanceOf('\ActiveCollab\DatabaseConnection\Result\Result', $result);
         $this->assertCount(3, $result);

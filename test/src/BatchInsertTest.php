@@ -1,11 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
+use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
+use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use DateTime;
 
 /**
@@ -19,7 +28,7 @@ class BatchInsertTest extends TestCase
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -38,7 +47,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Tear down the test environment
+     * Tear down the test environment.
      */
     public function tearDown()
     {
@@ -48,7 +57,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test if connection is properly creating batch insert instance
+     * Test if connection is properly creating batch insert instance.
      */
     public function testConnectionPropertyCreatesBatchInsertObject()
     {
@@ -63,7 +72,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test if rows per batch and insert mode can be changed
+     * Test if rows per batch and insert mode can be changed.
      */
     public function testRowsPerBatchAndModeCanBeChanged()
     {
@@ -78,7 +87,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test if insert SQL foundation is properly prepared
+     * Test if insert SQL foundation is properly prepared.
      */
     public function testInsertSqlIsProperlyPrepared()
     {
@@ -93,7 +102,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test if replace SQL foundation is properly prepared
+     * Test if replace SQL foundation is properly prepared.
      */
     public function testReplaceSqlIsProperlyPrepared()
     {
@@ -108,7 +117,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test if row prepare pattern is proeprly prepared
+     * Test if row prepare pattern is proeprly prepared.
      */
     public function testRowPreparePattern()
     {
@@ -123,7 +132,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test batch insert
+     * Test batch insert.
      */
     public function testBatchInsert()
     {
@@ -147,7 +156,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test batch replace
+     * Test batch replace.
      */
     public function testBatchReplace()
     {
@@ -177,7 +186,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test flush
+     * Test flush.
      */
     public function testFlush()
     {
@@ -194,7 +203,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test if rows can't be inserted once batch is done
+     * Test if rows can't be inserted once batch is done.
      *
      * @expectedException \RuntimeException
      */
@@ -215,7 +224,7 @@ class BatchInsertTest extends TestCase
     }
 
     /**
-     * Test if rows can't be inserted escaped once batch is done
+     * Test if rows can't be inserted escaped once batch is done.
      *
      * @expectedException \RuntimeException
      */

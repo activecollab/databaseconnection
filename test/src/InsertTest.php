@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
@@ -16,7 +26,7 @@ class InsertTest extends TestCase
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -41,7 +51,7 @@ class InsertTest extends TestCase
     }
 
     /**
-     * Tear down the test environment
+     * Tear down the test environment.
      */
     public function tearDown()
     {
@@ -51,7 +61,7 @@ class InsertTest extends TestCase
     }
 
     /**
-     * Test if last insert ID returns correct value
+     * Test if last insert ID returns correct value.
      */
     public function testInsertId()
     {
@@ -60,7 +70,7 @@ class InsertTest extends TestCase
     }
 
     /**
-     * Test insert
+     * Test insert.
      */
     public function testInsert()
     {
@@ -75,12 +85,12 @@ class InsertTest extends TestCase
         $this->assertEquals([
             'id' => 4,
             'name' => 'Anton Chekhov',
-            'birthday' => '1860-01-29'
+            'birthday' => '1860-01-29',
         ], $this->connection->executeFirstRow('SELECT * FROM `writers` WHERE `id` = ?', $last_insert_id));
     }
 
     /**
-     * Test replace mode
+     * Test replace mode.
      */
     public function testReplace()
     {
@@ -96,7 +106,7 @@ class InsertTest extends TestCase
         $this->assertEquals([
             'id' => 1,
             'name' => 'Anton Chekhov',
-            'birthday' => '1860-01-29'
+            'birthday' => '1860-01-29',
         ], $this->connection->executeFirstRow('SELECT * FROM `writers` WHERE `id` = ?', $last_insert_id));
     }
 }

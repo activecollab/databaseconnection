@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
@@ -15,7 +24,7 @@ class TablesTest extends TestCase
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -49,7 +58,7 @@ class TablesTest extends TestCase
     }
 
     /**
-     * Tear down the test environment
+     * Tear down the test environment.
      */
     public function tearDown()
     {
@@ -61,7 +70,7 @@ class TablesTest extends TestCase
     }
 
     /**
-     * Test list all database tables
+     * Test list all database tables.
      */
     public function testListTables()
     {
@@ -69,7 +78,7 @@ class TablesTest extends TestCase
     }
 
     /**
-     * Test list tables from a specified database (user needs to have proper permissions over that database)
+     * Test list tables from a specified database (user needs to have proper permissions over that database).
      */
     public function testListTablesFromAnotherDatabase()
     {
@@ -89,7 +98,7 @@ class TablesTest extends TestCase
     }
 
     /**
-     * Test if we can check if table exists or not
+     * Test if we can check if table exists or not.
      */
     public function testTableExists()
     {
@@ -98,7 +107,7 @@ class TablesTest extends TestCase
     }
 
     /**
-     * Test drop table command
+     * Test drop table command.
      */
     public function testDropTable()
     {

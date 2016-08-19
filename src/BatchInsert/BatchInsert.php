@@ -1,10 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\BatchInsert;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use InvalidArgumentException;
 use BadMethodCallException;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -28,49 +37,49 @@ class BatchInsert implements BatchInsertInterface
     private $fields;
 
     /**
-     * Cached SQL query foundation
+     * Cached SQL query foundation.
      *
      * @var string
      */
     private $sql_foundation;
 
     /**
-     * String that's used to prepare statements
+     * String that's used to prepare statements.
      *
      * @var string
      */
     private $row_prepare_pattern;
 
     /**
-     * Number of fields that are being inserted
+     * Number of fields that are being inserted.
      *
-     * @var integer
+     * @var int
      */
     private $fields_num;
 
     /**
-     * Numbe of rows that are inserted per single INSERT query
+     * Numbe of rows that are inserted per single INSERT query.
      *
-     * @var integer
+     * @var int
      */
     private $rows_per_batch;
 
     /**
-     * Insert or replace mode
+     * Insert or replace mode.
      *
      * @var string
      */
     private $mode;
 
     /**
-     * Array of rows that will need to be inserted into the database
+     * Array of rows that will need to be inserted into the database.
      *
      * @var array
      */
     private $rows = [];
 
     /**
-     * Total number of rows inserted
+     * Total number of rows inserted.
      *
      * @var int
      */
@@ -127,7 +136,7 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Return table name
+     * Return table name.
      *
      * @return string
      */
@@ -137,7 +146,7 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Return the list of files
+     * Return the list of files.
      *
      * @return array
      */
@@ -155,7 +164,7 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Return insert or replace mode (default is insert)
+     * Return insert or replace mode (default is insert).
      *
      * @return string
      */
@@ -165,14 +174,14 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Insert a row with the given field values
+     * Insert a row with the given field values.
      *
      * @param mixed ...$field_values
      */
     public function insert(...$field_values)
     {
         if ($this->is_done) {
-            throw new RuntimeException("This batch insert is already done");
+            throw new RuntimeException('This batch insert is already done');
         }
 
         if (count($field_values) == $this->fields_num) {
@@ -187,14 +196,14 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Insert array of already escaped values
+     * Insert array of already escaped values.
      *
      * @param mixed ...$field_values
      */
     public function insertEscaped(...$field_values)
     {
         if ($this->is_done) {
-            throw new RuntimeException("This batch insert is already done");
+            throw new RuntimeException('This batch insert is already done');
         }
 
         if (count($field_values) == $this->fields_num) {
@@ -207,12 +216,12 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Insert rows that are already loaded
+     * Insert rows that are already loaded.
      */
     public function flush()
     {
         if ($this->is_done) {
-            throw new RuntimeException("This batch insert is already done");
+            throw new RuntimeException('This batch insert is already done');
         }
 
         $count_rows = count($this->rows);
@@ -226,12 +235,12 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Finish with the batch
+     * Finish with the batch.
      */
     public function done()
     {
         if ($this->is_done) {
-            throw new RuntimeException("This batch insert is already done");
+            throw new RuntimeException('This batch insert is already done');
         }
 
         $this->flush();
@@ -241,7 +250,7 @@ class BatchInsert implements BatchInsertInterface
     }
 
     /**
-     * Check whether we should insert rows and insert them if we do
+     * Check whether we should insert rows and insert them if we do.
      */
     private function checkAndInsert()
     {

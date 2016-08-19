@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseConnection.
+ *
+ * (c) A51 doo <info@activecollab.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
@@ -16,7 +26,7 @@ class ExecuteTest extends TestCase
     private $connection;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -37,7 +47,7 @@ class ExecuteTest extends TestCase
     }
 
     /**
-     * Tear down the test environment
+     * Tear down the test environment.
      */
     public function tearDown()
     {
@@ -55,7 +65,7 @@ class ExecuteTest extends TestCase
     }
 
     /**
-     * Test execute
+     * Test execute.
      */
     public function testExecute()
     {
@@ -92,7 +102,7 @@ class ExecuteTest extends TestCase
     }
 
     /**
-     * Test execute
+     * Test execute.
      */
     public function testExecuteWithCustomCaster()
     {
@@ -130,7 +140,7 @@ class ExecuteTest extends TestCase
     }
 
     /**
-     * Execute first cell
+     * Execute first cell.
      */
     public function testExecuteFirstCell()
     {
@@ -144,7 +154,7 @@ class ExecuteTest extends TestCase
     }
 
     /**
-     * Test execute first row
+     * Test execute first row.
      */
     public function testExecuteFirstRow()
     {
@@ -156,7 +166,7 @@ class ExecuteTest extends TestCase
     }
 
     /**
-     * Test execute first column
+     * Test execute first column.
      */
     public function testExecuteFirstColumn()
     {
