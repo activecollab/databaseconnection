@@ -55,10 +55,10 @@ To run `SELECT` queries from arguments, instead of writing your own `SELECT` que
 
 All methods accept following arguments:
 
-1. $table_name - Name of the table. This is the only required argument,
-1. $fields - List of fields that need to be fetched. Provide a string (single field), array of fields, or `NULL` (all fields),
-1. $conditions - Query conditions. Provide a string, an array (pattern + arguments), or `NULL`, 
-1. $order_by_fields - List of fields that we want to order records by. Provide a string (single field), array of fields, or `NULL` (all fields),
+1. `$table_name` - Name of the table. This is the only required argument,
+1. `$fields` - List of fields that need to be fetched. Provide a string (single field), array of fields, or `NULL` (all fields),
+1. `$conditions` - Query conditions. Provide a string, an array (pattern + arguments), or `NULL`, 
+1. `$order_by_fields` - List of fields that we want to order records by. Provide a string (single field), array of fields, or `NULL` (all fields),
 
 ## Counting Records
 
