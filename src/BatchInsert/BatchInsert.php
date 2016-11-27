@@ -126,7 +126,7 @@ class BatchInsert implements BatchInsertInterface
             $this->sql_foundation = 'INSERT INTO ' . $this->connection->escapeTableName($table_name) . ' (' . implode(', ', $escaped_field_names) . ') VALUES ';
         }
         $this->row_prepare_pattern = '(' . implode(', ', $question_marks). ')';
-        $this->rows_per_batch = (integer) $rows_per_batch;
+        $this->rows_per_batch = (int) $rows_per_batch;
 
         if ($this->rows_per_batch < 1) {
             $this->rows_per_batch = 50;
