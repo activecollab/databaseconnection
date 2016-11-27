@@ -63,8 +63,8 @@ interface ConnectionInterface
     /**
      * Execute a query and return a result.
      *
-     * @param string $sql
-     * @param  mixed                     ...$arguments
+     * @param  string                    $sql
+     * @param  mixed[]                   $arguments
      * @return ResultInterface|true|null
      */
     public function execute($sql, ...$arguments);
@@ -72,8 +72,8 @@ interface ConnectionInterface
     /**
      * Return first row that provided SQL query returns.
      *
-     * @param string $sql
-     * @param  mixed  ...$arguments
+     * @param  string  $sql
+     * @param  mixed[] $arguments
      * @return array
      */
     public function executeFirstRow($sql, ...$arguments);
@@ -81,8 +81,8 @@ interface ConnectionInterface
     /**
      * Return value from the first cell of each column that provided SQL query returns.
      *
-     * @param string $sql
-     * @param  mixed  ...$arguments
+     * @param  string  $sql
+     * @param  mixed[] $arguments
      * @return array
      */
     public function executeFirstColumn($sql, ...$arguments);
@@ -90,8 +90,8 @@ interface ConnectionInterface
     /**
      * Return value from the first cell of the first row that provided SQL query returns.
      *
-     * @param string $sql
-     * @param  mixed  ...$arguments
+     * @param  string  $sql
+     * @param  mixed[] $arguments
      * @return mixed
      */
     public function executeFirstCell($sql, ...$arguments);
@@ -110,6 +110,50 @@ interface ConnectionInterface
      * @throws QueryException
      */
     public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null);
+
+    /**
+     * Prepare and execute SELECT query.
+     *
+     * @param  string                    $table_name
+     * @param  array|string|null         $fields
+     * @param  array|string|null         $conditions
+     * @param  array|string|null         $order_by_fields
+     * @return ResultInterface|null|true
+     */
+    public function select($table_name, $fields = null, $conditions = null, $order_by_fields = null);
+
+    /**
+     * Prepare and execute SELECT query, and return the first row.
+     *
+     * @param  string            $table_name
+     * @param  array|string|null $fields
+     * @param  array|string|null $conditions
+     * @param  array|string|null $order_by_fields
+     * @return array
+     */
+    public function selectFirstRow($table_name, $fields = null, $conditions = null, $order_by_fields = null);
+
+    /**
+     * Prepare and execute SELECT query, and return the first column of the first row.
+     *
+     * @param  string            $table_name
+     * @param  array|string|null $fields
+     * @param  array|string|null $conditions
+     * @param  array|string|null $order_by_fields
+     * @return array
+     */
+    public function selectFirstCell($table_name, $fields = null, $conditions = null, $order_by_fields = null);
+
+    /**
+     * Prepare and execute SELECT query, and return the first column.
+     *
+     * @param  string            $table_name
+     * @param  array|string|null $fields
+     * @param  array|string|null $conditions
+     * @param  array|string|null $order_by_fields
+     * @return array
+     */
+    public function selectFirstColumn($table_name, $fields = null, $conditions = null, $order_by_fields = null);
 
     /**
      * Return number of records from $table_name that match $conditions.

@@ -155,7 +155,7 @@ class TransactionsTest extends TestCase
         $this->assertEquals(3, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers`'));
 
         $this->connection->transact(function () {
-        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?)', 'Anton Chekhov', new DateTime('1860-01-29'));
+            $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?)', 'Anton Chekhov', new DateTime('1860-01-29'));
             throw new RuntimeException('Throwing an exception here');
         });
     }

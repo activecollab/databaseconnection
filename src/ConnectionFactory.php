@@ -39,16 +39,20 @@ class ConnectionFactory
      */
     public function mysqli($host, $user, $pass, $select_database = '', $set_connection_encoding = null, $set_connection_encoding_with_query = false)
     {
-        if (strpos($host, ':') !== false) {
-            $host_bits = explode(':', $host);
+        try {
+            if (strpos($host, ':') !== false) {
+                $host_bits = explode(':', $host);
 
-            if (empty($host_bits[1])) {
-                $host_bits[1] = 3306;
+                if (empty($host_bits[1])) {
+                    $host_bits[1] = 3306;
+                }
+
+                $link = $this->mysqliConnectFromParams($host_bits[0], (int) $host_bits[1], $user, $pass);
+            } else {
+                $link = $this->mysqliConnectFromParams($host, 3306, $user, $pass);
             }
-
-            $link = $this->mysqliConnectFromParams($host_bits[0], (int) $host_bits[1], $user, $pass);
-        } else {
-            $link = $this->mysqliConnectFromParams($host, 3306, $user, $pass);
+        } catch (\Exception $e) {
+            throw new ConnectionException('MySQLi connection failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
         if ($set_connection_encoding && !$set_connection_encoding_with_query) {
@@ -85,14 +89,10 @@ class ConnectionFactory
             throw new ConnectionException('Failed to connect to database. MySQL said: ' . $link->connect_error);
         }
 
-        if ($select_database) {
-            if ($link->select_db($select_database)) {
-                return $link;
-            } else {
-                throw new ConnectionException("Failed to select database '$select_database'");
-            }
-        } else {
-            return $link;
+        if ($select_database && !$link->select_db($select_database)) {
+            throw new ConnectionException("Failed to select database '$select_database'");
         }
+
+        return $link;
     }
 }

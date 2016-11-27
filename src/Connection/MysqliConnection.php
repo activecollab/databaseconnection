@@ -186,6 +186,76 @@ class MysqliConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function select($table_name, $fields = null, $conditions = null, $order_by_fields = null)
+    {
+        return $this->execute($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function selectFirstRow($table_name, $fields = null, $conditions = null, $order_by_fields = null)
+    {
+        return $this->executeFirstRow($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function selectFirstColumn($table_name, $fields = null, $conditions = null, $order_by_fields = null)
+    {
+        return $this->executeFirstColumn($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function selectFirstCell($table_name, $fields = null, $conditions = null, $order_by_fields = null)
+    {
+        return $this->executeFirstCell($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
+    }
+
+    /**
+     * Prepare SELECT query from arguments used by select*() methods.
+     *
+     * @param  string            $table_name
+     * @param  array|string|null $fields
+     * @param  array|string|null $conditions
+     * @param  array|string|null $order_by_fields
+     * @return string
+     */
+    private function prepareSelectQueryFromArguments($table_name, $fields, $conditions = null, $order_by_fields = null)
+    {
+        if (empty($table_name)) {
+            throw new InvalidArgumentException('Table name is required');
+        }
+
+        $escaped_field_names = empty($fields) ? '*' : implode(',', array_map(function ($field_name) {
+            return $this->escapeFieldName($field_name);
+        }, (array) $fields));
+
+        if ($conditions) {
+            $where = 'WHERE ' . $this->prepareConditions($conditions);
+        } else {
+            $where = '';
+        }
+
+        $escaped_order_by_field_names = '';
+
+        if (!empty($order_by_fields)) {
+            $escaped_order_by_field_names = implode(',', array_map(function ($field_name) {
+                return $this->escapeFieldName($field_name);
+            }, (array) $order_by_fields));
+        }
+
+        $order_by = $escaped_order_by_field_names ? "ORDER BY $escaped_order_by_field_names" : '';
+
+        return trim("SELECT $escaped_field_names FROM {$this->escapeTableName($table_name)} $where $order_by");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count($table_name, $conditions = null, $field = 'id')
     {
         if (empty($table_name)) {
@@ -202,7 +272,7 @@ class MysqliConnection implements ConnectionInterface
             $where = '';
         }
 
-        $count = $field == '*' ?  'COUNT(*)' :  'COUNT(' . $this->escapeFieldName($field) . ')';
+        $count = $field == '*' ? 'COUNT(*)' : 'COUNT(' . $this->escapeFieldName($field) . ')';
 
         return $this->executeFirstCell("SELECT $count AS 'row_count' FROM " . $this->escapeTableName($table_name) . $where);
     }
@@ -388,7 +458,7 @@ class MysqliConnection implements ConnectionInterface
      */
     public function userExists($user_name)
     {
-        return (boolean) $this->executeFirstCell("SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS 'is_present'", $user_name);
+        return (bool) $this->executeFirstCell("SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS 'is_present'", $user_name);
     }
 
     /**
