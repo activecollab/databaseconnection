@@ -66,6 +66,22 @@ First three arguments are required (MySQL hostname, username and password). Addi
 1. Name of the database that needs to be selected. When not specified, database will not be selected,
 2. Connection encoding that we would like to enforce. When not specified, default connection encoding will be used.
 
+## Selecting Records
+
+To run `SELECT` queries from arguments, instead of writing your own `SELECT` query, use the following methods:
+
+1. `select()` - maps to `execute()`,
+1. `selectFirstRow()` - maps to `executeFirstRow()`,
+1. `selectFirstColumn()` - maps to `executeFirstColumn()`,
+1. `selectFirstCell()` - maps to `executeFirstCell()`.
+
+All methods accept following arguments:
+
+1. $table_name - Name of the table. This is the only required argument,
+1. $fields - List of fields that need to be fetched. Provide a string (single field), array of fields, or `NULL` (all fields),
+1. $conditions - Query conditions. Provide a string, an array (pattern + arguments), or `NULL`, 
+1. $order_by_fields - List of fields that we want to order records by. Provide a string (single field), array of fields, or `NULL` (all fields),
+
 ## Counting Records
 
 DatabaseConnection lets you easily count records from the table:
