@@ -61,7 +61,7 @@ All methods accept following arguments:
 1. `$order_by_fields` - List of fields that we want to order records by. Provide a string (single field), array of fields, or `NULL` (all fields).
 
 ```php
-$writers = $connection->select('writers', ['id', 'name'], ["`name` = ?", 'Leo Tolstoy'], 'name');
+$writers = $connection->select('writers', ['id', 'name'], ['birthday >= ?', '1821-11-11'], 'name');
 ```
 
 ## Counting Records
