@@ -44,28 +44,6 @@ print_r($connection->executeFirstRow('SELECT * FROM `writers` WHERE `name` = ?',
 print_r($connection->executeFirstColumn('SELECT `name` FROM `writers` ORDER BY `name`'));
 ```
 
-## Connection Factory
-
-Quickest way to connect is to use `ConnectionFactory` class:
-
-```php
-<?php
-
-use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
-use ActiveCollab\DatabaseConnection\ConnectionFactory;
-
-$connection = (new ConnectionFactory())->mysqli('localhost', 'root', '', 'activecollab_database_connection_test', 'utf8mb4');
-
-if ($connection instanceof MysqliConnection) {
-    print_r($connection->getTableNames());
-}
-```
-
-First three arguments are required (MySQL hostname, username and password). Additionally, this function accepts:
-
-1. Name of the database that needs to be selected. When not specified, database will not be selected,
-2. Connection encoding that we would like to enforce. When not specified, default connection encoding will be used.
-
 ## Selecting Records
 
 To run `SELECT` queries from arguments, instead of writing your own `SELECT` query, use the following methods:
@@ -105,6 +83,28 @@ the column that we count agains can also be changed (even to `*`):
 $num = $this->connection->count('writers', null, '*');
 $num = $this->connection->count('writers', null, 'name')
 ```
+
+## Connection Factory
+
+Quickest way to connect is to use `ConnectionFactory` class:
+
+```php
+<?php
+
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\ConnectionFactory;
+
+$connection = (new ConnectionFactory())->mysqli('localhost', 'root', '', 'activecollab_database_connection_test', 'utf8mb4');
+
+if ($connection instanceof MysqliConnection) {
+    print_r($connection->getTableNames());
+}
+```
+
+First three arguments are required (MySQL hostname, username and password). Additionally, this function accepts:
+
+1. Name of the database that needs to be selected. When not specified, database will not be selected,
+2. Connection encoding that we would like to enforce. When not specified, default connection encoding will be used.
 
 ## Batch Inserts
 
