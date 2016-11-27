@@ -20,8 +20,14 @@ use ActiveCollab\DatabaseConnection\ConnectionFactory;
 class ConnectionFactoryTest extends TestCase
 {
     /**
-     * Test mysqli connection.
+     * @expectedException \ActiveCollab\DatabaseConnection\Exception\ConnectionException
+     * @expectedExceptionMessage MySQLi connection failed
      */
+    public function testExceptionOnInvalidArguments()
+    {
+        (new ConnectionFactory())->mysqli('localhost', 'unknonw-user', '', 'activecollab_database_connection_test');
+    }
+
     public function testMysqli()
     {
         $connection = (new ConnectionFactory())->mysqli('localhost', 'root', '', 'activecollab_database_connection_test');
@@ -30,9 +36,6 @@ class ConnectionFactoryTest extends TestCase
         $connection->disconnect();
     }
 
-    /**
-     * Test MySQLi connection with port added to hostname.
-     */
     public function testMysqliWithPortInHostname()
     {
         $connection = (new ConnectionFactory())->mysqli('localhost:3306', 'root', '', 'activecollab_database_connection_test');
