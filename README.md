@@ -88,6 +88,16 @@ $num = $this->connection->count('writers', null, '*');
 $num = $this->connection->count('writers', null, 'name')
 ```
 
+## Running Queries from File
+
+In order to run all queries from a file, use `executeFromFile()` method:
+
+```php
+$connection->executeFromFile('/path/to/file');
+```
+
+**Note:** This method is not implemented to handle large data dumps. Use `mysqldump` instead, or another specialized backup utility instead.
+
 ## Connection Factory
 
 Quickest way to connect is to use `ConnectionFactory` class:

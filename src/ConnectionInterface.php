@@ -261,6 +261,11 @@ interface ConnectionInterface
     public function inTransaction();
 
     /**
+     * @param string $file_path
+     */
+    public function executeFromFile($file_path);
+
+    /**
      * @param  string $database_name
      * @return bool
      */
