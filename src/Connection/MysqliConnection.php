@@ -438,6 +438,28 @@ class MysqliConnection implements ConnectionInterface
     }
 
     /**
+     * @param string $file_path
+     */
+    public function executeFromFile($file_path)
+    {
+        if (!is_file($file_path)) {
+            throw new RuntimeException('File not found');
+        }
+
+        if ($this->link->multi_query(file_get_contents($file_path))) {
+            do {
+                if ($result = $this->link->store_result()) {
+                    $result->free();
+                }
+
+                if (!$this->link->more_results()) {
+                    break;
+                }
+            } while ($this->link->next_result());
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function databaseExists($database_name)
