@@ -344,14 +344,11 @@ class MysqliConnection implements ConnectionInterface
     {
         if ($conditions = $this->prepareConditions($conditions)) {
             $this->execute("DELETE FROM {$this->escapeTableName($table_name)} WHERE $conditions");
-
-            return $this->affectedRows();
         } else {
-            $count = $this->count($table_name);
-            $this->execute("TRUNCATE TABLE {$this->escapeTableName($table_name)}");
-
-            return $count;
+            $this->execute("DELETE FROM {$this->escapeTableName($table_name)}");
         }
+
+        return $this->affectedRows();
     }
 
     /**
