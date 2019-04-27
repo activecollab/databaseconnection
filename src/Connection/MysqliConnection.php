@@ -30,9 +30,6 @@ use mysqli_result;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection
- */
 class MysqliConnection implements ConnectionInterface
 {
     /**
@@ -43,7 +40,7 @@ class MysqliConnection implements ConnectionInterface
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private $logger;
 
     /**
      * @var string
@@ -52,23 +49,15 @@ class MysqliConnection implements ConnectionInterface
 
     /**
      * @param mysqli               $link
-     * @param LoggerInterface|null $log
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(mysqli $link, LoggerInterface &$log = null)
+    public function __construct(mysqli $link, LoggerInterface $logger = null)
     {
         $this->link = $link;
-        $this->log = $log;
+        $this->logger = $logger;
     }
 
-    /**
-     * Set database name and optionally select that database.
-     *
-     * @param  string              $database_name
-     * @param  bool|true           $select_database
-     * @return $this
-     * @throws ConnectionException
-     */
-    public function &setDatabaseName($database_name, $select_database = true)
+    public function setDatabaseName(string $database_name, bool $select_database = true): ConnectionInterface
     {
         if (empty($select_database) || $this->link->select_db($database_name)) {
             $this->database_name = $database_name;
@@ -79,7 +68,7 @@ class MysqliConnection implements ConnectionInterface
         return $this;
     }
 
-    public function disconnect()
+    public function disconnect(): void
     {
         $this->link->close();
     }
@@ -104,7 +93,15 @@ class MysqliConnection implements ConnectionInterface
         return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_FIRST_CELL);
     }
 
-    public function advancedExecute($sql, $arguments = null, $load_mode = ConnectionInterface::LOAD_ALL_ROWS, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
+    public function advancedExecute(
+        $sql,
+        $arguments = null,
+        $load_mode = ConnectionInterface::LOAD_ALL_ROWS,
+        $return_mode = ConnectionInterface::RETURN_ARRAY,
+        $return_class_or_field = null,
+        array $constructor_arguments = null,
+        ContainerInterface &$container = null
+    )
     {
         if ($return_mode == ConnectionInterface::RETURN_OBJECT_BY_CLASS && empty($return_class_or_field)) {
             throw new InvalidArgumentException('Class is required');
@@ -429,19 +426,29 @@ class MysqliConnection implements ConnectionInterface
         );
     }
 
-    public function userExists($user_name)
+    public function userExists(string $user_name): bool
     {
-        return (bool) $this->executeFirstCell("SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS 'is_present'", $user_name);
+        return (bool) $this->executeFirstCell(
+            "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS 'is_present'",
+            $user_name
+        );
     }
 
-    public function dropUser($user_name, $hostname = '%')
+    public function createUser(string $user_name, string $password, string $hostname = '%'): void
+    {
+        if (!$this->userExists($user_name)) {
+            $this->execute("CREATE USER ?@? IDENTIFIED BY ?", $user_name, $hostname, $password);
+        }
+    }
+
+    public function dropUser(string $user_name, string $hostname = '%'): void
     {
         if ($this->userExists($user_name)) {
             $this->execute('DROP USER ?@?', $user_name, $hostname);
         }
     }
 
-    public function getTableNames($database_name = '')
+    public function getTableNames(string $database_name = ''): array
     {
         if ($database_name) {
             $tables = $this->executeFirstColumn('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME', $database_name);
@@ -458,17 +465,17 @@ class MysqliConnection implements ConnectionInterface
         return $tables;
     }
 
-    public function tableExists($table_name)
+    public function tableExists(string $table_name): bool
     {
         return in_array($table_name, $this->getTableNames());
     }
 
-    public function dropTable($table_name)
+    public function dropTable(string $table_name): void
     {
         $this->execute('DROP TABLE IF EXISTS ' . $this->escapeTableName($table_name));
     }
 
-    public function getFieldNames($table_name)
+    public function getFieldNames(string $table_name): array
     {
         $result = [];
 
@@ -481,7 +488,7 @@ class MysqliConnection implements ConnectionInterface
         return $result;
     }
 
-    public function fieldExists($table_name, $field_name)
+    public function fieldExists(string $table_name, string $field_name): bool
     {
         return in_array($field_name, $this->getFieldNames($table_name)); // @TODO may be a better way to do this
     }
@@ -581,7 +588,7 @@ class MysqliConnection implements ConnectionInterface
      */
     private function prepareAndExecuteQuery($sql, $arguments)
     {
-        if ($this->log || $this->on_log_query) {
+        if ($this->logger || $this->on_log_query) {
             $microtime = microtime(true);
 
             $prepared_sql = empty($arguments) ?
@@ -592,16 +599,16 @@ class MysqliConnection implements ConnectionInterface
 
             $execution_time = rtrim(number_format(microtime(true) - $microtime, 6, '.', ''), '0');
 
-            if ($this->log) {
+            if ($this->logger) {
                 if ($result === false) {
-                    $this->log->error('Query error {error_message}', [
+                    $this->logger->error('Query error {error_message}', [
                         'error_message' => $this->link->error,
                         'error_code' => $this->link->errno,
                         'sql' => $prepared_sql,
                         'exec_time' => $execution_time,
                     ]);
                 } else {
-                    $this->log->debug('Query {sql} executed in {exec_time}s', [
+                    $this->logger->debug('Query {sql} executed in {exec_time}s', [
                         'sql' => $prepared_sql,
                         'exec_time' => $execution_time,
                     ]);
@@ -706,7 +713,7 @@ class MysqliConnection implements ConnectionInterface
     private function handleMySqlGoneAway($sql, $arguments, $load_mode, $return_mode)
     {
         if (!$this->link->ping()) {
-            $this->log->notice('Mysql reconnect failed');
+            $this->logger->notice('Mysql reconnect failed');
 
             throw new QueryException($this->link->error, $this->link->errno);
         }
@@ -804,15 +811,9 @@ class MysqliConnection implements ConnectionInterface
         return "`$unescaped`";
     }
 
-    /**
-     * @var ValueCasterInterface
-     */
     private $default_caster;
 
-    /**
-     * @return ValueCasterInterface
-     */
-    private function &getDefaultCaster()
+    private function getDefaultCaster(): ValueCasterInterface
     {
         if (empty($this->default_caster)) {
             $this->default_caster = new ValueCaster();
@@ -825,24 +826,10 @@ class MysqliConnection implements ConnectionInterface
     //  Events
     // ---------------------------------------------------
 
-    /**
-     * @var callable|null
-     */
     private $on_log_query;
 
-    /**
-     * Set a callback that will receive every query after we run it.
-     *
-     * Callback should accept two parameters: first for SQL that was ran, and second for time that it took to run
-     *
-     * @param callable|null $callback
-     */
-    public function onLogQuery(callable $callback = null)
+    public function onLogQuery(callable $callback = null): void
     {
-        if ($callback === null || is_callable($callback)) {
-            $this->on_log_query = $callback;
-        } else {
-            throw new InvalidArgumentException('Callback needs to be NULL or callable');
-        }
+        $this->on_log_query = $callback;
     }
 }

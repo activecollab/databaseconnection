@@ -52,10 +52,7 @@ interface ConnectionInterface
     const INSERT = 'INSERT';
     const REPLACE = 'REPLACE';
 
-    /**
-     * Close connection.
-     */
-    public function disconnect();
+    public function disconnect(): void;
 
     /**
      * Execute a query and return a result.
@@ -106,7 +103,15 @@ interface ConnectionInterface
      * @return mixed
      * @throws QueryException
      */
-    public function advancedExecute($sql, $arguments = null, $load_mode = self::LOAD_ALL_ROWS, $return_mode = self::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null);
+    public function advancedExecute(
+        $sql,
+        $arguments = null,
+        $load_mode = self::LOAD_ALL_ROWS,
+        $return_mode = self::RETURN_ARRAY,
+        $return_class_or_field = null,
+        array $constructor_arguments = null,
+        ContainerInterface &$container = null
+    );
 
     /**
      * Prepare and execute SELECT query.
@@ -225,56 +230,16 @@ interface ConnectionInterface
     public function createDatabase(string $database_name): void;
     public function dropDatabase(string $database_name): void;
 
-    /**
-     * @param  string $user_name
-     * @return bool
-     */
-    public function userExists($user_name);
+    public function userExists(string $user_name): bool;
+    public function createUser(string $user_name, string $password, string $hostname = '%'): void;
+    public function dropUser(string $user_name, string $hostname = '%'): void;
 
-    /**
-     * @param string $user_name
-     * @param string $hostname
-     */
-    public function dropUser($user_name, $hostname = '%');
+    public function getTableNames(string $database_name = ''): array;
+    public function tableExists(string $table_name): bool;
+    public function dropTable(string $table_name): void;
 
-    /**
-     * Return array of table names.
-     *
-     * @param  string $database_name
-     * @return array
-     */
-    public function getTableNames($database_name = '');
-
-    /**
-     * Return true if table named $table_name exists in the selected database.
-     *
-     * @param  string $table_name
-     * @return bool
-     */
-    public function tableExists($table_name);
-
-    /**
-     * Drop a table named $table_name from selected database.
-     *
-     * @param string $table_name
-     */
-    public function dropTable($table_name);
-
-    /**
-     * Return a list of field name.
-     *
-     * @param  string $table_name
-     * @return array
-     */
-    public function getFieldNames($table_name);
-
-    /**
-     * Return true if $field_name exists in $table_name.
-     *
-     * @param string $table_name
-     * @param string $field_name
-     */
-    public function fieldExists($table_name, $field_name);
+    public function getFieldNames(string $table_name): array;
+    public function fieldExists(string $table_name, string $field_name): bool;
 
     /**
      * Drop a field from the database.
@@ -414,5 +379,5 @@ interface ConnectionInterface
      *
      * @param callable|null $callback
      */
-    public function onLogQuery(callable $callback = null);
+    public function onLogQuery(callable $callback = null): void;
 }
