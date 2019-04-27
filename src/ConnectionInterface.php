@@ -228,11 +228,11 @@ interface ConnectionInterface
     public function executeFromFile(string $file_path): void;
     public function databaseExists(string $database_name): bool;
     public function createDatabase(string $database_name): void;
-    public function dropDatabase(string $database_name): void;
+    public function dropDatabase(string $database_name, bool $check_if_exists = true): void;
 
     public function userExists(string $user_name): bool;
     public function createUser(string $user_name, string $password, string $hostname = '%'): void;
-    public function dropUser(string $user_name, string $hostname = '%'): void;
+    public function dropUser(string $user_name, string $hostname = '%', bool $check_if_exists = true): void;
 
     public function getTableNames(string $database_name = ''): array;
     public function tableExists(string $table_name): bool;

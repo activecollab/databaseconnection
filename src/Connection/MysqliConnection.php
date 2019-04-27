@@ -415,8 +415,12 @@ class MysqliConnection implements ConnectionInterface
         );
     }
 
-    public function dropDatabase(string $database_name): void
+    public function dropDatabase(string $database_name, bool $check_if_exists = true): void
     {
+        if ($check_if_exists && !$this->databaseExists($database_name)) {
+            return;
+        }
+
         $this->execute(
             sprintf(
                 'DROP DATABASE IF EXISTS %s',
@@ -441,11 +445,13 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    public function dropUser(string $user_name, string $hostname = '%'): void
+    public function dropUser(string $user_name, string $hostname = '%', bool $check_if_exists = true): void
     {
-        if ($this->userExists($user_name)) {
-            $this->execute('DROP USER ?@?', $user_name, $hostname);
+        if ($check_if_exists && !$this->userExists($user_name)) {
+            return;
         }
+
+        $this->execute('DROP USER ?@?', $user_name, $hostname);
     }
 
     public function getTableNames(string $database_name = ''): array
