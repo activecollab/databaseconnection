@@ -235,6 +235,13 @@ interface ConnectionInterface
     public function changeUserPassword(string $user_name, string $password, string $hostname = null): void;
     public function dropUser(string $user_name, string $hostname = '%', bool $check_if_exists = true): void;
 
+    public function grantAllPrivileges(
+        string $user_name,
+        string $database_name,
+        string $host_name = '%',
+        bool $with_grant_permissions = false
+    ): void;
+
     public function getTableNames(string $database_name = ''): array;
     public function tableExists(string $table_name): bool;
     public function dropTable(string $table_name): void;

@@ -477,6 +477,26 @@ class MysqliConnection implements ConnectionInterface
         $this->execute('DROP USER ?@?', $user_name, $hostname);
     }
 
+    public function grantAllPrivileges(
+        string $user_name,
+        string $database_name,
+        string $host_name = '%',
+        bool $with_grant_permissions = false
+    ): void
+    {
+        $this->execute(
+            sprintf(
+                "GRANT ALL PRIVILEGES ON %s.* TO ?@? %s",
+                $this->escapeDatabaseName($database_name),
+                $with_grant_permissions ? 'WITH GRANT OPTION' : ''
+            ),
+            $user_name,
+            $host_name
+        );
+        
+        $this->execute('FLUSH PRIVILEGES');
+    }
+
     public function getTableNames(string $database_name = ''): array
     {
         if ($database_name) {
