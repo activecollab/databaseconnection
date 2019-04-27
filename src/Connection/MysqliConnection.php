@@ -445,6 +445,29 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
+    public function changeUserPassword(string $user_name, string $password, string $hostname = null): void
+    {
+        if ($hostname) {
+            $hosts = [$hostname];
+        } else {
+            $hosts = $this->executeFirstColumn(
+                'SELECT Host FROM mysql.user WHERE User = ?',
+                $user_name
+            );
+        }
+
+        if (!empty($hosts)) {
+            foreach ($hosts as $host) {
+                $this->execute(
+                    'SET PASSWORD FOR ?@? = PASSWORD(?)',
+                    $user_name,
+                    $host,
+                    $password
+                );
+            }
+        }
+    }
+
     public function dropUser(string $user_name, string $hostname = '%', bool $check_if_exists = true): void
     {
         if ($check_if_exists && !$this->userExists($user_name)) {

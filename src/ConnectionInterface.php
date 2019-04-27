@@ -232,6 +232,7 @@ interface ConnectionInterface
 
     public function userExists(string $user_name): bool;
     public function createUser(string $user_name, string $password, string $hostname = '%'): void;
+    public function changeUserPassword(string $user_name, string $password, string $hostname = null): void;
     public function dropUser(string $user_name, string $hostname = '%', bool $check_if_exists = true): void;
 
     public function getTableNames(string $database_name = ''): array;
