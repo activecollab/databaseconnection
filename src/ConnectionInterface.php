@@ -9,19 +9,16 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use Closure;
-use Exception;
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 
-/**
- * @package ActiveCollab\DatabaseConnection
- */
 interface ConnectionInterface
 {
     /**
@@ -165,36 +162,31 @@ interface ConnectionInterface
      * @param  string            $field
      * @return int
      */
-    public function count($table_name, $conditions = null, $field = 'id');
+    public function count(string $table_name, $conditions = null, $field = 'id'): int;
 
     /**
      * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set).
      *
-     * @param  string                   $table
-     * @param  array                    $field_value_map
-     * @param  string                   $mode
+     * @param  string $table_name
+     * @param  array  $field_value_map
+     * @param  string $mode
      * @return int
      * @throws InvalidArgumentException
      */
-    public function insert($table, array $field_value_map, $mode = self::INSERT);
+    public function insert(
+        string $table_name,
+        array $field_value_map,
+        string $mode = ConnectionInterface::INSERT
+    ): int;
 
-    /**
-     * Prepare a batch insert utility instance.
-     *
-     * @param  string               $table_name
-     * @param  array                $fields
-     * @param  int                  $rows_per_batch
-     * @param  string               $mode
-     * @return BatchInsertInterface
-     */
-    public function batchInsert($table_name, array $fields, $rows_per_batch = 50, $mode = self::INSERT);
+    public function batchInsert(
+        string $table_name,
+        array $fields,
+        int $rows_per_batch = 50,
+        string $mode = self::INSERT
+    ): BatchInsertInterface;
 
-    /**
-     * Return last insert ID.
-     *
-     * @return int
-     */
-    public function lastInsertId();
+    public function lastInsertId(): int;
 
     /**
      * Update one or more rows with the given list of values for fields.
@@ -207,7 +199,7 @@ interface ConnectionInterface
      * @return int
      * @throws InvalidArgumentException
      */
-    public function update($table_name, array $field_value_map, $conditions = null);
+    public function update($table_name, array $field_value_map, $conditions = null): int;
 
     /**
      * Delete one or more records from the table.
@@ -219,62 +211,19 @@ interface ConnectionInterface
      * @return int
      * @throws InvalidArgumentException
      */
-    public function delete($table_name, $conditions = null);
+    public function delete($table_name, $conditions = null): int;
+    public function affectedRows(): int;
 
-    /**
-     * Return number of affected rows.
-     *
-     * @return int
-     */
-    public function affectedRows();
+    public function transact(callable $body, callable $on_success = null, callable $on_error = null): void;
+    public function beginWork(): void;
+    public function commit(): void;
+    public function rollback(): void;
+    public function inTransaction(): bool;
 
-    /**
-     * Run body commands within a transation.
-     *
-     * @param  Closure      $body
-     * @param  Closure|null $on_success
-     * @param  CLosure|null $on_error
-     * @throws Exception
-     */
-    public function transact(Closure $body, $on_success = null, $on_error = null);
-
-    /**
-     * Begin transaction.
-     */
-    public function beginWork();
-
-    /**
-     * Commit transaction.
-     */
-    public function commit();
-
-    /**
-     * Rollback transaction.
-     */
-    public function rollback();
-
-    /**
-     * Return true if system is in transaction.
-     *
-     * @return bool
-     */
-    public function inTransaction();
-
-    /**
-     * @param string $file_path
-     */
-    public function executeFromFile($file_path);
-
-    /**
-     * @param  string $database_name
-     * @return bool
-     */
-    public function databaseExists($database_name);
-
-    /**
-     * @param string $database_name
-     */
-    public function dropDatabase($database_name);
+    public function executeFromFile(string $file_path): void;
+    public function databaseExists(string $database_name): bool;
+    public function createDatabase(string $database_name): void;
+    public function dropDatabase(string $database_name): void;
 
     /**
      * @param  string $user_name
@@ -407,7 +356,7 @@ interface ConnectionInterface
     /**
      * Prepare SQL (replace ? with data from $arguments array).
      *
-     * @param string $sql
+     * @param  string $sql
      * @param  mixed  ...$arguments
      * @return string
      */

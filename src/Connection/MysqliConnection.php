@@ -12,6 +12,7 @@
 namespace ActiveCollab\DatabaseConnection\Connection;
 
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
+use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
@@ -20,7 +21,6 @@ use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DateValue\DateValue;
-use Closure;
 use DateTime;
 use Exception;
 use Interop\Container\ContainerInterface;
@@ -79,49 +79,31 @@ class MysqliConnection implements ConnectionInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function disconnect()
     {
         $this->link->close();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function execute($sql, ...$arguments)
     {
         return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function executeFirstRow($sql, ...$arguments)
     {
         return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_FIRST_ROW);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function executeFirstColumn($sql, ...$arguments)
     {
         return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_FIRST_COLUMN);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function executeFirstCell($sql, ...$arguments)
     {
         return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_FIRST_CELL);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function advancedExecute($sql, $arguments = null, $load_mode = ConnectionInterface::LOAD_ALL_ROWS, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
     {
         if ($return_mode == ConnectionInterface::RETURN_OBJECT_BY_CLASS && empty($return_class_or_field)) {
@@ -183,33 +165,21 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function select($table_name, $fields = null, $conditions = null, $order_by_fields = null)
     {
         return $this->execute($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function selectFirstRow($table_name, $fields = null, $conditions = null, $order_by_fields = null)
     {
         return $this->executeFirstRow($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function selectFirstColumn($table_name, $fields = null, $conditions = null, $order_by_fields = null)
     {
         return $this->executeFirstColumn($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function selectFirstCell($table_name, $fields = null, $conditions = null, $order_by_fields = null)
     {
         return $this->executeFirstCell($this->prepareSelectQueryFromArguments($table_name, $fields, $conditions, $order_by_fields));
@@ -224,7 +194,12 @@ class MysqliConnection implements ConnectionInterface
      * @param  array|string|null $order_by_fields
      * @return string
      */
-    private function prepareSelectQueryFromArguments($table_name, $fields, $conditions = null, $order_by_fields = null)
+    private function prepareSelectQueryFromArguments(
+        string $table_name,
+        $fields,
+        $conditions = null,
+        $order_by_fields = null
+    ): string
     {
         if (empty($table_name)) {
             throw new InvalidArgumentException('Table name is required');
@@ -253,10 +228,7 @@ class MysqliConnection implements ConnectionInterface
         return trim("SELECT $escaped_field_names FROM {$this->escapeTableName($table_name)} $where $order_by");
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function count($table_name, $conditions = null, $field = 'id')
+    public function count(string $table_name, $conditions = null, $field = 'id'): int
     {
         if (empty($table_name)) {
             throw new InvalidArgumentException('Table name is required');
@@ -274,13 +246,20 @@ class MysqliConnection implements ConnectionInterface
 
         $count = $field == '*' ? 'COUNT(*)' : 'COUNT(' . $this->escapeFieldName($field) . ')';
 
-        return $this->executeFirstCell("SELECT $count AS 'row_count' FROM " . $this->escapeTableName($table_name) . $where);
+        return (int) $this->executeFirstCell(
+            sprintf("SELECT %s AS 'row_count' FROM %s %s",
+                $count,
+                $this->escapeTableName($table_name),
+                $where
+            )
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function insert($table, array $field_value_map, $mode = ConnectionInterface::INSERT)
+    public function insert(
+        string $table_name,
+        array $field_value_map,
+        string $mode = ConnectionInterface::INSERT
+    ): int
     {
         if (empty($field_value_map)) {
             throw new InvalidArgumentException("Values array can't be empty");
@@ -292,7 +271,7 @@ class MysqliConnection implements ConnectionInterface
             throw new InvalidArgumentException("Mode '$mode' is not a valid insert mode");
         }
 
-        $this->execute("$mode INTO " . $this->escapeTableName($table) . ' (' . implode(',', array_map(function ($field_name) {
+        $this->execute("$mode INTO " . $this->escapeTableName($table_name) . ' (' . implode(',', array_map(function ($field_name) {
             return $this->escapeFieldName($field_name);
         }, array_keys($field_value_map))) . ') VALUES (' . implode(',', array_map(function ($value) {
             return $this->escapeValue($value);
@@ -301,26 +280,22 @@ class MysqliConnection implements ConnectionInterface
         return $this->lastInsertId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function batchInsert($table_name, array $fields, $rows_per_batch = 50, $mode = self::INSERT)
+    public function batchInsert(
+        string $table_name,
+        array $fields,
+        int $rows_per_batch = 50,
+        string $mode = self::INSERT
+    ): BatchInsertInterface
     {
         return new BatchInsert($this, $table_name, $fields, $rows_per_batch, $mode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function lastInsertId()
+    public function lastInsertId(): int
     {
-        return $this->link->insert_id;
+        return (int) $this->link->insert_id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update($table_name, array $field_value_map, $conditions = null)
+    public function update($table_name, array $field_value_map, $conditions = null): int
     {
         if (empty($field_value_map)) {
             throw new InvalidArgumentException("Values array can't be empty");
@@ -337,10 +312,7 @@ class MysqliConnection implements ConnectionInterface
         return $this->affectedRows();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete($table_name, $conditions = null)
+    public function delete($table_name, $conditions = null): int
     {
         if ($conditions = $this->prepareConditions($conditions)) {
             $this->execute("DELETE FROM {$this->escapeTableName($table_name)} WHERE $conditions");
@@ -351,53 +323,35 @@ class MysqliConnection implements ConnectionInterface
         return $this->affectedRows();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function affectedRows()
+    public function affectedRows(): int
     {
-        return $this->link->affected_rows;
+        return (int) $this->link->affected_rows;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transact(Closure $body, $on_success = null, $on_error = null)
+    public function transact(callable $body, callable $on_success = null, callable $on_error = null): void
     {
-        if ($body instanceof Closure) {
-            try {
-                $this->beginWork();
-                call_user_func($body);
-                $this->commit();
+        try {
+            $this->beginWork();
+            call_user_func($body);
+            $this->commit();
 
-                if ($on_success instanceof Closure) {
-                    call_user_func($on_success);
-                }
-            } catch (Exception $e) {
-                $this->rollback();
-
-                if ($on_error instanceof Closure) {
-                    call_user_func($on_error, $e);
-                } else {
-                    throw $e;
-                }
+            if ($on_success) {
+                call_user_func($on_success);
             }
-        } else {
-            throw new InvalidArgumentException('Closure expected');
+        } catch (Exception $e) {
+            $this->rollback();
+
+            if ($on_error) {
+                call_user_func($on_error, $e);
+            } else {
+                throw $e;
+            }
         }
     }
 
-    /**
-     * Transaction level.
-     *
-     * @var int
-     */
     private $transaction_level = 0;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function beginWork()
+    public function beginWork(): void
     {
         if ($this->transaction_level == 0) {
             $this->execute('BEGIN WORK');
@@ -405,10 +359,7 @@ class MysqliConnection implements ConnectionInterface
         ++$this->transaction_level;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function commit()
+    public function commit(): void
     {
         if ($this->transaction_level) {
             --$this->transaction_level;
@@ -418,10 +369,7 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rollback()
+    public function rollback(): void
     {
         if ($this->transaction_level) {
             $this->transaction_level = 0;
@@ -429,18 +377,12 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function inTransaction()
+    public function inTransaction(): bool
     {
         return $this->transaction_level > 0;
     }
 
-    /**
-     * @param string $file_path
-     */
-    public function executeFromFile($file_path)
+    public function executeFromFile(string $file_path): void
     {
         if (!is_file($file_path)) {
             throw new RuntimeException('File not found');
@@ -459,33 +401,39 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function databaseExists($database_name)
+    public function databaseExists(string $database_name): bool
     {
-        return $this->executeFirstCell('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?', $database_name) == $database_name;
+        return $this->executeFirstCell(
+            'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?', $database_name
+        ) == $database_name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dropDatabase($database_name)
+    public function createDatabase(string $database_name): void
     {
-        $this->execute('DROP DATABASE IF EXISTS ' . $this->escapeTableName($database_name));
+        $this->execute(
+            sprintf(
+                'CREATE DATABASE %s DEFAULT CHARACTER SET = `utf8mb4`',
+                $this->escapeTableName($database_name)
+            )
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function dropDatabase(string $database_name): void
+    {
+        $this->execute(
+            sprintf(
+                'DROP DATABASE IF EXISTS %s',
+                $this->escapeTableName($database_name
+                )
+            )
+        );
+    }
+
     public function userExists($user_name)
     {
         return (bool) $this->executeFirstCell("SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS 'is_present'", $user_name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropUser($user_name, $hostname = '%')
     {
         if ($this->userExists($user_name)) {
@@ -493,9 +441,6 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableNames($database_name = '')
     {
         if ($database_name) {
@@ -513,25 +458,16 @@ class MysqliConnection implements ConnectionInterface
         return $tables;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function tableExists($table_name)
     {
         return in_array($table_name, $this->getTableNames());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropTable($table_name)
     {
         $this->execute('DROP TABLE IF EXISTS ' . $this->escapeTableName($table_name));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFieldNames($table_name)
     {
         $result = [];
@@ -545,17 +481,11 @@ class MysqliConnection implements ConnectionInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function fieldExists($table_name, $field_name)
     {
         return in_array($field_name, $this->getFieldNames($table_name)); // @TODO may be a better way to do this
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropField($table_name, $field_name, $check_if_exists = true)
     {
         if ($check_if_exists && !$this->fieldExists($table_name, $field_name)) {
@@ -565,9 +495,6 @@ class MysqliConnection implements ConnectionInterface
         $this->execute("ALTER TABLE {$this->escapeTableName($table_name)} DROP {$this->escapeFieldName($field_name)}");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIndexNames($table_name)
     {
         $result = [];
@@ -585,17 +512,11 @@ class MysqliConnection implements ConnectionInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function indexExists($table_name, $index_name)
     {
         return in_array($index_name, $this->getIndexNames($table_name)); // @TODO may be a better way to do this
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropIndex($table_name, $index_name, $check_if_exists = true)
     {
         if ($check_if_exists && !$this->indexExists($table_name, $index_name)) {
@@ -605,9 +526,6 @@ class MysqliConnection implements ConnectionInterface
         $this->execute("ALTER TABLE {$this->escapeTableName($table_name)} DROP INDEX {$this->escapeFieldName($index_name)}");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function areForeignKeyChecksOn()
     {
         if ($row = $this->executeFirstRow("SHOW VARIABLES LIKE 'FOREIGN_KEY_CHECKS'")) {
@@ -617,25 +535,16 @@ class MysqliConnection implements ConnectionInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function turnOnForeignKeyChecks()
     {
         $this->execute('SET foreign_key_checks = 1;');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function turnOffForeignKeyChecks()
     {
         $this->execute('SET foreign_key_checks = 0;');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getForeignKeyNames($table_name)
     {
         $result = [];
@@ -649,17 +558,11 @@ class MysqliConnection implements ConnectionInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function foreignKeyExists($table_name, $fk_name)
     {
         return in_array($fk_name, $this->getForeignKeyNames($table_name));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropForeignKey($table_name, $fk_name, $check_if_exists = true)
     {
         if ($check_if_exists && !$this->foreignKeyExists($table_name, $fk_name)) {
@@ -717,9 +620,6 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepare($sql, ...$arguments)
     {
         if (empty($arguments)) {
@@ -744,9 +644,6 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepareConditions($conditions)
     {
         if ($conditions === null || is_string($conditions)) {
@@ -822,9 +719,6 @@ class MysqliConnection implements ConnectionInterface
         throw new RuntimeException('Not implemented.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escapeValue($unescaped)
     {
         // Date value
@@ -895,25 +789,16 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escapeFieldName($unescaped)
     {
         return "`$unescaped`";
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escapeTableName($unescaped)
     {
         return "`$unescaped`";
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function escapeDatabaseName($unescaped)
     {
         return "`$unescaped`";
