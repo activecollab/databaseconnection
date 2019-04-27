@@ -438,17 +438,17 @@ class MysqliConnection implements ConnectionInterface
         );
     }
 
-    public function createUser(string $user_name, string $password, string $hostname = '%'): void
+    public function createUser(string $user_name, string $password, string $host_name = '%'): void
     {
         if (!$this->userExists($user_name)) {
-            $this->execute("CREATE USER ?@? IDENTIFIED BY ?", $user_name, $hostname, $password);
+            $this->execute("CREATE USER ?@? IDENTIFIED BY ?", $user_name, $host_name, $password);
         }
     }
 
-    public function changeUserPassword(string $user_name, string $password, string $hostname = null): void
+    public function changeUserPassword(string $user_name, string $password, string $host_name = null): void
     {
-        if ($hostname) {
-            $hosts = [$hostname];
+        if ($host_name) {
+            $hosts = [$host_name];
         } else {
             $hosts = $this->executeFirstColumn(
                 'SELECT Host FROM mysql.user WHERE User = ?',
@@ -468,13 +468,13 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    public function dropUser(string $user_name, string $hostname = '%', bool $check_if_exists = true): void
+    public function dropUser(string $user_name, string $host_name = '%', bool $check_if_exists = true): void
     {
         if ($check_if_exists && !$this->userExists($user_name)) {
             return;
         }
 
-        $this->execute('DROP USER ?@?', $user_name, $hostname);
+        $this->execute('DROP USER ?@?', $user_name, $host_name);
     }
 
     public function grantAllPrivileges(
@@ -493,7 +493,7 @@ class MysqliConnection implements ConnectionInterface
             $user_name,
             $host_name
         );
-        
+
         $this->execute('FLUSH PRIVILEGES');
     }
 

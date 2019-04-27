@@ -231,9 +231,9 @@ interface ConnectionInterface
     public function dropDatabase(string $database_name, bool $check_if_exists = true): void;
 
     public function userExists(string $user_name): bool;
-    public function createUser(string $user_name, string $password, string $hostname = '%'): void;
-    public function changeUserPassword(string $user_name, string $password, string $hostname = null): void;
-    public function dropUser(string $user_name, string $hostname = '%', bool $check_if_exists = true): void;
+    public function createUser(string $user_name, string $password, string $host_name = '%'): void;
+    public function changeUserPassword(string $user_name, string $password, string $host_name = null): void;
+    public function dropUser(string $user_name, string $host_name = '%', bool $check_if_exists = true): void;
 
     public function grantAllPrivileges(
         string $user_name,
