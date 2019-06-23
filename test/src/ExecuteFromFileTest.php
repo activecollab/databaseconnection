@@ -78,7 +78,5 @@ class ExecuteFromFileTest extends TestCase
         $this->assertSame(0, $this->connection->count('currencies'));
         $this->connection->executeFromFile(dirname(__DIR__) . '/resources/currencies.sql');
         $this->assertSame(121, $this->connection->count('currencies'));
-
-        var_dump($this->connection->executeFirstColumn('SELECT `code` FROM `currencies` ORDER BY `id`'));
     }
 }
