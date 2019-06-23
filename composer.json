@@ -16,9 +16,10 @@
     ],
     "require": {
         "php": ">=7.1",
+        "ext-json": "*",
         "ext-mysqli": "*",
-        "activecollab/containeraccess": "^1.0.0",
-        "activecollab/datevalue": "v2.0.x-dev",
+        "activecollab/containeraccess": "^1.0",
+        "activecollab/datevalue": "^2.0",
         "psr/log": "^1.0.0"
     },
     "require-dev": {
