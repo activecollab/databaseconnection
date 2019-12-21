@@ -23,10 +23,10 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DateValue\DateValue;
 use DateTime;
 use Exception;
-use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use mysqli;
 use mysqli_result;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -441,7 +441,7 @@ class MysqliConnection implements ConnectionInterface
     public function createUser(string $user_name, string $password, string $host_name = '%'): void
     {
         if (!$this->userExists($user_name)) {
-            $this->execute("CREATE USER ?@? IDENTIFIED BY ?", $user_name, $host_name, $password);
+            $this->execute('CREATE USER ?@? IDENTIFIED BY ?', $user_name, $host_name, $password);
         }
     }
 
@@ -486,7 +486,7 @@ class MysqliConnection implements ConnectionInterface
     {
         $this->execute(
             sprintf(
-                "GRANT ALL PRIVILEGES ON %s.* TO ?@? %s",
+                'GRANT ALL PRIVILEGES ON %s.* TO ?@? %s',
                 $this->escapeDatabaseName($database_name),
                 $with_grant_permissions ? 'WITH GRANT OPTION' : ''
             ),

@@ -16,23 +16,20 @@ use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Container;
 use ActiveCollab\DatabaseConnection\Test\Fixture\WriterWithContainer;
 use DateTime;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class ContainerPropagatesToObjectTest extends TestCase
 {
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
 
-    /**
-     * Set up test environment.
-     */
     public function setUp()
     {
         parent::setUp();
@@ -60,9 +57,6 @@ class ContainerPropagatesToObjectTest extends TestCase
         ]);
     }
 
-    /**
-     * Tear down the test environment.
-     */
     public function tearDown()
     {
         if ($this->connection->tableExists('writers')) {
@@ -72,9 +66,6 @@ class ContainerPropagatesToObjectTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @throws \ActiveCollab\DatabaseConnection\Exception\QueryException
-     */
     public function testExceptionWhenLoadingByObjectClassAndClassNameIsEmpty()
     {
         /** @var WriterWithContainer[] $result */

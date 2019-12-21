@@ -16,8 +16,8 @@ namespace ActiveCollab\DatabaseConnection;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 
 interface ConnectionInterface
 {
@@ -172,9 +172,9 @@ interface ConnectionInterface
     /**
      * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set).
      *
-     * @param  string $table_name
-     * @param  array  $field_value_map
-     * @param  string $mode
+     * @param  string                   $table_name
+     * @param  array                    $field_value_map
+     * @param  string                   $mode
      * @return int
      * @throws InvalidArgumentException
      */

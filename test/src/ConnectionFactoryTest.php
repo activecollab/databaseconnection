@@ -25,12 +25,22 @@ class ConnectionFactoryTest extends TestCase
      */
     public function testExceptionOnInvalidArguments()
     {
-        (new ConnectionFactory())->mysqli('localhost', 'unknonw-user', '', 'activecollab_database_connection_test');
+        (new ConnectionFactory())->mysqli(
+            'localhost',
+            'unknonw-user',
+            '',
+            'activecollab_database_connection_test'
+        );
     }
 
     public function testMysqli()
     {
-        $connection = (new ConnectionFactory())->mysqli('localhost', 'root', '', 'activecollab_database_connection_test');
+        $connection = (new ConnectionFactory())->mysqli(
+            'localhost',
+            'root',
+            $this->getValidMySqlPassword(),
+            'activecollab_database_connection_test'
+        );
 
         $this->assertInstanceOf(MysqliConnection::class, $connection);
         $connection->disconnect();
@@ -38,7 +48,12 @@ class ConnectionFactoryTest extends TestCase
 
     public function testMysqliWithPortInHostname()
     {
-        $connection = (new ConnectionFactory())->mysqli('localhost:3306', 'root', '', 'activecollab_database_connection_test');
+        $connection = (new ConnectionFactory())->mysqli(
+            'localhost:3306',
+            'root',
+            $this->getValidMySqlPassword(),
+            'activecollab_database_connection_test'
+        );
 
         $this->assertInstanceOf(MysqliConnection::class, $connection);
         $connection->disconnect();

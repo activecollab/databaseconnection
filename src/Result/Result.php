@@ -17,10 +17,10 @@ use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use BadMethodCallException;
-use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use JsonSerializable;
 use mysqli_result;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
 /**

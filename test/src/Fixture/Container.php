@@ -11,8 +11,8 @@
 
 namespace ActiveCollab\DatabaseConnection\Test\Fixture;
 
-use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test\Fixtures
@@ -22,11 +22,8 @@ class Container extends \Pimple\Container implements ContainerInterface
     /**
      * Finds an entry of the container by its identifier and returns it.
      *
-     * @param string $id Identifier of the entry to look for
-     *
-     * @throws InvalidArgumentException No entry was found for this identifier
-     *
-     * @return mixed Entry
+     * @param  string $id Identifier of the entry to look for
+     * @return mixed  Entry
      */
     public function get($id)
     {

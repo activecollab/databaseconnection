@@ -31,7 +31,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->link = new mysqli('localhost', 'root', '', 'activecollab_database_connection_test');
+        $this->link = new mysqli(
+            'localhost',
+            'root',
+            $this->getValidMySqlPassword(),
+            'activecollab_database_connection_test'
+        );
 
         if ($this->link->connect_error) {
             throw new RuntimeException('Failed to connect to database. MySQL said: '.$this->link->connect_error);
@@ -46,5 +51,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $this->link->close();
 
         parent::tearDown();
+    }
+
+    protected function getValidMySqlPassword(): string
+    {
+        return (string) getenv('DATABASE_CONNECTION_TEST_PASSWORD');
     }
 }

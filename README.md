@@ -257,7 +257,7 @@ If objects that you are hydrating implement `ActiveCollab\ContainerAccess\Contai
 ```php
 use ActiveCollab\DatabaseConnection\Test\Fixture\Container;
 use ActiveCollab\DatabaseConnection\Test\Fixture\WriterWithContainer;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 $container = new Container([
     'dependency' => 'it works!'
