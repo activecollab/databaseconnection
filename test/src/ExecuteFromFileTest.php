@@ -9,24 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 class ExecuteFromFileTest extends TestCase
 {
-    /**
-     * @var MysqliConnection
-     */
-    private $connection;
+    private MysqliConnection $connection;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();

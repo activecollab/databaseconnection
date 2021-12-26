@@ -9,24 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 class ForeignKeysTest extends TestCase
 {
-    /**
-     * @var MysqliConnection
-     */
-    private $connection;
+    private MysqliConnection $connection;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -65,9 +58,6 @@ class ForeignKeysTest extends TestCase
         $this->connection->turnOnForeignKeyChecks();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function tearDown(): void
     {
         $this->connection->turnOffForeignKeyChecks();

@@ -319,9 +319,6 @@ class Result implements ResultInterface
         return new ResultIterator($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function &setValueCaster(ValueCasterInterface $value_caster)
     {
         $this->value_caser = $value_caster;
@@ -329,9 +326,6 @@ class Result implements ResultInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function &returnObjectsByClass($class_name)
     {
         $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
@@ -340,9 +334,6 @@ class Result implements ResultInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function &returnObjectsByField($field_name)
     {
         $this->return_mode = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
