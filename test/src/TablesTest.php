@@ -26,7 +26,7 @@ class TablesTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +60,7 @@ class TablesTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE IF EXISTS `writers1`');
         $this->connection->execute('DROP TABLE IF EXISTS `writers2`');

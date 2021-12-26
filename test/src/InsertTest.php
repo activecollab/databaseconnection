@@ -28,7 +28,7 @@ class InsertTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class InsertTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE IF EXISTS `writers`');
 

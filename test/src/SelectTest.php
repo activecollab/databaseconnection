@@ -14,6 +14,7 @@ namespace ActiveCollab\DatabaseConnection\Test;
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -28,7 +29,7 @@ class SelectTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -49,19 +50,18 @@ class SelectTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE `writers`');
 
         parent::tearDown();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Table name is required
-     */
     public function testTableNameIsRequired()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Table name is required");
+
         $this->connection->select('');
     }
 
@@ -180,23 +180,23 @@ class SelectTest extends TestCase
     public function testSelectFirstRow()
     {
         $first_writer_by_id = $this->connection->selectFirstRow('writers');
-        $this->assertInternalType('array', $first_writer_by_id);
+        $this->assertIsArray($first_writer_by_id);
 
         $this->assertEquals(['id' => 1, 'name' => 'Leo Tolstoy', 'birthday' => '1828-09-09'], $first_writer_by_id);
 
         $first_writer_by_name = $this->connection->selectFirstRow('writers', null, null, 'name');
-        $this->assertInternalType('array', $first_writer_by_name);
+        $this->assertIsArray($first_writer_by_name);
         $this->assertEquals(['id' => 2, 'name' => 'Alexander Pushkin', 'birthday' => '1799-06-06'], $first_writer_by_name);
     }
 
     public function testExecuteFirstColumn()
     {
         $writer_names = $this->connection->selectFirstColumn('writers', 'name', null, 'name');
-        $this->assertInternalType('array', $writer_names);
+        $this->assertIsArray($writer_names);
         $this->assertEquals(['Alexander Pushkin', 'Fyodor Dostoyevsky', 'Leo Tolstoy'], $writer_names);
 
         $writer_birthdays = $this->connection->selectFirstColumn('writers', 'birthday', null, 'name');
-        $this->assertInternalType('array', $writer_birthdays);
+        $this->assertIsArray($writer_birthdays);
         $this->assertEquals(['1799-06-06', '1821-11-11', '1828-09-09'], $writer_birthdays);
     }
 }

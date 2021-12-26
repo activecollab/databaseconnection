@@ -12,6 +12,7 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -26,7 +27,7 @@ class ExecuteFromFileTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +53,7 @@ class ExecuteFromFileTest extends TestCase
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection->tableExists('currencies')) {
             $this->connection->dropTable('currencies');
@@ -61,14 +62,12 @@ class ExecuteFromFileTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage File not found
-     */
     public function testExecuteFromNonExistingFile()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("File not found");
         $unknown_file = dirname(__DIR__) . '/resources/unknown file';
-        $this->assertFileNotExists($unknown_file);
+        $this->assertFileDoesNotExist($unknown_file);
 
         $this->connection->executeFromFile($unknown_file);
     }

@@ -40,7 +40,7 @@ class ResultIterator implements Iterator
      *
      * @see ResultSet::seek()
      */
-    public function rewind()
+    public function rewind(): void
     {
         if ($this->result->getCursorPosition() > 0) {
             $this->result->seek(0);
@@ -50,30 +50,24 @@ class ResultIterator implements Iterator
     /**
      * This method checks to see whether there are more results
      * by advancing the cursor position.
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->result->next();
     }
 
     /**
      * Returns the cursor position.
-     *
-     * @return int
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->result->getCursorPosition();
     }
 
     /**
      * Returns the row (assoc array) at current cursor position.
-     *
-     * @return array
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->result->getCurrentRow();
     }
@@ -82,7 +76,7 @@ class ResultIterator implements Iterator
      * This method does not actually do anything since we have already advanced
      * the cursor pos in valid().
      */
-    public function next()
+    public function next(): void
     {
     }
 }

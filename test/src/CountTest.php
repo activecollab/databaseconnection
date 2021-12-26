@@ -27,7 +27,7 @@ class CountTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +48,7 @@ class CountTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE `writers`');
 

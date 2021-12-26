@@ -16,6 +16,7 @@ use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use DateTime;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -30,7 +31,7 @@ class BatchInsertTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -49,7 +50,7 @@ class BatchInsertTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE `writers`');
 
@@ -205,10 +206,12 @@ class BatchInsertTest extends TestCase
     /**
      * Test if rows can't be inserted once batch is done.
      *
-     * @expectedException \RuntimeException
+     *
      */
     public function testRowsCantBeInsertedOnceDone()
     {
+        $this->expectException(RuntimeException::class);
+
         $batch_insert = $this->connection->batchInsert('writers', ['name', 'birthday'], 350);
 
         $batch_insert->insert('Leo Tolstoy', new DateTime('1828-09-09'));
@@ -226,10 +229,12 @@ class BatchInsertTest extends TestCase
     /**
      * Test if rows can't be inserted escaped once batch is done.
      *
-     * @expectedException \RuntimeException
+     *
      */
     public function testRowsCantBeInsertedEscapedOnceDone()
     {
+        $this->expectException(RuntimeException::class);
+
         $batch_insert = $this->connection->batchInsert('writers', ['name', 'birthday'], 350);
 
         $batch_insert->insert('Leo Tolstoy', new DateTime('1828-09-09'));

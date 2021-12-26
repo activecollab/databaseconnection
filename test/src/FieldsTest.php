@@ -12,6 +12,7 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\Exception\QueryException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -26,7 +27,7 @@ class FieldsTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +45,7 @@ class FieldsTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE IF EXISTS `writers`');
 
@@ -58,7 +59,7 @@ class FieldsTest extends TestCase
     {
         $field_names = $this->connection->getFieldNames('writers');
 
-        $this->assertInternalType('array', $field_names);
+        $this->assertIsArray($field_names);
         $this->assertCount(3, $field_names);
         $this->assertEquals(['id', 'name', 'birthday'], $field_names);
     }
@@ -96,12 +97,11 @@ class FieldsTest extends TestCase
         $this->assertCount(3, $this->connection->getFieldNames('writers'));
     }
 
-    /**
-     * @expectedException \ActiveCollab\DatabaseConnection\Exception\QueryException
-     * @expectedExceptionMessage Can't DROP 'field that does not exist'; check that column/key exists
-     */
     public function testUnsafeDropNonExistingField()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage("Can't DROP COLUMN `field that does not exist`; check that it exists");
+
         $this->assertCount(3, $this->connection->getFieldNames('writers'));
         $this->connection->dropField('writers', 'field that does not exist', false);
         $this->assertCount(3, $this->connection->getFieldNames('writers'));

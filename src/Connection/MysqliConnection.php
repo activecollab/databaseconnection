@@ -26,6 +26,7 @@ use Exception;
 use InvalidArgumentException;
 use mysqli;
 use mysqli_result;
+use mysqli_sql_exception;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -59,10 +60,28 @@ class MysqliConnection implements ConnectionInterface
 
     public function setDatabaseName(string $database_name, bool $select_database = true): ConnectionInterface
     {
-        if (empty($select_database) || $this->link->select_db($database_name)) {
-            $this->database_name = $database_name;
-        } else {
-            throw new ConnectionException("Failed to select database '$database_name'");
+        if (empty($select_database)) {
+            throw new ConnectionException(sprintf("Failed to select database '%s'", $database_name));
+        }
+
+        $database_selected = false;
+
+        try {
+            if ($this->link->select_db($database_name)) {
+                $this->database_name = $database_name;
+                $database_selected = true;
+            }
+
+        } catch (Exception $e) {
+            throw new ConnectionException(
+                sprintf("Failed to select database '%s'", $database_name),
+                $e->getCode(),
+                $e
+            );
+        }
+
+        if (empty($database_selected)) {
+            throw new ConnectionException(sprintf("Failed to select database '%s'", $database_name));
         }
 
         return $this;
@@ -75,7 +94,7 @@ class MysqliConnection implements ConnectionInterface
 
     public function execute($sql, ...$arguments)
     {
-        return $this->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS);
+        return $this->advancedExecute($sql, $arguments);
     }
 
     public function executeFirstRow($sql, ...$arguments)
@@ -109,10 +128,14 @@ class MysqliConnection implements ConnectionInterface
             throw new InvalidArgumentException('Field name is required');
         }
 
-        $query_result = $this->prepareAndExecuteQuery($sql, $arguments);
+        try {
+            $query_result = $this->prepareAndExecuteQuery($sql, $arguments);
 
-        if ($query_result === false) {
-            $query_result = $this->tryToRecoverFromFailedQuery($sql, $arguments, $load_mode, $return_mode);
+            if ($query_result === false) {
+                $query_result = $this->tryToRecoverFromFailedQuery($sql, $arguments, $load_mode, $return_mode);
+            }
+        } catch (mysqli_sql_exception $e) {
+            throw new QueryException($e->getMessage(), $e->getCode(), $e);
         }
 
         if ($query_result instanceof mysqli_result) {

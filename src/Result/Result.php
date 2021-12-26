@@ -22,6 +22,7 @@ use JsonSerializable;
 use mysqli_result;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use Traversable;
 
 /**
  * Abstraction of database query result.
@@ -97,7 +98,7 @@ class Result implements ResultInterface
         }
 
         if ($return_mode === ConnectionInterface::RETURN_OBJECT_BY_CLASS) {
-            if (!(new ReflectionClass($return_class_or_field))->implementsInterface('\ActiveCollab\DatabaseConnection\Record\LoadFromRow')) {
+            if (!(new ReflectionClass($return_class_or_field))->implementsInterface(LoadFromRow::class)) {
                 throw new InvalidArgumentException("Class '$return_class_or_field' needs to implement LoadFromRow interface");
             }
         }
@@ -129,11 +130,8 @@ class Result implements ResultInterface
 
     /**
      * Set cursor to a given position in the record set.
-     *
-     * @param  int  $num
-     * @return bool
      */
-    public function seek($num)
+    public function seek(int $num): bool
     {
         if ($num >= 0 && $num <= $this->count() - 1) {
             if (!$this->resource->data_seek($num)) {
@@ -150,10 +148,8 @@ class Result implements ResultInterface
 
     /**
      * Return next record in result set.
-     *
-     * @return array
      */
-    public function next()
+    public function next(): bool
     {
         if ($this->cursor_position < $this->count() && $row = $this->resource->fetch_assoc()) {
             // for getting the current row
@@ -168,18 +164,14 @@ class Result implements ResultInterface
 
     /**
      * Return number of records in result set.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->resource->num_rows;
     }
 
     /**
      * Free resource when we are done with this result.
-     *
-     * @return bool
      */
     public function free()
     {
@@ -204,9 +196,9 @@ class Result implements ResultInterface
             $this->next();
 
             return $this->getCurrentRow();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -235,12 +227,8 @@ class Result implements ResultInterface
      *
      * This function will treat $field_or_getter as field in case or array
      * return method, or as getter in case of object return method
-     *
-     * @param string $field_or_getter
-     *
-     * @return array
      */
-    public function toArrayIndexedBy($field_or_getter)
+    public function toArrayIndexedBy(string $field_or_getter): array
     {
         $result = [];
 
@@ -257,10 +245,8 @@ class Result implements ResultInterface
 
     /**
      * Return array or property => value pairs that describes this object.
-     *
-     * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         if (!$this->count()) {
             return [];
@@ -281,10 +267,8 @@ class Result implements ResultInterface
 
     /**
      * Return array of all rows.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = [];
 
@@ -297,59 +281,40 @@ class Result implements ResultInterface
 
     /**
      * Check if $offset exists.
-     *
-     * @param string $offset
-     *
-     * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return $offset >= 0 && $offset < $this->count();
     }
 
     /**
      * Return value at $offset.
-     *
-     * @param string $offset
-     *
-     * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->getRowAt($offset);
     }
 
     /**
      * Set value at $offset.
-     *
-     * @param int|string $offset
-     * @param mixed      $value
-     *
-     * @throws BadMethodCallException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new BadMethodCallException('Database results are read only');
     }
 
     /**
      * Unset value at $offset.
-     *
-     * @param string $offset
-     *
-     * @throws BadMethodCallException
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new BadMethodCallException('Database results are read only');
     }
 
     /**
-     * Returns an iterator for for this object, for use with foreach.
-     *
-     * @return ResultIterator
+     * Returns an iterator for this object, for use with foreach.
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ResultIterator($this);
     }

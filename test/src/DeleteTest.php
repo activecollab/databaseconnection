@@ -13,6 +13,7 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -27,7 +28,7 @@ class DeleteTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +53,7 @@ class DeleteTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE IF EXISTS `writers`');
 
@@ -106,19 +107,15 @@ class DeleteTest extends TestCase
         $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `name` = ?', 'Leo Tolstoy'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionDueToEmptyConditionsArray()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->connection->delete('writers', []);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionDueToInvalidConditions()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->connection->delete('writers', 123);
     }
 }

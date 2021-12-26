@@ -12,6 +12,7 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use DateTime;
 
@@ -28,7 +29,7 @@ class ExecuteTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -49,18 +50,16 @@ class ExecuteTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE `writers`');
 
         parent::tearDown();
     }
 
-    /**
-     * @expectedException \ActiveCollab\DatabaseConnection\Exception\QueryException
-     */
     public function testExceptionOnInvalidQuery()
     {
+        $this->expectException(QueryException::class);
         $this->connection->execute('invalid query 100%');
     }
 

@@ -30,7 +30,7 @@ class ContainerPropagatesToObjectTest extends TestCase
      */
     private $container;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -57,7 +57,7 @@ class ContainerPropagatesToObjectTest extends TestCase
         ]);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection->tableExists('writers')) {
             $this->connection->dropTable('writers');

@@ -12,21 +12,16 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\Exception\QueryException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
  */
 class IndexesTest extends TestCase
 {
-    /**
-     * @var MysqliConnection
-     */
-    private $connection;
+    private MysqliConnection $connection;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -42,10 +37,7 @@ class IndexesTest extends TestCase
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE IF EXISTS `writers`');
 
@@ -59,7 +51,7 @@ class IndexesTest extends TestCase
     {
         $index_names = $this->connection->getIndexNames('writers');
 
-        $this->assertInternalType('array', $index_names);
+        $this->assertIsArray($index_names);
         $this->assertCount(2, $index_names);
         $this->assertEquals(['PRIMARY', 'name'], $index_names);
     }
@@ -97,12 +89,11 @@ class IndexesTest extends TestCase
         $this->assertCount(2, $this->connection->getIndexNames('writers'));
     }
 
-    /**
-     * @expectedException \ActiveCollab\DatabaseConnection\Exception\QueryException
-     * @expectedExceptionMessage Can't DROP 'index that does not exist'; check that column/key exists
-     */
     public function testUnsafeDropNonExistingIndex()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage("Can't DROP INDEX `index that does not exist`; check that it exists");
+
         $this->assertCount(2, $this->connection->getIndexNames('writers'));
         $this->connection->dropIndex('writers', 'index that does not exist', false);
         $this->assertCount(2, $this->connection->getIndexNames('writers'));

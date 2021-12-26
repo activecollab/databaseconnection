@@ -16,6 +16,7 @@ use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
 use DateTime;
 use DateTimeZone;
+use InvalidArgumentException;
 
 class EscapeTest extends TestCase
 {
@@ -27,7 +28,7 @@ class EscapeTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -109,19 +110,15 @@ class EscapeTest extends TestCase
         $this->assertEquals("('1','2','3')", $this->connection->escapeValue([1, 2, 3]));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOnEmptyArray()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->connection->escapeValue([]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOnUsupportedObject()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->connection->escapeValue($this->link);
     }
 

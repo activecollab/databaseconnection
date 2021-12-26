@@ -13,7 +13,9 @@ namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
+use Exception;
 use mysqli as MysqliLink;
+use mysqli_sql_exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -21,26 +23,23 @@ use Psr\Log\LoggerInterface;
  */
 class ConnectionFactory
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $log;
-
-    /**
-     * @param LoggerInterface|null $log
-     */
-    public function __construct(LoggerInterface &$log = null)
+    public function __construct(
+        private ?LoggerInterface $log = null
+    )
     {
-        $this->log = $log;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function mysqli($host, $user, $pass, $select_database = '', $set_connection_encoding = null, $set_connection_encoding_with_query = false)
+    public function mysqli(
+        $host,
+        $user,
+        $pass,
+        $select_database = '',
+        $set_connection_encoding = null,
+        $set_connection_encoding_with_query = false
+    )
     {
         try {
-            if (strpos($host, ':') !== false) {
+            if (str_contains($host, ':')) {
                 $host_bits = explode(':', $host);
 
                 if (empty($host_bits[1])) {
@@ -51,8 +50,12 @@ class ConnectionFactory
             } else {
                 $link = $this->mysqliConnectFromParams($host, 3306, $user, $pass);
             }
-        } catch (\Exception $e) {
-            throw new ConnectionException('MySQLi connection failed: ' . $e->getMessage(), $e->getCode(), $e);
+        } catch (Exception $e) {
+            throw new ConnectionException(
+                sprintf('MySQLi connection failed: %s', $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
         }
 
         if ($set_connection_encoding && !$set_connection_encoding_with_query) {
@@ -83,7 +86,15 @@ class ConnectionFactory
      */
     private function mysqliConnectFromParams($host, $port, $user, $pass, $select_database = '')
     {
-        $link = new MysqliLink($host, $user, $pass, '', $port);
+        try {
+            $link = new MysqliLink($host, $user, $pass, '', $port);
+        } catch (Exception $e) {
+            throw new ConnectionException(
+                sprintf('MySQLi connection failed: %s', $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
+        }
 
         if ($link->connect_error) {
             throw new ConnectionException('Failed to connect to database. MySQL said: ' . $link->connect_error);

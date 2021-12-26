@@ -13,18 +13,18 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\ConnectionFactory;
+use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
  */
 class ConnectionFactoryTest extends TestCase
 {
-    /**
-     * @expectedException \ActiveCollab\DatabaseConnection\Exception\ConnectionException
-     * @expectedExceptionMessage MySQLi connection failed
-     */
     public function testExceptionOnInvalidArguments()
     {
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage("Failed to select database 'activecollab_database_connection_test'");
+
         (new ConnectionFactory())->mysqli(
             'localhost',
             'unknonw-user',

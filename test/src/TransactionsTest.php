@@ -26,7 +26,7 @@ class TransactionsTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +48,7 @@ class TransactionsTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection->inTransaction()) {
             $this->connection->rollback();
@@ -148,10 +148,12 @@ class TransactionsTest extends TestCase
     /**
      * Test if transaction closure propagates exception thrown within.
      *
-     * @expectedException \RuntimeException
+     *
      */
     public function testRollbackTransactClosure()
     {
+        $this->expectException(RuntimeException::class);
+
         $this->assertEquals(3, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers`'));
 
         $this->connection->transact(function () {

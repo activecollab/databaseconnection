@@ -12,6 +12,7 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\Exception\QueryException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -26,7 +27,7 @@ class ForeignKeysTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -67,7 +68,7 @@ class ForeignKeysTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->turnOffForeignKeyChecks();
 
@@ -101,7 +102,7 @@ class ForeignKeysTest extends TestCase
     {
         $fk_names = $this->connection->getForeignKeyNames('writers');
 
-        $this->assertInternalType('array', $fk_names);
+        $this->assertIsArray($fk_names);
         $this->assertCount(2, $fk_names);
 
         $this->assertContains('writer_period', $fk_names);
@@ -141,11 +142,10 @@ class ForeignKeysTest extends TestCase
         $this->assertCount(2, $this->connection->getForeignKeyNames('writers'));
     }
 
-    /**
-     * @expectedException \ActiveCollab\DatabaseConnection\Exception\QueryException
-     */
     public function testUnsafeDropNonExistingFk()
     {
+        $this->expectException(QueryException::class);
+
         $this->assertCount(2, $this->connection->getForeignKeyNames('writers'));
         $this->connection->dropForeignKey('writers', 'FK that does not exist', false);
         $this->assertCount(2, $this->connection->getForeignKeyNames('writers'));

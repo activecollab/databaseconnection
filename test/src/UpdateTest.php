@@ -13,6 +13,7 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -27,7 +28,7 @@ class UpdateTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +53,7 @@ class UpdateTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE IF EXISTS `writers`');
 
@@ -132,22 +133,20 @@ class UpdateTest extends TestCase
         $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `name` = ?', 'Leo Tolstoy'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionDueToEmptyConditionsArray()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->connection->update('writers', [
         'name' => 'Anton Chekhov',
         'birthday' => new DateTime('1860-01-29'),
         ], []);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionDueToInvalidConditions()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->connection->update('writers', [
             'name' => 'Anton Chekhov',
             'birthday' => new DateTime('1860-01-29'),

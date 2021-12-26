@@ -17,6 +17,7 @@ use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Writer;
 use DateTime;
+use InvalidArgumentException;
 
 class ExecuteLoadObjectTest extends TestCase
 {
@@ -28,7 +29,7 @@ class ExecuteLoadObjectTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -54,7 +55,7 @@ class ExecuteLoadObjectTest extends TestCase
     /**
      * Tear down the test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection->tableExists('writers')) {
             $this->connection->dropTable('writers');
@@ -63,19 +64,15 @@ class ExecuteLoadObjectTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionWhenLoadingByObjectClassAndClassNameIsEmpty()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionWhenLoadingByFieldAndFieldNameIsEmpty()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_FIELD);
     }
 

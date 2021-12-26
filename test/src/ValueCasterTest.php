@@ -12,8 +12,10 @@
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateValueInterface;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseConnection\Test
@@ -21,15 +23,15 @@ use ActiveCollab\DateValue\DateValueInterface;
 class ValueCasterTest extends TestCase
 {
     /**
-     * Test defualt casters.
+     * Test default casters.
      */
     public function testCasterStartsWithIdAndRowCountCasters()
     {
         $caster = new ValueCaster();
 
-        $this->assertEquals(ValueCaster::CAST_INT, $caster->getTypeByFieldName('id'));
-        $this->assertEquals(ValueCaster::CAST_INT, $caster->getTypeByFieldName('row_count'));
-        $this->assertEquals(ValueCaster::CAST_STRING, $caster->getTypeByFieldName('unknown_by_default'));
+        $this->assertEquals(ValueCasterInterface::CAST_INT, $caster->getTypeByFieldName('id'));
+        $this->assertEquals(ValueCasterInterface::CAST_INT, $caster->getTypeByFieldName('row_count'));
+        $this->assertEquals(ValueCasterInterface::CAST_STRING, $caster->getTypeByFieldName('unknown_by_default'));
     }
 
     /**
@@ -37,10 +39,10 @@ class ValueCasterTest extends TestCase
      */
     public function testIdAndRowCountCastersCanBeReconfigured()
     {
-        $caster = new ValueCaster(['id' => ValueCaster::CAST_BOOL, 'row_count' => ValueCaster::CAST_DATETIME]);
+        $caster = new ValueCaster(['id' => ValueCasterInterface::CAST_BOOL, 'row_count' => ValueCasterInterface::CAST_DATETIME]);
 
-        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('id'));
-        $this->assertEquals(ValueCaster::CAST_DATETIME, $caster->getTypeByFieldName('row_count'));
+        $this->assertEquals(ValueCasterInterface::CAST_BOOL, $caster->getTypeByFieldName('id'));
+        $this->assertEquals(ValueCasterInterface::CAST_DATETIME, $caster->getTypeByFieldName('row_count'));
     }
 
     /**
@@ -50,11 +52,11 @@ class ValueCasterTest extends TestCase
     {
         $default_caster = new ValueCaster();
 
-        $this->assertEquals(ValueCaster::CAST_STRING, $default_caster->getTypeByFieldName('budget'));
+        $this->assertEquals(ValueCasterInterface::CAST_STRING, $default_caster->getTypeByFieldName('budget'));
 
-        $new_caster = new ValueCaster(['budget' => ValueCaster::CAST_FLOAT]);
+        $new_caster = new ValueCaster(['budget' => ValueCasterInterface::CAST_FLOAT]);
 
-        $this->assertEquals(ValueCaster::CAST_FLOAT, $new_caster->getTypeByFieldName('budget'));
+        $this->assertEquals(ValueCasterInterface::CAST_FLOAT, $new_caster->getTypeByFieldName('budget'));
     }
 
     /**
@@ -64,16 +66,16 @@ class ValueCasterTest extends TestCase
     {
         $caster = new ValueCaster();
 
-        $this->assertEquals(ValueCaster::CAST_INT, $caster->getTypeByFieldName('project_leader_id'));
+        $this->assertEquals(ValueCasterInterface::CAST_INT, $caster->getTypeByFieldName('project_leader_id'));
 
-        $this->assertEquals(ValueCaster::CAST_DATETIME, $caster->getTypeByFieldName('created_at'));
-        $this->assertEquals(ValueCaster::CAST_DATE, $caster->getTypeByFieldName('due_on'));
-        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('is_important'));
-        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('was_extracted'));
-        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('had_trial'));
-        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('were_imported'));
-        $this->assertEquals(ValueCaster::CAST_BOOL, $caster->getTypeByFieldName('have_been_reported'));
-        $this->assertEquals(ValueCaster::CAST_STRING, $caster->getTypeByFieldName('regular_field'));
+        $this->assertEquals(ValueCasterInterface::CAST_DATETIME, $caster->getTypeByFieldName('created_at'));
+        $this->assertEquals(ValueCasterInterface::CAST_DATE, $caster->getTypeByFieldName('due_on'));
+        $this->assertEquals(ValueCasterInterface::CAST_BOOL, $caster->getTypeByFieldName('is_important'));
+        $this->assertEquals(ValueCasterInterface::CAST_BOOL, $caster->getTypeByFieldName('was_extracted'));
+        $this->assertEquals(ValueCasterInterface::CAST_BOOL, $caster->getTypeByFieldName('had_trial'));
+        $this->assertEquals(ValueCasterInterface::CAST_BOOL, $caster->getTypeByFieldName('were_imported'));
+        $this->assertEquals(ValueCasterInterface::CAST_BOOL, $caster->getTypeByFieldName('have_been_reported'));
+        $this->assertEquals(ValueCasterInterface::CAST_STRING, $caster->getTypeByFieldName('regular_field'));
     }
 
     /**
@@ -83,7 +85,7 @@ class ValueCasterTest extends TestCase
     {
         $caster = new ValueCaster();
 
-        $this->assertEquals(ValueCaster::CAST_INT, $caster->getTypeByFieldName('project_leader_id'));
+        $this->assertEquals(ValueCasterInterface::CAST_INT, $caster->getTypeByFieldName('project_leader_id'));
 
         $row = ['project_leader_id' => null];
 
@@ -114,55 +116,54 @@ class ValueCasterTest extends TestCase
         ];
 
         (new ValueCaster([
-            'budget' => ValueCaster::CAST_FLOAT,
-            'json_empty' => ValueCaster::CAST_JSON,
-            'json_object' => ValueCaster::CAST_JSON,
-            'json_array' => ValueCaster::CAST_JSON,
-            'json_scalar' => ValueCaster::CAST_JSON,
+            'budget' => ValueCasterInterface::CAST_FLOAT,
+            'json_empty' => ValueCasterInterface::CAST_JSON,
+            'json_object' => ValueCasterInterface::CAST_JSON,
+            'json_array' => ValueCasterInterface::CAST_JSON,
+            'json_scalar' => ValueCasterInterface::CAST_JSON,
         ]))->castRowValues($row);
 
-        $this->assertInternalType('integer', $row['id']);
+        $this->assertIsInt($row['id']);
         $this->assertEquals(456, $row['id']);
 
-        $this->assertInternalType('integer', $row['project_leader_id']);
+        $this->assertIsInt($row['project_leader_id']);
         $this->assertEquals(123, $row['project_leader_id']);
 
-        $this->assertInternalType('string', $row['name']);
+        $this->assertIsString($row['name']);
         $this->assertEquals('Project name', $row['name']);
 
         $this->assertInstanceOf(DateTimeValueInterface::class, $row['created_at']);
         $this->assertInstanceOf(DateValueInterface::class, $row['updated_on']);
 
-        $this->assertInternalType('boolean', $row['is_important']);
+        $this->assertIsBool($row['is_important']);
         $this->assertTrue($row['is_important']);
 
         $this->assertArrayHasKey('completed_at', $row);
         $this->assertNull($row['completed_at']);
 
-        $this->assertInternalType('float', $row['budget']);
+        $this->assertIsFloat($row['budget']);
         $this->assertEquals(1200.50, $row['budget']);
 
         $this->assertNull($row['json_empty']);
 
-        $this->assertInternalType('array', $row['json_object']);
+        $this->assertIsArray($row['json_object']);
         $this->assertEquals(['first' => 12, 'second' => '13'], $row['json_object']);
 
-        $this->assertInternalType('array', $row['json_array']);
+        $this->assertIsArray($row['json_array']);
         $this->assertEquals([1, 2, 3, 4, 5], $row['json_array']);
 
-        $this->assertInternalType('integer', $row['json_scalar']);
+        $this->assertIsInt($row['json_scalar']);
         $this->assertEquals(12345, $row['json_scalar']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessageRegExp /Failed to parse JSON. Reason: (.*)\w+/
-     */
     public function testInvalidJsonBreaksCasting()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches("/Failed to parse JSON. Reason: (.*)\w+/");
+
         $row = ['broken_json' => '{"broken":"object'];
 
-        (new ValueCaster(['broken_json' => ValueCaster::CAST_JSON]))->castRowValues($row);
+        (new ValueCaster(['broken_json' => ValueCasterInterface::CAST_JSON]))->castRowValues($row);
     }
 
     /**
@@ -175,6 +176,6 @@ class ValueCasterTest extends TestCase
 
         $row = ['ok_json' => '{"ok":"json"}'];
 
-        (new ValueCaster(['ok_json' => ValueCaster::CAST_JSON]))->castRowValues($row);
+        (new ValueCaster(['ok_json' => ValueCasterInterface::CAST_JSON]))->castRowValues($row);
     }
 }

@@ -51,18 +51,13 @@ interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, Jso
 
     /**
      * Set cursor to a given position in the record set.
-     *
-     * @param  int  $num
-     * @return bool
      */
-    public function seek($num);
+    public function seek(int $num): bool;
 
     /**
      * Return next record in result set.
-     *
-     * @return array
      */
-    public function next();
+    public function next(): bool;
 
     /**
      * Return current row.
@@ -84,19 +79,13 @@ interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, Jso
      *
      * This function will treat $field_or_getter as field in case or array
      * return method, or as getter in case of object return method
-     *
-     * @param string $field_or_getter
-     *
-     * @return array
      */
-    public function toArrayIndexedBy($field_or_getter);
+    public function toArrayIndexedBy(string $field_or_getter): array;
 
     /**
      * Return array of all rows.
-     *
-     * @return array
      */
-    public function toArray();
+    public function toArray(): array;
 
     /**
      * Set a custom value caster.
