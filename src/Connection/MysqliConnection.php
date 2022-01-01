@@ -408,7 +408,17 @@ class MysqliConnection implements ConnectionInterface
             throw new RuntimeException('File not found');
         }
 
-        if ($this->link->multi_query(file_get_contents($file_path))) {
+        $content = file_get_contents($file_path);
+
+        if (!is_string($content)) {
+            return;
+        }
+
+        if (empty(trim($content))) {
+            return;
+        }
+
+        if ($this->link->multi_query($content)) {
             do {
                 if ($result = $this->link->store_result()) {
                     $result->free();
