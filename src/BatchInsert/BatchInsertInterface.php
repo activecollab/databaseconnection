@@ -11,9 +11,6 @@
 
 namespace ActiveCollab\DatabaseConnection\BatchInsert;
 
-/**
- * @package ActiveCollab\DatabaseConnection\BatchInsert
- */
 interface BatchInsertInterface
 {
     /**

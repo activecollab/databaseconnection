@@ -18,9 +18,6 @@ use mysqli as MysqliLink;
 use mysqli_sql_exception;
 use Psr\Log\LoggerInterface;
 
-/**
- * @package ActiveCollab\DatabaseConnection
- */
 class ConnectionFactory
 {
     public function __construct(

@@ -16,9 +16,6 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\BatchInsert
- */
 class BatchInsert implements BatchInsertInterface
 {
     /**

@@ -9,15 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Record;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Record
- */
 interface LoadFromRow
 {
-    /**
-     * @param array $row
-     */
     public function loadFromRow(array $row);
 }

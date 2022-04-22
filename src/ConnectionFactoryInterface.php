@@ -13,9 +13,6 @@ namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 
-/**
- * @package ActiveCollab\DatabaseConnection
- */
 interface ConnectionFactoryInterface
 {
     /**

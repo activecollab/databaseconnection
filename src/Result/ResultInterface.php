@@ -18,9 +18,6 @@ use Countable;
 use IteratorAggregate;
 use JsonSerializable;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Result
- */
 interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, JsonSerializable
 {
     /**

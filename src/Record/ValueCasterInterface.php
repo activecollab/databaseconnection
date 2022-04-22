@@ -11,9 +11,6 @@
 
 namespace ActiveCollab\DatabaseConnection\Record;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Record
- */
 interface ValueCasterInterface
 {
     const CAST_INT = 'int';
@@ -43,10 +40,6 @@ interface ValueCasterInterface
 
     /**
      * Return type by field name.
-     *
-     * @param string $field_name
-     *
-     * @return string
      */
-    public function getTypeByFieldName($field_name);
+    public function getTypeByFieldName(string $field_name): string;
 }
