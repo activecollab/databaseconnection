@@ -40,9 +40,9 @@ class MultiPolygon implements MultiPolygonInterface
             ',',
             array_map(
                 function (PolygonInterface $polygon) {
-                    return sprintf('(%s)', (string) $polygon);
+                    return sprintf('(%s)', $polygon);
                 },
-                $this->polygons
+                $this->getPolygons()
             )
         );
     }

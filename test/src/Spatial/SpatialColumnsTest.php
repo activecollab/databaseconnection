@@ -15,6 +15,8 @@ use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
+use ActiveCollab\DatabaseConnection\Spatial\MultiLineString\MultiLineString;
+use ActiveCollab\DatabaseConnection\Spatial\MultiLineString\MultiLineStringInterface;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPoint\MultiPoint;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPoint\MultiPointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygon;
@@ -34,6 +36,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $this->connection->dropTable('points');
         $this->connection->dropTable('multi_points');
         $this->connection->dropTable('line_strings');
+        $this->connection->dropTable('multi_line_strings');
         $this->connection->dropTable('polygons');
         $this->connection->dropTable('multi_polygons');
 
@@ -183,6 +186,72 @@ class SpatialColumnsTest extends DbConnectedTestCase
                     $line_string_to_write->getPoints()[$k]
                 )
             );
+        }
+    }
+
+    public function testWillReadAndWriteMultiLineString(): void
+    {
+        $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `multi_line_strings` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `multi_line_string` MULTILINESTRING NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        $this->assertTrue($create_table);
+
+        $multi_line_string_to_write = new MultiLineString(
+            new LineString(
+                new Point(new Coordinate(45.60317644), new Coordinate(19.27315063)),
+                new Point(new Coordinate(45.60312479), new Coordinate(19.27319189)),
+                new Point(new Coordinate(45.60473116), new Coordinate(19.27750116)),
+                new Point(new Coordinate(45.60478264), new Coordinate(19.27745963)),
+            ),
+
+            new LineString(
+                new Point(new Coordinate(45.60449426), new Coordinate(19.27769178)),
+                new Point(new Coordinate(45.60431683), new Coordinate(19.27783455)),
+                new Point(new Coordinate(45.60270942), new Coordinate(19.27352285)),
+                new Point(new Coordinate(45.60288728), new Coordinate(19.27338113)),
+            ),
+        );
+
+        $inserted = $this->connection->insert(
+            'multi_line_strings',
+            [
+                'multi_line_string' => $multi_line_string_to_write,
+            ]
+        );
+
+        $this->assertSame(1, $inserted);
+
+        $rows = $this->connection->execute(
+            'SELECT `id`, ST_AsText(`multi_line_string`) AS "multi_line_string" FROM `multi_line_strings`'
+        );
+        $this->assertInstanceOf(ResultInterface::class, $rows);
+
+        $rows->setValueCaster(
+            new ValueCaster(
+                [
+                    'multi_line_string' => ValueCasterInterface::CAST_SPATIAL,
+                ]
+            )
+        );
+
+        $first_row = $rows[0];
+
+        $this->assertInstanceOf(MultiLineStringInterface::class, $first_row['multi_line_string']);
+
+        /** @var MultiLineStringInterface $read_multi_line_strings */
+        $read_multi_line_strings = $first_row['multi_line_string'];
+
+        foreach ($read_multi_line_strings as $k => $read_multi_line_string) {
+            foreach ($read_multi_line_string->getPoints() as $j => $read_point) {
+                $this->assertTrue(
+                    $read_point->isSame(
+                        $multi_line_string_to_write->getLines()[$k]->getPoints()[$j]
+                    )
+                );
+            }
         }
     }
 
