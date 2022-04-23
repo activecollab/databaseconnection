@@ -16,6 +16,7 @@ namespace ActiveCollab\DatabaseConnection\Test;
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 use DateTime;
 
 class ExecuteTest extends TestCase

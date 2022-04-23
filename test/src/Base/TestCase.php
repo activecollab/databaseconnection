@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ActiveCollab\DatabaseConnection\Test;
+namespace ActiveCollab\DatabaseConnection\Test\Base;
 
 use mysqli;
 use RuntimeException;

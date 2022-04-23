@@ -15,6 +15,7 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 use DateTime;
 use InvalidArgumentException;
 

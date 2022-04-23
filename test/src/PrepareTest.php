@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 
 class PrepareTest extends TestCase
 {

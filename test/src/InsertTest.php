@@ -15,6 +15,7 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 use DateTime;
 
 class InsertTest extends TestCase

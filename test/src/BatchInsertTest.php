@@ -17,6 +17,7 @@ use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 use DateTime;
 use RuntimeException;
 

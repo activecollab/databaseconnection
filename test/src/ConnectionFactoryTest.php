@@ -16,6 +16,7 @@ namespace ActiveCollab\DatabaseConnection\Test;
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\ConnectionFactory;
 use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
+use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 
 class ConnectionFactoryTest extends TestCase
 {
