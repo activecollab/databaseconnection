@@ -9,11 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Record;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Record
- */
 interface ValueCasterInterface
 {
     const CAST_INT = 'int';
@@ -23,6 +22,7 @@ interface ValueCasterInterface
     const CAST_DATE = 'date';
     const CAST_DATETIME = 'datetime';
     const CAST_JSON = 'json';
+    const CAST_SPATIAL = 'wkt';
 
     /**
      * Cast row value to native PHP types based on caster settings.
@@ -43,10 +43,6 @@ interface ValueCasterInterface
 
     /**
      * Return type by field name.
-     *
-     * @param string $field_name
-     *
-     * @return string
      */
-    public function getTypeByFieldName($field_name);
+    public function getTypeByFieldName(string $field_name): string;
 }

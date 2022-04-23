@@ -9,16 +9,16 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\ConnectionFactory;
 use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
-class ConnectionFactoryTest extends TestCase
+class ConnectionFactoryTest extends DbLinkedTestCase
 {
     public function testExceptionOnInvalidArguments()
     {

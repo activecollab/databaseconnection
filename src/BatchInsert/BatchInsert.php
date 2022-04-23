@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\BatchInsert;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
@@ -16,9 +18,6 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\BatchInsert
- */
 class BatchInsert implements BatchInsertInterface
 {
     /**

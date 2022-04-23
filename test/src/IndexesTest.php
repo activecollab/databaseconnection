@@ -9,15 +9,15 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
-class IndexesTest extends TestCase
+class IndexesTest extends DbLinkedTestCase
 {
     private MysqliConnection $connection;
 

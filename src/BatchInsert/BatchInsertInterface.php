@@ -9,11 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\BatchInsert;
 
-/**
- * @package ActiveCollab\DatabaseConnection\BatchInsert
- */
 interface BatchInsertInterface
 {
     /**

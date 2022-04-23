@@ -9,25 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
-namespace ActiveCollab\DatabaseConnection\Test;
+declare(strict_types=1);
+
+namespace ActiveCollab\DatabaseConnection\Test\Base;
 
 use mysqli;
 use RuntimeException;
-use PHPUnit\Framework\TestCase as BaseTestCase;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
-abstract class TestCase extends BaseTestCase
+abstract class DbLinkedTestCase extends TestCase
 {
-    /**
-     * @var mysqli
-     */
-    protected $link;
+    protected mysqli $link;
 
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -44,9 +36,6 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
-    /**
-     * Tear down test environment.
-     */
     public function tearDown(): void
     {
         $this->link->close();

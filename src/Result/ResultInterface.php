@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Result;
 
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
@@ -18,9 +20,6 @@ use Countable;
 use IteratorAggregate;
 use JsonSerializable;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Result
- */
 interface ResultInterface extends IteratorAggregate, ArrayAccess, Countable, JsonSerializable
 {
     /**

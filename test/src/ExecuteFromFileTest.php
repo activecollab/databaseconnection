@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 use RuntimeException;
 
-class ExecuteFromFileTest extends TestCase
+class ExecuteFromFileTest extends DbLinkedTestCase
 {
     private MysqliConnection $connection;
 

@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Connection;
 
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
@@ -20,6 +22,7 @@ use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 use ActiveCollab\DateValue\DateValue;
 use DateTime;
 use Exception;
@@ -702,11 +705,11 @@ class MysqliConnection implements ConnectionInterface
             }
 
             return $result;
-        } else {
-            return empty($arguments) ?
-                $this->link->query($sql) :
-                $this->link->query(call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments)));
         }
+
+        return empty($arguments) ?
+            $this->link->query($sql) :
+            $this->link->query(call_user_func_array([&$this, 'prepare'], array_merge([$sql], $arguments)));
     }
 
     public function prepare($sql, ...$arguments)
@@ -813,69 +816,74 @@ class MysqliConnection implements ConnectionInterface
         // Date value
         if ($unescaped instanceof DateValue) {
             return "'" . $this->link->real_escape_string($unescaped->format('Y-m-d')) . "'";
+        }
 
         // Date time value (including DateTimeValue)
-        } elseif ($unescaped instanceof DateTime) {
+        if ($unescaped instanceof DateTime) {
             return "'" . $this->link->real_escape_string($unescaped->format('Y-m-d H:i:s')) . "'";
+        }
+
+        // Spatial data instances.
+        if ($unescaped instanceof GeometricObjectInterface) {
+            return sprintf("ST_GEOMFROMTEXT('%s')", $this->link->real_escape_string($unescaped->toWkt()));
+        }
 
         // Float
-        } else {
-            if (is_float($unescaped)) {
-                return "'" . str_replace(',', '.', (float) $unescaped) . "'"; // replace , with . for locales where comma is used by the system (German for example)
-
-            // Boolean (maps to TINYINT(1))
-            } else {
-                if (is_bool($unescaped)) {
-                    return $unescaped ? "'1'" : "'0'";
-
-                // NULL
-                } else {
-                    if ($unescaped === null) {
-                        return 'NULL';
-
-                    // Escape first cell of each row
-                    } else {
-                        if ($unescaped instanceof ResultInterface) {
-                            if ($unescaped->count() < 1) {
-                                throw new InvalidArgumentException("Empty results can't be escaped");
-                            }
-
-                            $escaped = [];
-
-                            foreach ($unescaped as $v) {
-                                $escaped[] = $this->escapeValue(array_shift($v));
-                            }
-
-                            return '(' . implode(',', $escaped) . ')';
-
-                        // Escape each array element
-                        } else {
-                            if (is_array($unescaped)) {
-                                if (empty($unescaped)) {
-                                    throw new InvalidArgumentException("Empty arrays can't be escaped");
-                                }
-
-                                $escaped = [];
-
-                                foreach ($unescaped as $v) {
-                                    $escaped[] = $this->escapeValue($v);
-                                }
-
-                                return '(' . implode(',', $escaped) . ')';
-
-                            // Regular string and integer escape
-                            } else {
-                                if (is_scalar($unescaped)) {
-                                    return "'" . $this->link->real_escape_string($unescaped) . "'";
-                                } else {
-                                    throw new InvalidArgumentException('Value is expected to be scalar, array, or instance of: DateTime or Result');
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        if (is_float($unescaped)) {
+            return sprintf(
+                "'%s'",
+                str_replace(',', '.', (string) (float) $unescaped)  // replace , with . for locales where comma is used by the system (German for example)
+            );
         }
+
+        // Boolean (maps to TINYINT(1))
+        if (is_bool($unescaped)) {
+            return $unescaped ? "'1'" : "'0'";
+        }
+
+        // NULL
+        if ($unescaped === null) {
+            return 'NULL';
+        }
+
+        // Escape first cell of each row
+        if ($unescaped instanceof ResultInterface) {
+            if ($unescaped->count() < 1) {
+                throw new InvalidArgumentException("Empty results can't be escaped");
+            }
+
+            $escaped = [];
+
+            foreach ($unescaped as $v) {
+                $escaped[] = $this->escapeValue(array_shift($v));
+            }
+
+            return '(' . implode(',', $escaped) . ')';
+        }
+
+        // Escape each array element
+        if (is_array($unescaped)) {
+            if (empty($unescaped)) {
+                throw new InvalidArgumentException("Empty arrays can't be escaped");
+            }
+
+            $escaped = [];
+
+            foreach ($unescaped as $v) {
+                $escaped[] = $this->escapeValue($v);
+            }
+
+            return '(' . implode(',', $escaped) . ')';
+        }
+
+        // Regular string and integer escape
+        if (is_scalar($unescaped)) {
+            return sprintf("'%s'", $this->link->real_escape_string((string) $unescaped));
+        }
+
+        throw new InvalidArgumentException(
+            'Value is expected to be scalar, array, or instance of: DateTime or Result'
+        );
     }
 
     public function escapeFieldName($unescaped)

@@ -9,30 +9,14 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
-class UsersTest extends TestCase
+class UsersTest extends DbConnectedTestCase
 {
-    /**
-     * @var MysqliConnection
-     */
-    private $connection;
-
-    /**
-     * Set up test environment.
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->connection = new MysqliConnection($this->link);
-    }
-
     /**
      * Test user exists call.
      */

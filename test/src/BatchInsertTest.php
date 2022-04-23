@@ -9,33 +9,22 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
-use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
-class BatchInsertTest extends TestCase
+class BatchInsertTest extends DbConnectedTestCase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->connection = new Connection($this->link);
 
         $create_table = $this->connection->execute("CREATE TABLE `writers` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -47,9 +36,6 @@ class BatchInsertTest extends TestCase
         $this->assertTrue($create_table);
     }
 
-    /**
-     * Tear down the test environment.
-     */
     public function tearDown(): void
     {
         $this->connection->execute('DROP TABLE `writers`');

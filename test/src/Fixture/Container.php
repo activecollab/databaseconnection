@@ -9,14 +9,13 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test\Fixture;
 
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures
- */
 class Container extends \Pimple\Container implements ContainerInterface
 {
     /**

@@ -9,28 +9,25 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Record;
 
+use ActiveCollab\DatabaseConnection\Spatial\WktParser\WktParser;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Record
- */
 class ValueCaster implements ValueCasterInterface
 {
-    /**
-     * @var array
-     */
-    private $dictated = ['id' => self::CAST_INT, 'row_count' => self::CAST_INT];
+    private array $dictated = [
+        'id' => self::CAST_INT,
+        'row_count' => self::CAST_INT,
+    ];
 
-    /**
-     * @param array|null $dictated
-     */
     public function __construct(array $dictated = null)
     {
-        if ($dictated && is_array($dictated)) {
+        if ($dictated) {
             $this->dictated = array_merge($this->dictated, $dictated);
         }
     }
@@ -66,8 +63,6 @@ class ValueCaster implements ValueCasterInterface
                 return (int) $value;
             case self::CAST_FLOAT:
                 return (float) $value;
-            case self::CAST_STRING:
-                return (string) $value;
             case self::CAST_BOOL:
                 return (bool) $value;
             case self::CAST_DATE:
@@ -77,34 +72,35 @@ class ValueCaster implements ValueCasterInterface
             case self::CAST_JSON:
                 if (empty($value)) {
                     return null;
-                } else {
-                    $result = json_decode($value, true);
-
-                    if (empty($result) && json_last_error()) {
-                        throw new RuntimeException('Failed to parse JSON. Reason: ' . json_last_error_msg(), json_last_error());
-                    }
-
-                    return $result;
                 }
-            default:
-                return (string) $value;
+
+                $result = json_decode($value, true);
+
+                if (empty($result) && json_last_error()) {
+                    throw new RuntimeException(
+                        sprintf('Failed to parse JSON. Reason: %s', json_last_error_msg()),
+                        json_last_error()
+                    );
+                }
+
+                return $result;
+            case self::CAST_SPATIAL:
+                return (new WktParser())->geomFromText((string) $value);
         }
+
+        return (string) $value;
     }
 
-    /**
-     * Return type by field name.
-     *
-     * @param string $field_name
-     *
-     * @return string
-     */
-    public function getTypeByFieldName($field_name)
+    public function getTypeByFieldName(string $field_name): string
     {
         if (isset($this->dictated[$field_name])) {
             return $this->dictated[$field_name];
         }
 
-        if (substr($field_name, 0, 3) === 'is_' || in_array(substr($field_name, 0, 4), ['has_', 'had_', 'was_']) || in_array(substr($field_name, 0, 5), ['were_', 'have_'])) {
+        if (str_starts_with($field_name, 'is_')
+            || in_array(substr($field_name, 0, 4), ['has_', 'had_', 'was_'])
+            || in_array(substr($field_name, 0, 5), ['were_', 'have_'])
+        ) {
             return self::CAST_BOOL;
         }
 
