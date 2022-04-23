@@ -825,7 +825,7 @@ class MysqliConnection implements ConnectionInterface
 
         // Spatial data instances.
         if ($unescaped instanceof GeometricObjectInterface) {
-            return sprintf("ST_GEOMFROMTEXT('%s')", $this->link->real_escape_string((string) $unescaped));
+            return sprintf("ST_GEOMFROMTEXT('%s')", $this->link->real_escape_string($unescaped->toWkt()));
         }
 
         // Float

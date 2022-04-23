@@ -37,6 +37,11 @@ class Polygon implements PolygonInterface
         return $this->inner_boundaries;
     }
 
+    public function toWkt(): string
+    {
+        return sprintf('POLYGON(%s)', $this);
+    }
+
     public function __toString(): string
     {
         $boundaries = [
@@ -47,9 +52,6 @@ class Polygon implements PolygonInterface
             $boundaries[] = sprintf('(%s)', $inner_boundary);
         }
 
-        return sprintf(
-            'POLYGON(%s)',
-            implode(', ', $boundaries)
-        );
+        return implode(', ', $boundaries);
     }
 }

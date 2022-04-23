@@ -16,6 +16,7 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
+use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Polygon\Polygon;
 use ActiveCollab\DatabaseConnection\Spatial\Polygon\PolygonInterface;
 use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
@@ -26,6 +27,56 @@ class SpatialColumnsTest extends DbConnectedTestCase
     {
         parent::setUp();
 
+
+    }
+
+    public function tearDown(): void
+    {
+        $this->connection->dropTable('points');
+        $this->connection->dropTable('polygons');
+
+        parent::tearDown();
+    }
+
+    public function testWillReadAndWritePoints(): void
+    {
+        $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `points` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `point` POINT NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        $this->assertTrue($create_table);
+
+        $point_to_write = new Point(new Coordinate(25.774), new Coordinate(-80.19));
+
+        $inserted = $this->connection->insert(
+            'points',
+            [
+                'point' => $point_to_write,
+            ]
+        );
+
+        $this->assertSame(1, $inserted);
+
+        $rows = $this->connection->execute('SELECT `id`, ST_AsText(`point`) AS "point" FROM `points`');
+        $this->assertInstanceOf(ResultInterface::class, $rows);
+
+        $rows->setValueCaster(
+            new ValueCaster(
+                [
+                    'point' => ValueCasterInterface::CAST_SPATIAL,
+                ]
+            )
+        );
+
+        $first_row = $rows[0];
+
+        $this->assertInstanceOf(PointInterface::class, $first_row['point']);
+    }
+
+    public function testWillReadAndWritePolygon(): void
+    {
         $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `polygons` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `polygon` POLYGON NOT NULL,
@@ -33,17 +84,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
 
         $this->assertTrue($create_table);
-    }
 
-    public function tearDown(): void
-    {
-        $this->connection->dropTable('polygons');
-
-        parent::tearDown();
-    }
-
-    public function testWillReadAndWritePolygon(): void
-    {
         $polygon_to_write =  new Polygon(
             new LinearRing(
                 new Point(new Coordinate(25.774), new Coordinate(-80.19)),
@@ -56,7 +97,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $inserted = $this->connection->insert(
             'polygons',
             [
-                'polygon' => $polygon_to_write
+                'polygon' => $polygon_to_write,
             ]
         );
 

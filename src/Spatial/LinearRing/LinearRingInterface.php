@@ -13,7 +13,7 @@ namespace ActiveCollab\DatabaseConnection\Spatial\LinearRing;
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 
-interface LinearRingInterface extends GeometricObjectInterface
+interface LinearRingInterface
 {
     /**
      * @return PointInterface[]

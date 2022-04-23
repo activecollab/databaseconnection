@@ -14,4 +14,5 @@ use Stringable;
 
 interface GeometricObjectInterface extends Stringable
 {
+    public function toWkt(): string;
 }

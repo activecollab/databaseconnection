@@ -70,7 +70,7 @@ class WktParser
             throw new InvalidWktException($text, $e);
         }
 
-        if ($type === self::POLYGON) {
+        if (in_array($type, [self::POINT, self::POLYGON])) {
             return $components;
         }
 

@@ -37,6 +37,11 @@ class Point implements PointInterface
             $coordinate->getY()->getValue() === $this->getY()->getValue();
     }
 
+    public function toWkt(): string
+    {
+        return sprintf('POINT(%s)', $this);
+    }
+
     public function __toString(): string
     {
         return sprintf(
