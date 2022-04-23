@@ -10,9 +10,9 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 
-use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 
-class SpatialColumnsTest extends DbConnectedTestCase
+class SpatialColumnsTest extends DbLinkedTestCase
 {
     public function setUp(): void
     {

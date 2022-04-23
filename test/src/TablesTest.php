@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
-use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 
-class TablesTest extends DbConnectedTestCase
+class TablesTest extends DbLinkedTestCase
 {
     /**
      * @var MysqliConnection

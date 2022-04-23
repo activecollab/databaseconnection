@@ -16,9 +16,9 @@ namespace ActiveCollab\DatabaseConnection\Test;
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\ConnectionFactory;
 use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
-use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 
-class ConnectionFactoryTest extends DbConnectedTestCase
+class ConnectionFactoryTest extends DbLinkedTestCase
 {
     public function testExceptionOnInvalidArguments()
     {

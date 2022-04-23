@@ -15,13 +15,13 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Container;
 use ActiveCollab\DatabaseConnection\Test\Fixture\WriterWithContainer;
 use DateTime;
 use Psr\Container\ContainerInterface;
 
-class ContainerPropagatesToObjectTest extends DbConnectedTestCase
+class ContainerPropagatesToObjectTest extends DbLinkedTestCase
 {
     /**
      * @var ConnectionInterface

@@ -16,7 +16,7 @@ namespace ActiveCollab\DatabaseConnection\Test\Base;
 use mysqli;
 use RuntimeException;
 
-abstract class DbConnectedTestCase extends TestCase
+abstract class DbLinkedTestCase extends TestCase
 {
     protected mysqli $link;
 

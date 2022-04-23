@@ -16,10 +16,10 @@ namespace ActiveCollab\DatabaseConnection\Test;
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
-use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
 use DateTime;
 
-class ExecuteTest extends DbConnectedTestCase
+class ExecuteTest extends DbLinkedTestCase
 {
     /**
      * @var Connection
