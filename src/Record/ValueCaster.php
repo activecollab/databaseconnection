@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Record;
 
+use ActiveCollab\DatabaseConnection\Spatial\WktParser\WktParser;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
 use RuntimeException;
@@ -62,8 +63,6 @@ class ValueCaster implements ValueCasterInterface
                 return (int) $value;
             case self::CAST_FLOAT:
                 return (float) $value;
-            case self::CAST_STRING:
-                return (string) $value;
             case self::CAST_BOOL:
                 return (bool) $value;
             case self::CAST_DATE:
@@ -73,21 +72,23 @@ class ValueCaster implements ValueCasterInterface
             case self::CAST_JSON:
                 if (empty($value)) {
                     return null;
-                } else {
-                    $result = json_decode($value, true);
-
-                    if (empty($result) && json_last_error()) {
-                        throw new RuntimeException(
-                            sprintf('Failed to parse JSON. Reason: %s', json_last_error_msg()),
-                            json_last_error()
-                        );
-                    }
-
-                    return $result;
                 }
-            default:
-                return (string) $value;
+
+                $result = json_decode($value, true);
+
+                if (empty($result) && json_last_error()) {
+                    throw new RuntimeException(
+                        sprintf('Failed to parse JSON. Reason: %s', json_last_error_msg()),
+                        json_last_error()
+                    );
+                }
+
+                return $result;
+            case self::CAST_SPATIAL:
+                return (new WktParser())->geomFromText($value);
         }
+
+        return (string) $value;
     }
 
     public function getTypeByFieldName(string $field_name): string

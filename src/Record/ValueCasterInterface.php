@@ -22,6 +22,7 @@ interface ValueCasterInterface
     const CAST_DATE = 'date';
     const CAST_DATETIME = 'datetime';
     const CAST_JSON = 'json';
+    const CAST_SPATIAL = 'wkt';
 
     /**
      * Cast row value to native PHP types based on caster settings.

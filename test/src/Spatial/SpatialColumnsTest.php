@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 
+use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Latitude;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Longitude;
@@ -53,5 +56,20 @@ class SpatialColumnsTest extends DbConnectedTestCase
         );
 
         $this->assertSame(1, $inserted);
+
+        $rows = $this->connection->execute('SELECT `id`, ST_AsText(`polygon`) AS "polygon" FROM `polygons`');
+        $this->assertInstanceOf(ResultInterface::class, $rows);
+
+        $rows->setValueCaster(
+            new ValueCaster(
+                [
+                    'polygon' => ValueCasterInterface::CAST_SPATIAL,
+                ]
+            )
+        );
+
+        $first_row = $rows[0];
+
+        var_dump($first_row);
     }
 }
