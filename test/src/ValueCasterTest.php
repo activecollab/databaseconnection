@@ -15,12 +15,12 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateValueInterface;
 use RuntimeException;
 
-class ValueCasterTest extends TestCase
+class ValueCasterTest extends DbConnectedTestCase
 {
     /**
      * Test default casters.

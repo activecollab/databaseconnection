@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
 use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
 
-class EscapeTest extends TestCase
+class EscapeTest extends DbConnectedTestCase
 {
     /**
      * @var Connection

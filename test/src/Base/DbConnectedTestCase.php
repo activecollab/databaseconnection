@@ -17,7 +17,7 @@ use mysqli;
 use RuntimeException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
-abstract class TestCase extends BaseTestCase
+abstract class DbConnectedTestCase extends BaseTestCase
 {
     /**
      * @var mysqli

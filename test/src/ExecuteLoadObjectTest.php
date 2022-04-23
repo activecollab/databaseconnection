@@ -17,12 +17,12 @@ use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Writer;
 use DateTime;
 use InvalidArgumentException;
 
-class ExecuteLoadObjectTest extends TestCase
+class ExecuteLoadObjectTest extends DbConnectedTestCase
 {
     /**
      * @var Connection

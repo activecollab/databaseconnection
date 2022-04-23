@@ -15,9 +15,9 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
-class FieldsTest extends TestCase
+class FieldsTest extends DbConnectedTestCase
 {
     /**
      * @var MysqliConnection

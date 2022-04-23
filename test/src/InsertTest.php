@@ -15,10 +15,10 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 
-class InsertTest extends TestCase
+class InsertTest extends DbConnectedTestCase
 {
     /**
      * @var Connection

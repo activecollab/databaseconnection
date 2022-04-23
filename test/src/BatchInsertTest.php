@@ -17,11 +17,11 @@ use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsertInterface;
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 use RuntimeException;
 
-class BatchInsertTest extends TestCase
+class BatchInsertTest extends DbConnectedTestCase
 {
     /**
      * @var Connection

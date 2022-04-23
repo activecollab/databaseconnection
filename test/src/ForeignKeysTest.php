@@ -15,9 +15,9 @@ namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Exception\QueryException;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
-class ForeignKeysTest extends TestCase
+class ForeignKeysTest extends DbConnectedTestCase
 {
     private MysqliConnection $connection;
 

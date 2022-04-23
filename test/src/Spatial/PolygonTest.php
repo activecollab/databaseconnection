@@ -15,10 +15,10 @@ use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Latitude;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Longitude;
 use ActiveCollab\DatabaseConnection\Spatial\Polygon;
 use ActiveCollab\DatabaseConnection\Spatial\PolygonInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use LogicException;
 
-class PolygonTest extends TestCase
+class PolygonTest extends DbConnectedTestCase
 {
     public function testWillRequireFourCoordinates(): void
     {

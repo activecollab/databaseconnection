@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
-class SpatialColumnsTest extends TestCase
+class SpatialColumnsTest extends DbConnectedTestCase
 {
 }

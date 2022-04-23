@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 use Exception;
 use RuntimeException;
 
-class TransactionsTest extends TestCase
+class TransactionsTest extends DbConnectedTestCase
 {
     /**
      * @var Connection

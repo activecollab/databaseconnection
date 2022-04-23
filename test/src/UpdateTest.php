@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 use InvalidArgumentException;
 
-class UpdateTest extends TestCase
+class UpdateTest extends DbConnectedTestCase
 {
     /**
      * @var MysqliConnection

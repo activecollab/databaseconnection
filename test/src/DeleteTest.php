@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 use InvalidArgumentException;
 
-class DeleteTest extends TestCase
+class DeleteTest extends DbConnectedTestCase
 {
     /**
      * @var Connection
