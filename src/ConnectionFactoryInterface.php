@@ -14,19 +14,23 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use mysqli as MysqliLink;
 
 interface ConnectionFactoryInterface
 {
-    /**
-     * Connect to MySQL using mysqli extension.
-     *
-     * @param  string           $host
-     * @param  string           $user
-     * @param  string           $pass
-     * @param  string           $select_database
-     * @param  string|null      $set_connection_encoding
-     * @param  bool             $set_connection_encoding_with_query
-     * @return MysqliConnection
-     */
-    public function mysqli($host, $user, $pass, $select_database = '', $set_connection_encoding = null, $set_connection_encoding_with_query = false);
+    public function mysqli(
+        string $host,
+        string $user,
+        string $pass,
+        string $select_database = '',
+        string $set_connection_encoding = null,
+        bool $set_connection_encoding_with_query = false
+    ): MysqliConnection;
+
+    public function mysqliFromLink(
+        MysqliLink $link,
+        string $select_database = '',
+        string $set_connection_encoding = null,
+        bool $set_connection_encoding_with_query = false
+    ): MysqliConnection;
 }

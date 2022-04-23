@@ -9,8 +9,12 @@
  * with this source code in the file LICENSE.
  */
 
-date_default_timezone_set('GMT');
+declare(strict_types=1);
 
-require dirname(__DIR__) . '/vendor/autoload.php';
-require __DIR__ . '/src/Base/TestCase.php';
-require __DIR__ . '/src/Base/DbConnectedTestCase.php';
+namespace ActiveCollab\DatabaseConnection\Test\Base;
+
+use PHPUnit\Framework\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+}

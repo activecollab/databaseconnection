@@ -15,18 +15,11 @@ namespace ActiveCollab\DatabaseConnection\Test\Base;
 
 use mysqli;
 use RuntimeException;
-use PHPUnit\Framework\TestCase as BaseTestCase;
 
-abstract class DbConnectedTestCase extends BaseTestCase
+abstract class DbConnectedTestCase extends TestCase
 {
-    /**
-     * @var mysqli
-     */
-    protected $link;
+    protected mysqli $link;
 
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -43,9 +36,6 @@ abstract class DbConnectedTestCase extends BaseTestCase
         }
     }
 
-    /**
-     * Tear down test environment.
-     */
     public function tearDown(): void
     {
         $this->link->close();

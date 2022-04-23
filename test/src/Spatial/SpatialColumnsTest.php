@@ -14,4 +14,15 @@ use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
 class SpatialColumnsTest extends DbConnectedTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+
+    }
+
+    public function testPolygonReadAndWrite(): void
+    {
+
+    }
 }

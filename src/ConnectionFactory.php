@@ -17,7 +17,6 @@ use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Exception\ConnectionException;
 use Exception;
 use mysqli as MysqliLink;
-use mysqli_sql_exception;
 use Psr\Log\LoggerInterface;
 
 class ConnectionFactory
@@ -29,13 +28,13 @@ class ConnectionFactory
     }
 
     public function mysqli(
-        $host,
-        $user,
-        $pass,
-        $select_database = '',
-        $set_connection_encoding = null,
-        $set_connection_encoding_with_query = false
-    )
+        string $host,
+        string $user,
+        string $pass,
+        string $select_database = '',
+        string $set_connection_encoding = null,
+        bool $set_connection_encoding_with_query = false
+    ): MysqliConnection
     {
         try {
             if (str_contains($host, ':')) {
@@ -61,6 +60,21 @@ class ConnectionFactory
             $link->set_charset($set_connection_encoding);
         }
 
+        return $this->mysqliFromLink(
+            $link,
+            $select_database,
+            $set_connection_encoding,
+            $set_connection_encoding_with_query
+        );
+    }
+
+    public function mysqliFromLink(
+        MysqliLink $link,
+        string $select_database = '',
+        string $set_connection_encoding = null,
+        bool $set_connection_encoding_with_query = false
+    ): MysqliConnection
+    {
         $connection = new MysqliConnection($link, $this->log);
 
         if ($select_database) {
@@ -74,16 +88,13 @@ class ConnectionFactory
         return $connection;
     }
 
-    /**
-     * @param  string              $host
-     * @param  int                 $port
-     * @param  string              $user
-     * @param  string              $pass
-     * @param  string              $select_database
-     * @return MysqliLink
-     * @throws ConnectionException
-     */
-    private function mysqliConnectFromParams($host, $port, $user, $pass, $select_database = '')
+    private function mysqliConnectFromParams(
+        string $host,
+        int $port,
+        string $user,
+        string $pass,
+        string $select_database = ''
+    ): MysqliLink
     {
         try {
             $link = new MysqliLink($host, $user, $pass, '', $port);
