@@ -10,11 +10,13 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\WktParser;
 
+use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
+use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Coordinate;
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Latitude;
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Longitude;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRingInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Polygon\Polygon;
+use ActiveCollab\DatabaseConnection\Spatial\Polygon\PolygonInterface;
 use Exception;
 
 class WktParser
@@ -40,9 +42,9 @@ class WktParser
     ];
 
     public function geomFromText($text) {
-        $ltext = strtolower($text);
+        $lowered_text = strtolower($text);
         $type_pattern = '/\s*(\w+)\s*\(\s*(.*)\s*\)\s*$/';
-        if (!preg_match($type_pattern, $ltext, $matches)) {
+        if (!preg_match($type_pattern, $lowered_text, $matches)) {
             throw new InvalidWktException($text);
         }
         foreach (self::WKT_TYPES as $wkt_type) {
@@ -76,8 +78,14 @@ class WktParser
         return new $constructor($components);
     }
 
-    protected function parsePoint($str) {
-        return preg_split('/\s+/', trim($str));
+    private function parsePoint(string $text): PointInterface
+    {
+        $parsed_text = preg_split('/\s+/', trim($text));
+
+        return new Point(
+            new Coordinate((float) $parsed_text[0]),
+            new Coordinate((float) $parsed_text[1]),
+        );
     }
 
     protected function parseMultiPoint(string $str)
@@ -91,31 +99,31 @@ class WktParser
         return $this->parseLineString($str);
     }
 
+    /**
+     * @return PointInterface[]
+     */
     protected function parseLineString(string $text): array
     {
         $components = [];
 
         foreach (preg_split('/,/', trim($text)) as $point_text) {
-            $parsed_point = $this->parsePoint($point_text);
-
-            $components[] = new Coordinate(
-                new Latitude((float) $parsed_point[0]),
-                new Longitude((float) $parsed_point[1]),
-            );
+            $components[] = $this->parsePoint($point_text);
         }
 
         return $components;
     }
 
-    protected function parseLinearRing($str) {
-        return $this->parseLineString($str);
+    private function parseLinearRing(string $text): LinearRingInterface
+    {
+        return new LinearRing(...$this->parseLineString($text));
     }
 
-    protected function parsePolygon(string $text): LinearRingInterface
+    private function parsePolygon(string $text): PolygonInterface
     {
-        $linear_rings = $this->_parseCollection($text, 'LinearRing');
+        $boundaries = $this->_parseCollection($text, self::LINEAR_RING);
+        $exterior_boundary = array_pop($boundaries);
 
-        return new LinearRing(...$linear_rings[0]);
+        return new Polygon($exterior_boundary, ...$boundaries);
     }
 
     protected function parseMultiPolygon($str) {

@@ -10,13 +10,13 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\LinearRing;
 
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\CoordinateInterface;
-use ActiveCollab\DatabaseConnection\Spatial\SpatialDataInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
+use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 
-interface LinearRingInterface extends SpatialDataInterface
+interface LinearRingInterface extends GeometricObjectInterface
 {
     /**
-     * @return CoordinateInterface[]
+     * @return PointInterface[]
      */
     public function getCoordinates(): array;
 }

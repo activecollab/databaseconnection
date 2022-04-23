@@ -12,6 +12,6 @@ namespace ActiveCollab\DatabaseConnection\Spatial;
 
 use Stringable;
 
-interface SpatialDataInterface extends Stringable
+interface GeometricObjectInterface extends Stringable
 {
 }

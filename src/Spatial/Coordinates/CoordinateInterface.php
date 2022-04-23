@@ -10,11 +10,7 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\Coordinates;
 
-use ActiveCollab\DatabaseConnection\Spatial\SpatialDataInterface;
-
-interface CoordinateInterface extends SpatialDataInterface
+interface CoordinateInterface
 {
-    public function getLatitude(): LatitudeInterface;
-    public function getLongitude(): LongitudeInterface;
-    public function isSame(CoordinateInterface $coordinate): bool;
+    public function getValue(): float;
 }

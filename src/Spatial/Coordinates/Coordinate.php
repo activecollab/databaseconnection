@@ -12,48 +12,15 @@ namespace ActiveCollab\DatabaseConnection\Spatial\Coordinates;
 
 class Coordinate implements CoordinateInterface
 {
-    public function __construct(
-        private LatitudeInterface $latitude,
-        private LongitudeInterface $longitude,
-    )
+    private float $value;
+
+    public function __construct(float $value)
     {
+        $this->value = $value;
     }
 
-    public function getLatitude(): LatitudeInterface
+    public function getValue(): float
     {
-        return $this->latitude;
-    }
-
-    public function getLongitude(): LongitudeInterface
-    {
-        return $this->longitude;
-    }
-
-    public function isSame(CoordinateInterface $coordinate): bool
-    {
-        return $coordinate->getLatitude()->getLatitude() === $this->getLatitude()->getLatitude() &&
-            $coordinate->getLongitude()->getLongitude() === $this->getLongitude()->getLongitude();
-    }
-
-    public function __toString(): string
-    {
-        return sprintf(
-            '%s %s',
-            $this->formatNumber($this->getLatitude()->getLatitude()),
-            $this->formatNumber($this->getLongitude()->getLongitude()),
-        );
-    }
-
-    private function formatNumber(float $number): string
-    {
-        return rtrim(
-            number_format(
-                $number,
-                8,
-                '.',
-                ''
-            ),
-            '0'
-        );
+        return $this->value;
     }
 }

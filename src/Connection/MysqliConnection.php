@@ -22,7 +22,7 @@ use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\DatabaseConnection\Spatial\SpatialDataInterface;
+use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 use ActiveCollab\DateValue\DateValue;
 use DateTime;
 use Exception;
@@ -824,7 +824,7 @@ class MysqliConnection implements ConnectionInterface
         }
 
         // Spatial data instances.
-        if ($unescaped instanceof SpatialDataInterface) {
+        if ($unescaped instanceof GeometricObjectInterface) {
             return sprintf("ST_GEOMFROMTEXT('%s')", $this->link->real_escape_string((string) $unescaped));
         }
 

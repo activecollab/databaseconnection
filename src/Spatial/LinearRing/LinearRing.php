@@ -10,18 +10,18 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\LinearRing;
 
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\CoordinateInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use LogicException;
 
 class LinearRing implements LinearRingInterface
 {
     /**
-     * @var CoordinateInterface[]
+     * @var PointInterface[]
      */
     private array $coordinates;
 
     public function __construct(
-        CoordinateInterface ...$coordinates
+        PointInterface ...$coordinates
     )
     {
         if (count($coordinates) < 4) {
@@ -42,16 +42,13 @@ class LinearRing implements LinearRingInterface
 
     public function __toString(): string
     {
-        return sprintf(
-            'POLYGON((%s))',
-            implode(
-                ', ',
-                array_map(
-                    function (CoordinateInterface $coordinate) {
-                        return (string) $coordinate;
-                    },
-                    $this->coordinates
-                )
+        return implode(
+            ',',
+            array_map(
+                function (PointInterface $coordinate) {
+                    return (string) $coordinate;
+                },
+                $this->coordinates
             )
         );
     }
