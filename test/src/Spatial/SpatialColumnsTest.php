@@ -14,7 +14,7 @@ use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Coordinate;
+use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Polygon\Polygon;

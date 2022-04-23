@@ -8,7 +8,9 @@
 
 declare(strict_types=1);
 
-namespace ActiveCollab\DatabaseConnection\Spatial\Coordinates;
+namespace ActiveCollab\DatabaseConnection\Spatial\Coordinate;
+
+use ActiveCollab\DatabaseConnection\Spatial\Coordinate\CoordinateInterface;
 
 class Coordinate implements CoordinateInterface
 {

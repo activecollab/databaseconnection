@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Coordinate;
+use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRingInterface;
 use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;

@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\Point;
 
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\CoordinateInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Coordinate\CoordinateInterface;
 use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 
 interface PointInterface extends GeometricObjectInterface
