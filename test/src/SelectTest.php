@@ -13,27 +13,16 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 use InvalidArgumentException;
 
-class SelectTest extends DbLinkedTestCase
+class SelectTest extends DbConnectedTestCase
 {
-    /**
-     * @var MysqliConnection
-     */
-    private $connection;
-
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->connection = new MysqliConnection($this->link);
 
         $create_table = $this->connection->execute("CREATE TABLE `writers` (
             `id` int(11) NOT NULL AUTO_INCREMENT,

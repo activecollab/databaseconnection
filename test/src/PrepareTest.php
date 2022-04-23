@@ -13,26 +13,10 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
-class PrepareTest extends DbLinkedTestCase
+class PrepareTest extends DbConnectedTestCase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * Set up test environment.
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->connection = new Connection($this->link);
-    }
-
     /**
      * Test that prepare work when there are no arguments.
      */

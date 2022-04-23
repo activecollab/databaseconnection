@@ -13,26 +13,15 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use DateTime;
 
-class InsertTest extends DbLinkedTestCase
+class InsertTest extends DbConnectedTestCase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->connection = new Connection($this->link);
 
         $this->connection->execute('DROP TABLE IF EXISTS `writers`');
 
