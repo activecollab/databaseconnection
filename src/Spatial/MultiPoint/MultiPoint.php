@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Spatial\MultiPoint;
 
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
+use LogicException;
 
 class MultiPoint implements MultiPointInterface
 {
@@ -21,6 +22,10 @@ class MultiPoint implements MultiPointInterface
 
     public function __construct(PointInterface ...$points)
     {
+        if (count($points) < 2) {
+            throw new LogicException('At least two points are required.');
+        }
+
         $this->points = $points;
     }
 

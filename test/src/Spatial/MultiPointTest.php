@@ -14,9 +14,20 @@ use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPoint\MultiPoint;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
+use LogicException;
 
 class MultiPointTest extends DbLinkedTestCase
 {
+    public function testWillRequireTwoPoints(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('At least two points are required.');
+
+        new MultiPoint(
+            new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+        );
+    }
+
     public function testWillRenderWtk(): void
     {
         $this->assertSame(
