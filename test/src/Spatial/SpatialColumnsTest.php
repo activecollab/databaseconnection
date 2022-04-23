@@ -13,6 +13,7 @@ namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Coordinate\CoordinateInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
@@ -33,6 +34,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
     public function tearDown(): void
     {
         $this->connection->dropTable('points');
+        $this->connection->dropTable('lines');
         $this->connection->dropTable('polygons');
 
         parent::tearDown();
@@ -73,6 +75,11 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $first_row = $rows[0];
 
         $this->assertInstanceOf(PointInterface::class, $first_row['point']);
+
+        /** @var PointInterface $read_point */
+        $read_point = $first_row['point'];
+
+        $this->assertTrue($read_point->isSame($point_to_write));
     }
 
     public function testWillReadAndWritePolygon(): void

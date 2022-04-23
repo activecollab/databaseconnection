@@ -19,10 +19,10 @@ use LogicException;
 
 class LinearRingTest extends DbLinkedTestCase
 {
-    public function testWillRequireFourCoordinates(): void
+    public function testWillRequireFourPoints(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('At least four coordinates are required.');
+        $this->expectExceptionMessage('At least four points are required.');
 
         new LinearRing(
             new Point(new Coordinate(25.774), new Coordinate(-80.19)),

@@ -10,46 +10,29 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\LinearRing;
 
+use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use LogicException;
 
-class LinearRing implements LinearRingInterface
+class LinearRing  extends LineString implements LinearRingInterface
 {
-    /**
-     * @var PointInterface[]
-     */
-    private array $coordinates;
-
     public function __construct(
         PointInterface ...$coordinates
     )
     {
         if (count($coordinates) < 4) {
-            throw new LogicException('At least four coordinates are required.');
+            throw new LogicException('At least four points are required.');
         }
 
         if (!$coordinates[0]->isSame($coordinates[count($coordinates) - 1])) {
             throw new LogicException('Linear ring is not closed.');
         }
 
-        $this->coordinates = $coordinates;
+        parent::__construct(...$coordinates);
     }
 
-    public function getCoordinates(): array
+    public function toWkt(): string
     {
-        return $this->coordinates;
-    }
-
-    public function __toString(): string
-    {
-        return implode(
-            ',',
-            array_map(
-                function (PointInterface $coordinate) {
-                    return (string) $coordinate;
-                },
-                $this->coordinates
-            )
-        );
+        throw new LogicException('WKT is not available for line rings.');
     }
 }

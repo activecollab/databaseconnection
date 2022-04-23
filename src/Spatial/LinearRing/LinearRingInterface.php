@@ -10,10 +10,10 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\LinearRing;
 
+use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
-use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 
-interface LinearRingInterface
+interface LinearRingInterface extends LineStringInterface
 {
     /**
      * @return PointInterface[]
