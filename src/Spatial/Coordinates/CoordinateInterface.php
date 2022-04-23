@@ -1,0 +1,18 @@
+<?php
+
+/*
+ * This file is part of the Active Collab DatabaseConnection project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
+declare(strict_types=1);
+
+namespace ActiveCollab\DatabaseConnection\Spatial\Coordinates;
+
+interface CoordinateInterface
+{
+    public function getLatitude(): LatitudeInterface;
+    public function getLongitude(): LongitudeInterface;
+    public function isSame(CoordinateInterface $coordinate): bool;
+}
