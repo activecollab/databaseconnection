@@ -9,15 +9,15 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test\Fixture;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 
 /**
- *  @property string $dependency
- *
- * @package ActiveCollab\DatabaseConnection\Test\Fixture
+ * @property string $dependency
  */
 class WriterWithContainer extends Writer implements ContainerAccessInterface
 {

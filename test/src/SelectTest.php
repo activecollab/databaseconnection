@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
@@ -16,9 +18,6 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use DateTime;
 use InvalidArgumentException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 class SelectTest extends TestCase
 {
     /**

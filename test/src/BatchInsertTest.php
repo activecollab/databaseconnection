@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
@@ -18,9 +20,6 @@ use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use DateTime;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 class BatchInsertTest extends TestCase
 {
     /**

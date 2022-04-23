@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
@@ -17,9 +19,6 @@ use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateValueInterface;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 class ValueCasterTest extends TestCase
 {
     /**

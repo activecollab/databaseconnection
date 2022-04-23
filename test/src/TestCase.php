@@ -9,15 +9,14 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use mysqli;
 use RuntimeException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 abstract class TestCase extends BaseTestCase
 {
     /**

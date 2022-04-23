@@ -9,15 +9,14 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use DateTime;
 use InvalidArgumentException;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 class UpdateTest extends TestCase
 {
     /**

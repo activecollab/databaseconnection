@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
@@ -147,8 +149,6 @@ class TransactionsTest extends TestCase
 
     /**
      * Test if transaction closure propagates exception thrown within.
-     *
-     *
      */
     public function testRollbackTransactClosure()
     {

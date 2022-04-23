@@ -9,13 +9,12 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Test;
 
 use ActiveCollab\DatabaseConnection\Connection;
 
-/**
- * @package ActiveCollab\DatabaseConnection\Test
- */
 class PrepareTest extends TestCase
 {
     /**
