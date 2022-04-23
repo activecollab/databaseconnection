@@ -15,6 +15,8 @@ use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygon;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygonInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
@@ -25,6 +27,16 @@ use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
 class SpatialColumnsTest extends DbConnectedTestCase
 {
+    public function tearDown(): void
+    {
+        $this->connection->dropTable('points');
+        $this->connection->dropTable('line_strings');
+        $this->connection->dropTable('polygons');
+        $this->connection->dropTable('multi_polygons');
+
+        parent::tearDown();
+    }
+
     public function testWillReadAndWritePoint(): void
     {
         $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `points` (
@@ -65,8 +77,6 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $read_point = $first_row['point'];
 
         $this->assertTrue($read_point->isSame($point_to_write));
-
-        $this->connection->dropTable('points');
     }
 
     public function testWillReadAndWriteLineString(): void
@@ -119,8 +129,6 @@ class SpatialColumnsTest extends DbConnectedTestCase
                 )
             );
         }
-
-        $this->connection->dropTable('line_strings');
     }
 
     public function testWillReadAndWritePolygon(): void
@@ -176,7 +184,77 @@ class SpatialColumnsTest extends DbConnectedTestCase
                 )
             );
         }
+    }
 
-        $this->connection->dropTable('polygons');
+    public function testWillReadAndWriteMultiPolygon(): void
+    {
+        $this->connection->dropTable('multi_polygons');
+
+        $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `multi_polygons` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `multi_polygon` MULTIPOLYGON NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        $this->assertTrue($create_table);
+
+        $multi_polygon_to_write = new MultiPolygon(
+            new Polygon(
+                new LinearRing(
+                    new Point(new Coordinate(45.60317644), new Coordinate(19.27315063)),
+                    new Point(new Coordinate(45.60312479), new Coordinate(19.27319189)),
+                    new Point(new Coordinate(45.60473116), new Coordinate(19.27750116)),
+                    new Point(new Coordinate(45.60478264), new Coordinate(19.27745963)),
+                    new Point(new Coordinate(45.60317644), new Coordinate(19.27315063)),
+                )
+            ),
+
+            new Polygon(
+                new LinearRing(
+                    new Point(new Coordinate(45.60449426), new Coordinate(19.27769178)),
+                    new Point(new Coordinate(45.60431683), new Coordinate(19.27783455)),
+                    new Point(new Coordinate(45.60270942), new Coordinate(19.27352285)),
+                    new Point(new Coordinate(45.60288728), new Coordinate(19.27338113)),
+                    new Point(new Coordinate(45.60449426), new Coordinate(19.27769178)),
+                )
+            )
+        );
+
+        $inserted = $this->connection->insert(
+            'multi_polygons',
+            [
+                'multi_polygon' => $multi_polygon_to_write,
+            ]
+        );
+
+        $this->assertSame(1, $inserted);
+
+        $rows = $this->connection->execute('SELECT `id`, ST_AsText(`multi_polygon`) AS "multi_polygon" FROM `multi_polygons`');
+        $this->assertInstanceOf(ResultInterface::class, $rows);
+
+        $rows->setValueCaster(
+            new ValueCaster(
+                [
+                    'multi_polygon' => ValueCasterInterface::CAST_SPATIAL,
+                ]
+            )
+        );
+
+        $first_row = $rows[0];
+
+        $this->assertInstanceOf(MultiPolygonInterface::class, $first_row['multi_polygon']);
+
+        /** @var MultiPolygonInterface $read_multi_polygon */
+        $read_multi_polygon = $first_row['multi_polygon'];
+
+        foreach ($read_multi_polygon as $k => $polygon) {
+            foreach ($polygon->getExteriorBoundary()->getCoordinates() as $j => $read_coordinate) {
+                $this->assertTrue(
+                    $read_coordinate->isSame(
+                        $multi_polygon_to_write->getPolygons()[$k]->getExteriorBoundary()->getCoordinates()[$j]
+                    )
+                );
+            }
+        }
     }
 }

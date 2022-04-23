@@ -3,6 +3,8 @@
 /*
  * This file is part of the Active Collab DatabaseConnection project.
  *
+ * Based on GisConverter library: https://github.com/arenevier/gisconverter.php
+ *
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
@@ -12,6 +14,8 @@ namespace ActiveCollab\DatabaseConnection\Spatial\WktParser;
 
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygon;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygonInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
@@ -20,6 +24,7 @@ use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRingInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Polygon\Polygon;
 use ActiveCollab\DatabaseConnection\Spatial\Polygon\PolygonInterface;
 use Exception;
+use LogicException;
 
 class WktParser
 {
@@ -72,12 +77,11 @@ class WktParser
             throw new InvalidWktException($text, $e);
         }
 
-        if (in_array($type, [self::POINT, self::LINE_STRING, self::POLYGON])) {
+        if (in_array($type, [self::POINT, self::LINE_STRING, self::POLYGON, self::MULTI_POLYGON])) {
             return $components;
         }
 
-        $constructor = __NAMESPACE__ . '\\' . $type;
-        return new $constructor($components);
+        throw new LogicException(sprintf('Unsupported type %s.', $type));
     }
 
     private function parsePoint(string $text): PointInterface
@@ -119,14 +123,15 @@ class WktParser
 
     private function parsePolygon(string $text): PolygonInterface
     {
-        $boundaries = $this->_parseCollection($text, self::LINEAR_RING);
+        $boundaries = $this->parseCollection($text, self::LINEAR_RING);
         $exterior_boundary = array_pop($boundaries);
 
         return new Polygon($exterior_boundary, ...$boundaries);
     }
 
-    protected function parseMultiPolygon($str) {
-        return $this->_parseCollection($str, "Polygon");
+    protected function parseMultiPolygon($str): MultiPolygonInterface
+    {
+        return new MultiPolygon(...$this->parseCollection($str, "Polygon"));
     }
 
     protected function parseGeometryCollection($str) {
@@ -137,7 +142,11 @@ class WktParser
         return $components;
     }
 
-    protected function _parseCollection(string $text, $child_constructor) {
+    private function parseCollection(
+        string $text,
+        string $child_constructor
+    ): array
+    {
         $components = [];
 
         foreach (preg_split('/\)\s*,\s*\(/', trim($text)) as $parse_text) {
