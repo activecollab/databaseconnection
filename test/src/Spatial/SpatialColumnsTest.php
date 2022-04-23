@@ -16,7 +16,7 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Latitude;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Longitude;
-use ActiveCollab\DatabaseConnection\Spatial\Polygon;
+use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
 use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
 class SpatialColumnsTest extends DbConnectedTestCase
@@ -46,7 +46,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $inserted = $this->connection->insert(
             'polygons',
             [
-                'polygon' => new Polygon(
+                'polygon' => new LinearRing(
                     new Coordinate(new Latitude(25.774), new Longitude(-80.19)),
                     new Coordinate(new Latitude(18.466), new Longitude(-66.118)),
                     new Coordinate(new Latitude(32.321), new Longitude(-64.757)),

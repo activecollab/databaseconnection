@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\Coordinates;
 
-interface CoordinateInterface
+use ActiveCollab\DatabaseConnection\Spatial\SpatialDataInterface;
+
+interface CoordinateInterface extends SpatialDataInterface
 {
     public function getLatitude(): LatitudeInterface;
     public function getLongitude(): LongitudeInterface;

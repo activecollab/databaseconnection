@@ -8,12 +8,12 @@
 
 declare(strict_types=1);
 
-namespace ActiveCollab\DatabaseConnection\Spatial;
+namespace ActiveCollab\DatabaseConnection\Spatial\LinearRing;
 
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\CoordinateInterface;
 use LogicException;
 
-class Polygon implements PolygonInterface
+class LinearRing implements LinearRingInterface
 {
     /**
      * @var CoordinateInterface[]
@@ -29,7 +29,7 @@ class Polygon implements PolygonInterface
         }
 
         if (!$coordinates[0]->isSame($coordinates[count($coordinates) - 1])) {
-            throw new LogicException('Polygon is not closed.');
+            throw new LogicException('Linear ring is not closed.');
         }
 
         $this->coordinates = $coordinates;
@@ -48,11 +48,7 @@ class Polygon implements PolygonInterface
                 ', ',
                 array_map(
                     function (CoordinateInterface $coordinate) {
-                        return sprintf(
-                            '%d %d',
-                            $coordinate->getLatitude()->getLatitude(),
-                            $coordinate->getLongitude()->getLongitude()
-                        );
+                        return (string) $coordinate;
                     },
                     $this->coordinates
                 )

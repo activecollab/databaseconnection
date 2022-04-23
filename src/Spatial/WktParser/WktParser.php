@@ -13,7 +13,8 @@ namespace ActiveCollab\DatabaseConnection\Spatial\WktParser;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Latitude;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\Longitude;
-use ActiveCollab\DatabaseConnection\Spatial\Polygon;
+use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
+use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRingInterface;
 use Exception;
 
 class WktParser
@@ -56,13 +57,19 @@ class WktParser
         }
 
         try {
-            $components = call_user_func([$this, 'parse' . $type], $matches[2]);
+            $components = call_user_func(
+                [
+                    $this,
+                    sprintf('parse%s', $type),
+                ],
+                $matches[2]
+            );
         } catch (Exception $e) {
             throw new InvalidWktException($text, $e);
         }
 
         if ($type === self::POLYGON) {
-            return new Polygon(...$components);
+            return $components;
         }
 
         $constructor = __NAMESPACE__ . '\\' . $type;
@@ -73,25 +80,30 @@ class WktParser
         return preg_split('/\s+/', trim($str));
     }
 
-    protected function parseMultiPoint($str) {
+    protected function parseMultiPoint(string $str)
+    {
         $str = trim($str);
+
         if (strlen ($str) == 0) {
             return [];
         }
+
         return $this->parseLineString($str);
     }
 
-    protected function parseLineString($str)
+    protected function parseLineString(string $text): array
     {
-        $components = array();
-        foreach (preg_split('/,/', trim($str)) as $compstr) {
-            $parsed_point = $this->parsePoint($compstr);
+        $components = [];
+
+        foreach (preg_split('/,/', trim($text)) as $point_text) {
+            $parsed_point = $this->parsePoint($point_text);
 
             $components[] = new Coordinate(
                 new Latitude((float) $parsed_point[0]),
                 new Longitude((float) $parsed_point[1]),
             );
         }
+
         return $components;
     }
 
@@ -99,8 +111,11 @@ class WktParser
         return $this->parseLineString($str);
     }
 
-    protected function parsePolygon($str) {
-        return $this->_parseCollection($str, 'LinearRing');
+    protected function parsePolygon(string $text): LinearRingInterface
+    {
+        $linear_rings = $this->_parseCollection($text, 'LinearRing');
+
+        return new LinearRing(...$linear_rings[0]);
     }
 
     protected function parseMultiPolygon($str) {
@@ -115,23 +130,27 @@ class WktParser
         return $components;
     }
 
-    protected function _parseCollection($str, $child_constructor) {
+    protected function _parseCollection(string $text, $child_constructor) {
         $components = [];
-        foreach (preg_split('/\)\s*,\s*\(/', trim($str)) as $compstr) {
-            if (strlen($compstr) and $compstr[0] == '(') {
-                $compstr = substr($compstr, 1);
-            }
-            if (strlen($compstr) and $compstr[strlen($compstr)-1] == ')') {
-                $compstr = substr($compstr, 0, -1);
+
+        foreach (preg_split('/\)\s*,\s*\(/', trim($text)) as $parse_text) {
+            if (strlen($parse_text) and $parse_text[0] == '(') {
+                $parse_text = substr($parse_text, 1);
             }
 
-            $children = call_user_func([$this, 'parse' . $child_constructor], $compstr);
+            if (strlen($parse_text) and $parse_text[strlen($parse_text)-1] == ')') {
+                $parse_text = substr($parse_text, 0, -1);
+            }
 
-            var_dump($children);
-
-//            $constructor = __NAMESPACE__ . '\\' . $child_constructor;
-//            $components[] = new $constructor($children);
+            $components[] = call_user_func(
+                [
+                    $this,
+                    sprintf('parse%s', $child_constructor)
+                ],
+                $parse_text
+            );
         }
+
         return $components;
     }
 }

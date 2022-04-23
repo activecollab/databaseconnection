@@ -8,11 +8,12 @@
 
 declare(strict_types=1);
 
-namespace ActiveCollab\DatabaseConnection\Spatial;
+namespace ActiveCollab\DatabaseConnection\Spatial\LinearRing;
 
 use ActiveCollab\DatabaseConnection\Spatial\Coordinates\CoordinateInterface;
+use ActiveCollab\DatabaseConnection\Spatial\SpatialDataInterface;
 
-interface PolygonInterface extends SpatialDataInterface
+interface LinearRingInterface extends SpatialDataInterface
 {
     /**
      * @return CoordinateInterface[]

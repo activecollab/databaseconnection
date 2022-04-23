@@ -34,4 +34,26 @@ class Coordinate implements CoordinateInterface
         return $coordinate->getLatitude()->getLatitude() === $this->getLatitude()->getLatitude() &&
             $coordinate->getLongitude()->getLongitude() === $this->getLongitude()->getLongitude();
     }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            '%s %s',
+            $this->formatNumber($this->getLatitude()->getLatitude()),
+            $this->formatNumber($this->getLongitude()->getLongitude()),
+        );
+    }
+
+    private function formatNumber(float $number): string
+    {
+        return rtrim(
+            number_format(
+                $number,
+                8,
+                '.',
+                ''
+            ),
+            '0'
+        );
+    }
 }
