@@ -13,7 +13,6 @@ namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\DatabaseConnection\Spatial\Coordinate\CoordinateInterface;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
@@ -26,22 +25,6 @@ use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 
 class SpatialColumnsTest extends DbConnectedTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-
-    }
-
-    public function tearDown(): void
-    {
-        $this->connection->dropTable('points');
-        $this->connection->dropTable('line_strings');
-        $this->connection->dropTable('polygons');
-
-        parent::tearDown();
-    }
-
     public function testWillReadAndWritePoint(): void
     {
         $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `points` (
@@ -82,6 +65,8 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $read_point = $first_row['point'];
 
         $this->assertTrue($read_point->isSame($point_to_write));
+
+        $this->connection->dropTable('points');
     }
 
     public function testWillReadAndWriteLineString(): void
@@ -134,6 +119,8 @@ class SpatialColumnsTest extends DbConnectedTestCase
                 )
             );
         }
+
+        $this->connection->dropTable('line_strings');
     }
 
     public function testWillReadAndWritePolygon(): void
@@ -189,5 +176,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
                 )
             );
         }
+
+        $this->connection->dropTable('polygons');
     }
 }
