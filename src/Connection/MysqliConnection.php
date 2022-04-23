@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseConnection\Connection;
 
 use ActiveCollab\DatabaseConnection\BatchInsert\BatchInsert;
@@ -821,7 +823,10 @@ class MysqliConnection implements ConnectionInterface
         // Float
         } else {
             if (is_float($unescaped)) {
-                return "'" . str_replace(',', '.', (float) $unescaped) . "'"; // replace , with . for locales where comma is used by the system (German for example)
+                return sprintf(
+                    "'%s'",
+                    str_replace(',', '.', (string) (float) $unescaped)  // replace , with . for locales where comma is used by the system (German for example)
+                );
 
             // Boolean (maps to TINYINT(1))
             } else {
@@ -832,45 +837,46 @@ class MysqliConnection implements ConnectionInterface
                 } else {
                     if ($unescaped === null) {
                         return 'NULL';
+                    }
 
                     // Escape first cell of each row
+                    if ($unescaped instanceof ResultInterface) {
+                        if ($unescaped->count() < 1) {
+                            throw new InvalidArgumentException("Empty results can't be escaped");
+                        }
+
+                        $escaped = [];
+
+                        foreach ($unescaped as $v) {
+                            $escaped[] = $this->escapeValue(array_shift($v));
+                        }
+
+                        return '(' . implode(',', $escaped) . ')';
+
+                    // Escape each array element
                     } else {
-                        if ($unescaped instanceof ResultInterface) {
-                            if ($unescaped->count() < 1) {
-                                throw new InvalidArgumentException("Empty results can't be escaped");
+                        if (is_array($unescaped)) {
+                            if (empty($unescaped)) {
+                                throw new InvalidArgumentException("Empty arrays can't be escaped");
                             }
 
                             $escaped = [];
 
                             foreach ($unescaped as $v) {
-                                $escaped[] = $this->escapeValue(array_shift($v));
+                                $escaped[] = $this->escapeValue($v);
                             }
 
                             return '(' . implode(',', $escaped) . ')';
 
-                        // Escape each array element
+                        // Regular string and integer escape
                         } else {
-                            if (is_array($unescaped)) {
-                                if (empty($unescaped)) {
-                                    throw new InvalidArgumentException("Empty arrays can't be escaped");
-                                }
-
-                                $escaped = [];
-
-                                foreach ($unescaped as $v) {
-                                    $escaped[] = $this->escapeValue($v);
-                                }
-
-                                return '(' . implode(',', $escaped) . ')';
-
-                            // Regular string and integer escape
-                            } else {
-                                if (is_scalar($unescaped)) {
-                                    return "'" . $this->link->real_escape_string($unescaped) . "'";
-                                } else {
-                                    throw new InvalidArgumentException('Value is expected to be scalar, array, or instance of: DateTime or Result');
-                                }
+                            if (is_scalar($unescaped)) {
+                                return sprintf("'%s'", $this->link->real_escape_string((string) $unescaped));
                             }
+
+                            throw new InvalidArgumentException(
+                                'Value is expected to be scalar, array, or instance of: DateTime or Result'
+                            );
                         }
                     }
                 }
