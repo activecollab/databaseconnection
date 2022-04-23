@@ -8,26 +8,19 @@
 
 declare(strict_types=1);
 
-namespace ActiveCollab\DatabaseConnection\Spatial\LineString;
+namespace ActiveCollab\DatabaseConnection\Spatial\MultiPoint;
 
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
-use LogicException;
 
-class LineString implements LineStringInterface
+class MultiPoint implements MultiPointInterface
 {
     /**
      * @var PointInterface[]
      */
     private array $points;
 
-    public function __construct(
-        PointInterface ...$points
-    )
+    public function __construct(PointInterface ...$points)
     {
-        if (count($points) < 2) {
-            throw new LogicException('At least two points are required.');
-        }
-
         $this->points = $points;
     }
 
@@ -38,7 +31,7 @@ class LineString implements LineStringInterface
 
     public function toWkt(): string
     {
-        return sprintf('LINESTRING(%s)', $this);
+        return sprintf('MULTIPOINT(%s)', $this);
     }
 
     public function __toString(): string
@@ -49,7 +42,7 @@ class LineString implements LineStringInterface
                 function (PointInterface $coordinate) {
                     return (string) $coordinate;
                 },
-                $this->points
+                $this->getPoints()
             )
         );
     }

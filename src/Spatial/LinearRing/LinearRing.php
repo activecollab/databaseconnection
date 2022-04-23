@@ -17,18 +17,18 @@ use LogicException;
 class LinearRing  extends LineString implements LinearRingInterface
 {
     public function __construct(
-        PointInterface ...$coordinates
+        PointInterface ...$points
     )
     {
-        if (count($coordinates) < 4) {
+        if (count($points) < 4) {
             throw new LogicException('At least four points are required.');
         }
 
-        if (!$coordinates[0]->isSame($coordinates[count($coordinates) - 1])) {
+        if (!$points[0]->isSame($points[count($points) - 1])) {
             throw new LogicException('Linear ring is not closed.');
         }
 
-        parent::__construct(...$coordinates);
+        parent::__construct(...$points);
     }
 
     public function toWkt(): string

@@ -15,6 +15,8 @@ use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPoint\MultiPoint;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPoint\MultiPointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygon;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygonInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
@@ -30,6 +32,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
     public function tearDown(): void
     {
         $this->connection->dropTable('points');
+        $this->connection->dropTable('multi_points');
         $this->connection->dropTable('line_strings');
         $this->connection->dropTable('polygons');
         $this->connection->dropTable('multi_polygons');
@@ -79,6 +82,58 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $this->assertTrue($read_point->isSame($point_to_write));
     }
 
+    public function testWillReadAndWriteMultiPoint(): void
+    {
+        $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `multi_points` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `multi_point` MULTIPOINT NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        $this->assertTrue($create_table);
+
+        $multi_point_to_write = new MultiPoint(
+            new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+            new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+            new Point(new Coordinate(32.321), new Coordinate(-64.757)),
+        );
+
+        $inserted = $this->connection->insert(
+            'multi_points',
+            [
+                'multi_point' => $multi_point_to_write,
+            ]
+        );
+
+        $this->assertSame(1, $inserted);
+
+        $rows = $this->connection->execute('SELECT `id`, ST_AsText(`multi_point`) AS "multi_point" FROM `multi_points`');
+        $this->assertInstanceOf(ResultInterface::class, $rows);
+
+        $rows->setValueCaster(
+            new ValueCaster(
+                [
+                    'multi_point' => ValueCasterInterface::CAST_SPATIAL,
+                ]
+            )
+        );
+
+        $first_row = $rows[0];
+
+        $this->assertInstanceOf(MultiPointInterface::class, $first_row['multi_point']);
+
+        /** @var MultiPointInterface $read_multi_point */
+        $read_multi_point = $first_row['multi_point'];
+
+        foreach ($read_multi_point->getPoints() as $k => $read_point) {
+            $this->assertTrue(
+                $read_point->isSame(
+                    $multi_point_to_write->getPoints()[$k]
+                )
+            );
+        }
+    }
+
     public function testWillReadAndWriteLineString(): void
     {
         $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `line_strings` (
@@ -122,10 +177,10 @@ class SpatialColumnsTest extends DbConnectedTestCase
         /** @var LineStringInterface $read_line_string */
         $read_line_string = $first_row['line_string'];
 
-        foreach ($read_line_string->getCoordinates() as $k => $read_coordinate) {
+        foreach ($read_line_string->getPoints() as $k => $read_coordinate) {
             $this->assertTrue(
                 $read_coordinate->isSame(
-                    $line_string_to_write->getCoordinates()[$k]
+                    $line_string_to_write->getPoints()[$k]
                 )
             );
         }
@@ -177,10 +232,10 @@ class SpatialColumnsTest extends DbConnectedTestCase
         /** @var PolygonInterface $read_polygon */
         $read_polygon = $first_row['polygon'];
 
-        foreach ($read_polygon->getExteriorBoundary()->getCoordinates() as $k => $read_coordinate) {
+        foreach ($read_polygon->getExteriorBoundary()->getPoints() as $k => $read_coordinate) {
             $this->assertTrue(
                 $read_coordinate->isSame(
-                    $polygon_to_write->getExteriorBoundary()->getCoordinates()[$k]
+                    $polygon_to_write->getExteriorBoundary()->getPoints()[$k]
                 )
             );
         }
@@ -251,7 +306,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
             foreach ($polygon->getExteriorBoundary()->getCoordinates() as $j => $read_coordinate) {
                 $this->assertTrue(
                     $read_coordinate->isSame(
-                        $multi_polygon_to_write->getPolygons()[$k]->getExteriorBoundary()->getCoordinates()[$j]
+                        $multi_polygon_to_write->getPolygons()[$k]->getExteriorBoundary()->getPoints()[$j]
                     )
                 );
             }

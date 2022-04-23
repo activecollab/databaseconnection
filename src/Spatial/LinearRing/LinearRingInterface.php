@@ -18,5 +18,5 @@ interface LinearRingInterface extends LineStringInterface
     /**
      * @return PointInterface[]
      */
-    public function getCoordinates(): array;
+    public function getPoints(): array;
 }

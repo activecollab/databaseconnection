@@ -14,6 +14,8 @@ namespace ActiveCollab\DatabaseConnection\Spatial\WktParser;
 
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPoint\MultiPoint;
+use ActiveCollab\DatabaseConnection\Spatial\MultiPoint\MultiPointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygon;
 use ActiveCollab\DatabaseConnection\Spatial\MultiPolygon\MultiPolygonInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
@@ -77,7 +79,7 @@ class WktParser
             throw new InvalidWktException($text, $e);
         }
 
-        if (in_array($type, [self::POINT, self::LINE_STRING, self::POLYGON, self::MULTI_POLYGON])) {
+        if (in_array($type, [self::POINT, self::MULTI_POINT, self::LINE_STRING, self::POLYGON, self::MULTI_POLYGON])) {
             return $components;
         }
 
@@ -94,15 +96,15 @@ class WktParser
         );
     }
 
-    protected function parseMultiPoint(string $str)
+    protected function parseMultiPoint(string $str): MultiPointInterface
     {
         $str = trim($str);
 
-        if (strlen ($str) == 0) {
-            return [];
+        if (empty($str)) {
+            return new MultiPoint();
         }
 
-        return $this->parseLineString($str);
+        return new MultiPoint(...$this->parseLineString($str)->getPoints());
     }
 
     protected function parseLineString(string $text): LineStringInterface
@@ -118,7 +120,7 @@ class WktParser
 
     private function parseLinearRing(string $text): LinearRingInterface
     {
-        return new LinearRing(...$this->parseLineString($text)->getCoordinates());
+        return new LinearRing(...$this->parseLineString($text)->getPoints());
     }
 
     private function parsePolygon(string $text): PolygonInterface
