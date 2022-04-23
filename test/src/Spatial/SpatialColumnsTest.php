@@ -14,6 +14,8 @@ use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinate\CoordinateInterface;
+use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
+use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRing;
@@ -34,13 +36,13 @@ class SpatialColumnsTest extends DbConnectedTestCase
     public function tearDown(): void
     {
         $this->connection->dropTable('points');
-        $this->connection->dropTable('lines');
+        $this->connection->dropTable('line_strings');
         $this->connection->dropTable('polygons');
 
         parent::tearDown();
     }
 
-    public function testWillReadAndWritePoints(): void
+    public function testWillReadAndWritePoint(): void
     {
         $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `points` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -80,6 +82,58 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $read_point = $first_row['point'];
 
         $this->assertTrue($read_point->isSame($point_to_write));
+    }
+
+    public function testWillReadAndWriteLineString(): void
+    {
+        $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `line_strings` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `line_string` LINESTRING NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        $this->assertTrue($create_table);
+
+        $line_string_to_write =  new LineString(
+            new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+            new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+            new Point(new Coordinate(32.321), new Coordinate(-64.757)),
+        );
+
+        $inserted = $this->connection->insert(
+            'line_strings',
+            [
+                'line_string' => $line_string_to_write,
+            ]
+        );
+
+        $this->assertSame(1, $inserted);
+
+        $rows = $this->connection->execute('SELECT `id`, ST_AsText(`line_string`) AS "line_string" FROM `line_strings`');
+        $this->assertInstanceOf(ResultInterface::class, $rows);
+
+        $rows->setValueCaster(
+            new ValueCaster(
+                [
+                    'line_string' => ValueCasterInterface::CAST_SPATIAL,
+                ]
+            )
+        );
+
+        $first_row = $rows[0];
+
+        $this->assertInstanceOf(LineStringInterface::class, $first_row['line_string']);
+
+        /** @var LineStringInterface $read_line_string */
+        $read_line_string = $first_row['line_string'];
+
+        foreach ($read_line_string->getCoordinates() as $k => $read_coordinate) {
+            $this->assertTrue(
+                $read_coordinate->isSame(
+                    $line_string_to_write->getCoordinates()[$k]
+                )
+            );
+        }
     }
 
     public function testWillReadAndWritePolygon(): void

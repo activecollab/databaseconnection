@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\WktParser;
 
+use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
+use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
@@ -70,7 +72,7 @@ class WktParser
             throw new InvalidWktException($text, $e);
         }
 
-        if (in_array($type, [self::POINT, self::POLYGON])) {
+        if (in_array($type, [self::POINT, self::LINE_STRING, self::POLYGON])) {
             return $components;
         }
 
@@ -99,23 +101,20 @@ class WktParser
         return $this->parseLineString($str);
     }
 
-    /**
-     * @return PointInterface[]
-     */
-    protected function parseLineString(string $text): array
+    protected function parseLineString(string $text): LineStringInterface
     {
-        $components = [];
+        $points = [];
 
         foreach (preg_split('/,/', trim($text)) as $point_text) {
-            $components[] = $this->parsePoint($point_text);
+            $points[] = $this->parsePoint($point_text);
         }
 
-        return $components;
+        return new LineString(...$points);
     }
 
     private function parseLinearRing(string $text): LinearRingInterface
     {
-        return new LinearRing(...$this->parseLineString($text));
+        return new LinearRing(...$this->parseLineString($text)->getCoordinates());
     }
 
     private function parsePolygon(string $text): PolygonInterface
