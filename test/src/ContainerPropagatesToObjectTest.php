@@ -13,31 +13,20 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test;
 
-use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Test\Base\DbLinkedTestCase;
+use ActiveCollab\DatabaseConnection\Test\Base\DbConnectedTestCase;
 use ActiveCollab\DatabaseConnection\Test\Fixture\Container;
 use ActiveCollab\DatabaseConnection\Test\Fixture\WriterWithContainer;
 use DateTime;
 use Psr\Container\ContainerInterface;
 
-class ContainerPropagatesToObjectTest extends DbLinkedTestCase
+class ContainerPropagatesToObjectTest extends DbConnectedTestCase
 {
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
 
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->connection = new Connection\MysqliConnection($this->link);
 
         if ($this->connection->tableExists('writers')) {
             $this->connection->dropTable('writers');
@@ -72,7 +61,15 @@ class ContainerPropagatesToObjectTest extends DbLinkedTestCase
     public function testExceptionWhenLoadingByObjectClassAndClassNameIsEmpty()
     {
         /** @var WriterWithContainer[] $result */
-        $result = $this->connection->advancedExecute('SELECT * FROM `writers` ORDER BY `id`', null, ConnectionInterface::LOAD_ALL_ROWS, ConnectionInterface::RETURN_OBJECT_BY_CLASS, WriterWithContainer::class, null, $this->container);
+        $result = $this->connection->advancedExecute(
+            'SELECT * FROM `writers` ORDER BY `id`',
+            null,
+            ConnectionInterface::LOAD_ALL_ROWS,
+            ConnectionInterface::RETURN_OBJECT_BY_CLASS,
+            WriterWithContainer::class,
+            null,
+            $this->container
+        );
 
         $this->assertCount(3, $result);
 
