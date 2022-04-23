@@ -10,12 +10,8 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial;
 
-use ActiveCollab\DatabaseConnection\Spatial\Coordinates\CoordinateInterface;
+use Stringable;
 
-interface PolygonInterface extends SpatialDataInterface
+interface SpatialDataInterface extends Stringable
 {
-    /**
-     * @return CoordinateInterface[]
-     */
-    public function getCoordinates(): array;
 }

@@ -39,4 +39,24 @@ class Polygon implements PolygonInterface
     {
         return $this->coordinates;
     }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            'POLYGON((%s))',
+            implode(
+                ', ',
+                array_map(
+                    function (CoordinateInterface $coordinate) {
+                        return sprintf(
+                            '%d %d',
+                            $coordinate->getLatitude()->getLatitude(),
+                            $coordinate->getLongitude()->getLongitude()
+                        );
+                    },
+                    $this->coordinates
+                )
+            )
+        );
+    }
 }

@@ -170,13 +170,12 @@ interface ConnectionInterface
     public function count(string $table_name, $conditions = null, $field = 'id'): int;
 
     /**
-     * Insert into $table a row that is reperesented with $values (key is field name, and value is value that we need to set).
+     * Insert into $table a row that is represented with $values (key is field name, and value is value that we need to set).
      *
      * @param  string                   $table_name
      * @param  array                    $field_value_map
      * @param  string                   $mode
      * @return int
-     * @throws InvalidArgumentException
      */
     public function insert(
         string $table_name,
