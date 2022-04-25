@@ -85,7 +85,7 @@ class ValueCaster implements ValueCasterInterface
 
                 return $result;
             case self::CAST_SPATIAL:
-                return (new WktParser())->geomFromText((string) $value);
+                return (new WktParser())->parse((string) $value);
         }
 
         return (string) $value;

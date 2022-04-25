@@ -30,7 +30,7 @@ use ActiveCollab\DatabaseConnection\Spatial\Polygon\PolygonInterface;
 use Exception;
 use LogicException;
 
-class WktParser
+class WktParser implements WktParserInterface
 {
     const POINT = 'Point';
     const MULTI_POINT = 'MultiPoint';
@@ -52,7 +52,8 @@ class WktParser
         self::GEOMETRY_COLLECTION,
     ];
 
-    public function geomFromText($text) {
+    public function parse(string $text)
+    {
         $lowered_text = strtolower($text);
         $type_pattern = '/\s*(\w+)\s*\(\s*(.*)\s*\)\s*$/';
         if (!preg_match($type_pattern, $lowered_text, $matches)) {
@@ -146,7 +147,7 @@ class WktParser
     protected function parseGeometryCollection($str) {
         $components = [];
         foreach (preg_split('/,\s*(?=[A-Za-z])/', trim($str)) as $compstr) {
-            $components[] = $this->geomFromText($compstr);
+            $components[] = $this->parse($compstr);
         }
         return $components;
     }
