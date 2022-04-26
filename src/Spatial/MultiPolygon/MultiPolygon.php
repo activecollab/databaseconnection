@@ -46,4 +46,9 @@ class MultiPolygon implements MultiPolygonInterface
             )
         );
     }
+
+    public function jsonSerialize(): array
+    {
+        return $this->polygons;
+    }
 }

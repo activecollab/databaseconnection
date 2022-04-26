@@ -51,4 +51,9 @@ class MultiPoint implements MultiPointInterface
             )
         );
     }
+
+    public function jsonSerialize(): array
+    {
+        return $this->points;
+    }
 }

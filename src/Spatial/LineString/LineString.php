@@ -53,4 +53,9 @@ class LineString implements LineStringInterface
             )
         );
     }
+
+    public function jsonSerialize(): array
+    {
+        return $this->points;
+    }
 }

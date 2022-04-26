@@ -54,4 +54,14 @@ class Polygon implements PolygonInterface
 
         return implode(', ', $boundaries);
     }
+
+    public function jsonSerialize(): array
+    {
+        return array_merge(
+            [
+                $this->exterior_boundary,
+            ],
+            $this->inner_boundaries
+        );
+    }
 }

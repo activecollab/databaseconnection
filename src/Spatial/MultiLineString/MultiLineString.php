@@ -46,4 +46,9 @@ class MultiLineString implements MultiLineStringInterface
             )
         );
     }
+
+    public function jsonSerialize(): array
+    {
+        return $this->lines;
+    }
 }
