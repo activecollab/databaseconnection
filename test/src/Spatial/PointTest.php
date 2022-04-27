@@ -23,4 +23,21 @@ class PointTest extends TestCase
             (new Point(new Coordinate(25.774), new Coordinate(-80.19)))->toWkt()
         );
     }
+
+    public function testWillEncodeToJson(): void
+    {
+        $this->assertSame(
+            [
+                'type' => 'Point',
+                'coordinates' => [
+                    25.774,
+                    -80.19,
+                ]
+            ],
+            json_decode(json_encode(
+                new Point(new Coordinate(25.774), new Coordinate(-80.19))),
+                true
+            ),
+        );
+    }
 }

@@ -67,8 +67,11 @@ class Point implements PointInterface
     public function jsonSerialize(): array
     {
         return [
-            'x' => $this->getX(),
-            'y' => $this->getY(),
+            'type' => 'Point',
+            'coordinates' => [
+                $this->getX()->getValue(),
+                $this->getY()->getValue(),
+            ]
         ];
     }
 }

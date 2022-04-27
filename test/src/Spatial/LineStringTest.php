@@ -50,4 +50,25 @@ class LineStringTest extends TestCase
             ))->toWkt()
         );
     }
+
+    public function testWillEncodeToJson(): void
+    {
+        $line_string = new LineString(
+            new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+            new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+            new Point(new Coordinate(32.321), new Coordinate(-64.757)),
+        );
+
+        $this->assertSame(
+            [
+                'type' => 'LineString',
+                'coordinates' => [
+                    [25.774, -80.19],
+                    [18.466, -66.118],
+                    [32.321, -64.757],
+                ]
+            ],
+            json_decode(json_encode($line_string), true),
+        );
+    }
 }
