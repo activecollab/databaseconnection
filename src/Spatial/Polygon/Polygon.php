@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Spatial\Polygon;
 
 use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRingInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 
 class Polygon implements PolygonInterface
 {
@@ -57,11 +58,27 @@ class Polygon implements PolygonInterface
 
     public function jsonSerialize(): array
     {
-        return array_merge(
-            [
-                $this->exterior_boundary,
-            ],
-            $this->inner_boundaries
-        );
+        return [
+            'type' => 'Polygon',
+            'coordinates' => array_map(
+                function (LinearRingInterface $linear_ring) {
+                    return array_map(
+                        function (PointInterface $point) {
+                            return [
+                                $point->getX()->getValue(),
+                                $point->getY()->getValue(),
+                            ];
+                        },
+                        $linear_ring->getPoints(),
+                    );
+                },
+                array_merge(
+                    [
+                        $this->getExteriorBoundary(),
+                    ],
+                    $this->getInnerBoundaries(),
+                )
+            )
+        ];
     }
 }

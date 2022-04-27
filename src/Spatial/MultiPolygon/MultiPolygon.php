@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\MultiPolygon;
 
+use ActiveCollab\DatabaseConnection\Spatial\LinearRing\LinearRingInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 use ActiveCollab\DatabaseConnection\Spatial\Polygon\PolygonInterface;
 
 class MultiPolygon implements MultiPolygonInterface
@@ -49,6 +51,32 @@ class MultiPolygon implements MultiPolygonInterface
 
     public function jsonSerialize(): array
     {
-        return $this->polygons;
+        return [
+            'type' => 'MultiPolygon',
+            'coordinates' => array_map(
+                function (PolygonInterface $polygon) {
+                    return array_map(
+                        function (LinearRingInterface $linear_ring) {
+                            return array_map(
+                                function (PointInterface $point) {
+                                    return [
+                                        $point->getX()->getValue(),
+                                        $point->getY()->getValue(),
+                                    ];
+                                },
+                                $linear_ring->getPoints(),
+                            );
+                        },
+                        array_merge(
+                            [
+                                $polygon->getExteriorBoundary(),
+                            ],
+                            $polygon->getInnerBoundaries(),
+                        )
+                    );
+                },
+                $this->getPolygons(),
+            )
+        ];
     }
 }
