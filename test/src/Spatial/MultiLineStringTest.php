@@ -39,4 +39,43 @@ class MultiLineStringTest extends TestCase
             ))->toWkt()
         );
     }
+
+    public function testWillEncodeToJson(): void
+    {
+        $line_string_1 = new LineString(
+            new Point(new Coordinate(45.60317644), new Coordinate(19.27315063)),
+            new Point(new Coordinate(45.60312479), new Coordinate(19.27319189)),
+            new Point(new Coordinate(45.60473116), new Coordinate(19.27750116)),
+            new Point(new Coordinate(45.60478264), new Coordinate(19.27745963)),
+        );
+
+        $line_string_2 = new LineString(
+            new Point(new Coordinate(45.60449426), new Coordinate(19.27769178)),
+            new Point(new Coordinate(45.60431683), new Coordinate(19.27783455)),
+            new Point(new Coordinate(45.60270942), new Coordinate(19.27352285)),
+            new Point(new Coordinate(45.60288728), new Coordinate(19.27338113)),
+        );
+
+        $this->assertSame(
+            [
+                'type' => 'MultiLineString',
+                'coordinates' => [
+                    [
+                        [45.60317644, 19.27315063],
+                        [45.60312479, 19.27319189],
+                        [45.60473116, 19.27750116],
+                        [45.60478264, 19.27745963],
+                    ],
+
+                    [
+                        [45.60449426, 19.27769178],
+                        [45.60431683, 19.27783455],
+                        [45.60270942, 19.27352285],
+                        [45.60288728, 19.27338113],
+                    ],
+                ]
+            ],
+            json_decode(json_encode(new MultiLineString($line_string_1, $line_string_2)), true),
+        );
+    }
 }

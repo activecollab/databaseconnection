@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace ActiveCollab\DatabaseConnection\Spatial\MultiLineString;
 
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
+use ActiveCollab\DatabaseConnection\Spatial\Point\PointInterface;
 
 class MultiLineString implements MultiLineStringInterface
 {
@@ -49,6 +50,22 @@ class MultiLineString implements MultiLineStringInterface
 
     public function jsonSerialize(): array
     {
-        return $this->lines;
+        return [
+            'type' => 'MultiLineString',
+            'coordinates' => array_map(
+                function (LineStringInterface $line_string) {
+                    return array_map(
+                        function (PointInterface $point) {
+                            return [
+                                $point->getX()->getValue(),
+                                $point->getY()->getValue(),
+                            ];
+                        },
+                        $line_string->getPoints(),
+                    );
+                },
+                $this->getLines(),
+            )
+        ];
     }
 }

@@ -54,6 +54,17 @@ class MultiPoint implements MultiPointInterface
 
     public function jsonSerialize(): array
     {
-        return $this->points;
+        return [
+            'type' => 'MultiPoint',
+            'coordinates' => array_map(
+                function (PointInterface $point) {
+                    return [
+                        $point->getX()->getValue(),
+                        $point->getY()->getValue(),
+                    ];
+                },
+                $this->getPoints(),
+            )
+        ];
     }
 }

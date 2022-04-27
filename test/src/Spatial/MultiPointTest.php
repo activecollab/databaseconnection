@@ -39,4 +39,25 @@ class MultiPointTest extends DbLinkedTestCase
             ))->toWkt()
         );
     }
+
+    public function testWillEncodeToJson(): void
+    {
+        $multi_point = new MultiPoint(
+            new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+            new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+            new Point(new Coordinate(32.321), new Coordinate(-64.757)),
+        );
+
+        $this->assertSame(
+            [
+                'type' => 'MultiPoint',
+                'coordinates' => [
+                    [25.774, -80.19],
+                    [18.466, -66.118],
+                    [32.321, -64.757],
+                ]
+            ],
+            json_decode(json_encode($multi_point), true),
+        );
+    }
 }
