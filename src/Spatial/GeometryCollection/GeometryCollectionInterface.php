@@ -12,10 +12,10 @@ namespace ActiveCollab\DatabaseConnection\Spatial\GeometryCollection;
 
 use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 
-interface GeometryCollectionInterface
+interface GeometryCollectionInterface extends GeometricObjectInterface
 {
     /**
      * @return GeometricObjectInterface[]
      */
-    public function getElements(): array;
+    public function getGeometries(): array;
 }

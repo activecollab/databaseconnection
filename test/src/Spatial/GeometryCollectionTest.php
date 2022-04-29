@@ -13,9 +13,42 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 
+use ActiveCollab\DatabaseConnection\Spatial\Coordinate\Coordinate;
+use ActiveCollab\DatabaseConnection\Spatial\GeometryCollection\GeometryCollection;
+use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
+use ActiveCollab\DatabaseConnection\Spatial\Point\Point;
 use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 
 class GeometryCollectionTest extends TestCase
 {
+    public function testWillEncodeToJson(): void
+    {
+        $line_string = new LineString(
+            new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+            new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+            new Point(new Coordinate(32.321), new Coordinate(-64.757)),
+        );
 
+        $this->assertSame(
+            [
+                'type' => 'GeometryCollection',
+                'geometries' => [
+                    [
+                        'type' => 'LineString',
+                        'coordinates' => [
+                            [25.774, -80.19],
+                            [18.466, -66.118],
+                            [32.321, -64.757],
+                        ],
+                    ],
+                ]
+            ],
+            json_decode(
+                json_encode(
+                    new GeometryCollection($line_string)
+                ),
+                true
+            ),
+        );
+    }
 }

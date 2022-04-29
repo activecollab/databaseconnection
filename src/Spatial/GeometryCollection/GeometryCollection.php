@@ -14,18 +14,36 @@ use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 
 class GeometryCollection implements GeometryCollectionInterface
 {
-    private array $elements;
+    private array $geometries;
 
-    public function __construct(GeometricObjectInterface ...$elements)
+    public function __construct(GeometricObjectInterface ...$geometries)
     {
-        $this->elements = $elements;
+        $this->geometries = $geometries;
     }
 
     /**
      * @return GeometricObjectInterface[]
      */
-    public function getElements(): array
+    public function getGeometries(): array
     {
-        return $this->elements;
+        return $this->geometries;
+    }
+
+    public function toWkt(): string
+    {
+        return '';
+    }
+
+    public function __toString(): string
+    {
+        return '';
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'type' => 'GeometryCollection',
+            'geometries' => $this->getGeometries(),
+        ];
     }
 }
