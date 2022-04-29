@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ActiveCollab\DatabaseConnection\Spatial\LineString;
+namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 
-use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
+use ActiveCollab\DatabaseConnection\Test\Base\TestCase;
 
-interface LineStringInterface extends GeometricObjectInterface
+class GeometryCollectionTest extends TestCase
 {
-    public function getPoints(): array;
+
 }
