@@ -153,6 +153,32 @@ Unless specified differently, following conventions apply:
 3. Fields with name starting with `is_`, `has_`, `had_`, `was_`, `were_` and `have_` are cast to boolean,
 4. Fields with name ending with `_at` or `_on` are cast to DateValue.
 
+## Spatial data
+
+Library works with spatial data types, as defined by OpenGIS. Supported types:
+
+1. Point
+2. Multi Point
+3. Line String
+4. Multi Line String
+5. Linear Ring
+6. Polygon
+7. Multi Polygon
+8. Geometry Collection
+
+Each supported type is defined as a separate value object, under `\\ActiveCollab\DatabaseConnection\Spatial` namespace. To specify which files should be treated as spatial, instruct value caster to use `\\ActiveCollab\DatabaseConnection\Record\ValueCasterInterface::CAST_SPATIAL`. Example:
+
+```php
+$rows = $this->connection->execute('SELECT ST_AsText(`geometry`) AS "geometry" FROM `example`');
+$rows->setValueCaster(
+    new ValueCaster(
+        [
+            'geometry' => ValueCasterInterface::CAST_SPATIAL,
+        ]
+    )
+);
+```
+
 ## Object Hydration
 
 This library enables quick and easy object hydration. To hydrate objects, you'll need a class that implements `\ActiveCollab\DatabaseConnection\Record\LoadFromRow` interface, for example:
