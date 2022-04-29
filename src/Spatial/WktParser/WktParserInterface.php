@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\WktParser;
 
+use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
+
 interface WktParserInterface
 {
-    public function parse(string $text);
+    public function parse(string $text): GeometricObjectInterface;
 }

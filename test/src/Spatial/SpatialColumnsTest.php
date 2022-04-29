@@ -16,6 +16,8 @@ namespace ActiveCollab\DatabaseConnection\Test\Spatial;
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseConnection\Spatial\GeometryCollection\GeometryCollection;
+use ActiveCollab\DatabaseConnection\Spatial\GeometryCollection\GeometryCollectionInterface;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
 use ActiveCollab\DatabaseConnection\Spatial\MultiLineString\MultiLineString;
@@ -42,6 +44,7 @@ class SpatialColumnsTest extends DbConnectedTestCase
         $this->connection->dropTable('multi_line_strings');
         $this->connection->dropTable('polygons');
         $this->connection->dropTable('multi_polygons');
+        $this->connection->dropTable('geometry_collections');
 
         parent::tearDown();
     }
@@ -379,6 +382,89 @@ class SpatialColumnsTest extends DbConnectedTestCase
                 $this->assertTrue(
                     $read_coordinate->isSame(
                         $multi_polygon_to_write->getPolygons()[$k]->getExteriorBoundary()->getPoints()[$j]
+                    )
+                );
+            }
+        }
+    }
+
+    public function testWillReadAndWriteGeometryCollection(): void
+    {
+        $this->connection->dropTable('geometry_collections');
+
+        $create_table = $this->connection->execute("CREATE TABLE IF NOT EXISTS `geometry_collections` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `geometry_collection` GEOMETRY NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+        $this->assertTrue($create_table);
+
+        $line_string = new LineString(
+            new Point(new Coordinate(45.60317644), new Coordinate(19.27315063)),
+            new Point(new Coordinate(45.60312479), new Coordinate(19.27319189)),
+            new Point(new Coordinate(45.60473116), new Coordinate(19.27750116)),
+            new Point(new Coordinate(45.60478264), new Coordinate(19.27745963)),
+        );
+
+        $multi_polygon = new MultiPolygon(
+            new Polygon(
+                new LinearRing(
+                    new Point(new Coordinate(45.60317644), new Coordinate(19.27315063)),
+                    new Point(new Coordinate(45.60312479), new Coordinate(19.27319189)),
+                    new Point(new Coordinate(45.60473116), new Coordinate(19.27750116)),
+                    new Point(new Coordinate(45.60478264), new Coordinate(19.27745963)),
+                    new Point(new Coordinate(45.60317644), new Coordinate(19.27315063)),
+                )
+            ),
+
+            new Polygon(
+                new LinearRing(
+                    new Point(new Coordinate(45.60449426), new Coordinate(19.27769178)),
+                    new Point(new Coordinate(45.60431683), new Coordinate(19.27783455)),
+                    new Point(new Coordinate(45.60270942), new Coordinate(19.27352285)),
+                    new Point(new Coordinate(45.60288728), new Coordinate(19.27338113)),
+                    new Point(new Coordinate(45.60449426), new Coordinate(19.27769178)),
+                )
+            ),
+        );
+
+        $geometry_collection_to_write = new GeometryCollection($line_string, $multi_polygon);
+
+        $inserted = $this->connection->insert(
+            'geometry_collections',
+            [
+                'geometry_collection' => $geometry_collection_to_write,
+            ]
+        );
+
+        $this->assertSame(1, $inserted);
+
+        $rows = $this->connection->execute('SELECT `id`, ST_AsText(`geometry_collection`) AS "geometry_collection" FROM `geometry_collections`');
+        $this->assertInstanceOf(ResultInterface::class, $rows);
+
+        $rows->setValueCaster(
+            new ValueCaster(
+                [
+                    'geometry_collection' => ValueCasterInterface::CAST_SPATIAL,
+                ]
+            )
+        );
+
+        $first_row = $rows[0];
+
+        $this->assertInstanceOf(GeometryCollectionInterface::class, $first_row['geometry_collection']);
+
+        /** @var GeometryCollectionInterface $read_geometry_collection */
+        $read_geometry_collection = $first_row['geometry_collection'];
+
+        $this->assertInstanceOf(MultiPolygonInterface::class, $read_geometry_collection->getGeometries()[1]);
+
+        foreach ($read_geometry_collection->getGeometries()[1] as $k => $polygon) {
+            foreach ($polygon->getExteriorBoundary()->getCoordinates() as $j => $read_coordinate) {
+                $this->assertTrue(
+                    $read_coordinate->isSame(
+                        $multi_polygon->getPolygons()[$k]->getExteriorBoundary()->getPoints()[$j]
                     )
                 );
             }

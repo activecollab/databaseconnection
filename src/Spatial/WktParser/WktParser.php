@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace ActiveCollab\DatabaseConnection\Spatial\WktParser;
 
+use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
+use ActiveCollab\DatabaseConnection\Spatial\GeometryCollection\GeometryCollection;
+use ActiveCollab\DatabaseConnection\Spatial\GeometryCollection\GeometryCollectionInterface;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineString;
 use ActiveCollab\DatabaseConnection\Spatial\LineString\LineStringInterface;
 use ActiveCollab\DatabaseConnection\Spatial\MultiLineString\MultiLineString;
@@ -52,7 +55,7 @@ class WktParser implements WktParserInterface
         self::GEOMETRY_COLLECTION,
     ];
 
-    public function parse(string $text)
+    public function parse(string $text): GeometricObjectInterface
     {
         $lowered_text = strtolower($text);
         $type_pattern = '/\s*(\w+)\s*\(\s*(.*)\s*\)\s*$/';
@@ -70,23 +73,24 @@ class WktParser implements WktParserInterface
             throw new InvalidWktException($text);
         }
 
+        if (!in_array($type, self::WKT_TYPES)) {
+            throw new LogicException(sprintf('Unsupported type %s.', $type));
+        }
+
         try {
-            $components = call_user_func(
-                [
-                    $this,
-                    sprintf('parse%s', $type),
-                ],
-                $matches[2]
-            );
+            return match ($type) {
+                self::POINT => $this->parsePoint($matches[2]),
+                self::MULTI_POINT => $this->parseMultiPoint($matches[2]),
+                self::LINE_STRING => $this->parseLineString($matches[2]),
+                self::MULTI_LINE_STRING => $this->parseMultiLineString($matches[2]),
+                self::LINEAR_RING => $this->parseLinearRing($matches[2]),
+                self::POLYGON => $this->parsePolygon($matches[2]),
+                self::MULTI_POLYGON => $this->parseMultiPolygon($matches[2]),
+                self::GEOMETRY_COLLECTION => $this->parseGeometryCollection($matches[2]),
+            };
         } catch (Exception $e) {
             throw new InvalidWktException($text, $e);
         }
-
-        if (in_array($type, [self::POINT, self::MULTI_POINT, self::LINE_STRING, self::MULTI_LINE_STRING, self::POLYGON, self::MULTI_POLYGON])) {
-            return $components;
-        }
-
-        throw new LogicException(sprintf('Unsupported type %s.', $type));
     }
 
     private function parsePoint(string $text): PointInterface
@@ -99,7 +103,7 @@ class WktParser implements WktParserInterface
         );
     }
 
-    protected function parseMultiPoint(string $str): MultiPointInterface
+    private function parseMultiPoint(string $str): MultiPointInterface
     {
         $str = trim($str);
 
@@ -110,7 +114,7 @@ class WktParser implements WktParserInterface
         return new MultiPoint(...$this->parseLineString($str)->getPoints());
     }
 
-    protected function parseLineString(string $text): LineStringInterface
+    private function parseLineString(string $text): LineStringInterface
     {
         $points = [];
 
@@ -139,17 +143,18 @@ class WktParser implements WktParserInterface
         return new Polygon($exterior_boundary, ...$boundaries);
     }
 
-    protected function parseMultiPolygon($str): MultiPolygonInterface
+    private function parseMultiPolygon($str): MultiPolygonInterface
     {
         return new MultiPolygon(...$this->parseCollection($str, "Polygon"));
     }
 
-    protected function parseGeometryCollection($str) {
+    private function parseGeometryCollection(string $text): GeometryCollectionInterface
+    {
         $components = [];
-        foreach (preg_split('/,\s*(?=[A-Za-z])/', trim($str)) as $compstr) {
-            $components[] = $this->parse($compstr);
+        foreach (preg_split('/,\s*(?=[A-Za-z])/', trim($text)) as $parse_geometry_text) {
+            $components[] = $this->parse($parse_geometry_text);
         }
-        return $components;
+        return new GeometryCollection(...$components);
     }
 
     private function parseCollection(

@@ -31,12 +31,20 @@ class GeometryCollection implements GeometryCollectionInterface
 
     public function toWkt(): string
     {
-        return '';
+        return sprintf('GEOMETRYCOLLECTION(%s)', $this);
     }
 
     public function __toString(): string
     {
-        return '';
+        return implode(
+            ',',
+            array_map(
+                function (GeometricObjectInterface $geometric_object) {
+                    return $geometric_object->toWkt();
+                },
+                $this->getGeometries(),
+            ),
+        );
     }
 
     public function jsonSerialize(): array
