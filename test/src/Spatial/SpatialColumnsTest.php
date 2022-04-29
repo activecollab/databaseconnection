@@ -458,7 +458,16 @@ class SpatialColumnsTest extends DbConnectedTestCase
         /** @var GeometryCollectionInterface $read_geometry_collection */
         $read_geometry_collection = $first_row['geometry_collection'];
 
+        $this->assertInstanceOf(LineStringInterface::class, $read_geometry_collection->getGeometries()[0]);
         $this->assertInstanceOf(MultiPolygonInterface::class, $read_geometry_collection->getGeometries()[1]);
+
+        foreach ($read_geometry_collection->getGeometries()[0]->getPoints() as $k => $read_coordinate) {
+            $this->assertTrue(
+                $read_coordinate->isSame(
+                    $line_string->getPoints()[$k]
+                )
+            );
+        }
 
         foreach ($read_geometry_collection->getGeometries()[1] as $k => $polygon) {
             foreach ($polygon->getExteriorBoundary()->getCoordinates() as $j => $read_coordinate) {
