@@ -166,7 +166,7 @@ Library works with spatial data types, as defined by OpenGIS. Supported types:
 7. Multi Polygon
 8. Geometry Collection
 
-Each supported type is defined as a separate value object, under `\\ActiveCollab\DatabaseConnection\Spatial` namespace. To specify which files should be treated as spatial, instruct value caster to use `\\ActiveCollab\DatabaseConnection\Record\ValueCasterInterface::CAST_SPATIAL`. Example:
+Each supported type is defined as a separate value object, under `\\ActiveCollab\DatabaseConnection\Spatial` namespace. To specify which fields should be treated as spatial, instruct value caster to use `\\ActiveCollab\DatabaseConnection\Record\ValueCasterInterface::CAST_SPATIAL`. Example:
 
 ```php
 $rows = $this->connection->execute('SELECT ST_AsText(`geometry`) AS "geometry" FROM `example`');
