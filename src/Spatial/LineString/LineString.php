@@ -36,6 +36,23 @@ class LineString implements LineStringInterface
         return $this->points;
     }
 
+    public function getLines(): array
+    {
+        $result = [];
+
+        $previous_point = null;
+
+        for ($i = 0; $i < count($this->points); $i++) {
+            if (!empty($previous_point)) {
+                $result[] = new LineString($previous_point, $this->points[$i]);
+            }
+
+            $previous_point = $this->points[$i];
+        }
+
+        return $result;
+    }
+
     public function toWkt(): string
     {
         return sprintf('LINESTRING(%s)', $this);

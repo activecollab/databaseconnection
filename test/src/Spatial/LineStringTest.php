@@ -42,6 +42,38 @@ class LineStringTest extends TestCase
         $this->assertInstanceOf(LineStringInterface::class, $line_string);
     }
 
+    public function testWillIterateLines(): void
+    {
+        $line_string = new LineString(
+            new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+            new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+            new Point(new Coordinate(32.321), new Coordinate(-64.757)),
+        );
+
+        $lines = $line_string->getLines();
+
+        $this->assertCount(2, $lines);
+
+        $this->assertInstanceOf(LineStringInterface::class, $lines[0]);
+        $this->assertSame(
+            (new LineString(
+                new Point(new Coordinate(25.774), new Coordinate(-80.19)),
+                new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+            ))->toWkt(),
+            $lines[0]->toWkt(),
+        );
+
+        $this->assertInstanceOf(LineStringInterface::class, $lines[1]);
+
+        $this->assertSame(
+            (new LineString(
+                new Point(new Coordinate(18.466), new Coordinate(-66.118)),
+                new Point(new Coordinate(32.321), new Coordinate(-64.757)),
+            ))->toWkt(),
+            $lines[1]->toWkt(),
+        );
+    }
+
     public function testWillRenderWtk(): void
     {
         $this->assertSame(

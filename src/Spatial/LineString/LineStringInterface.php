@@ -18,4 +18,5 @@ use ActiveCollab\DatabaseConnection\Spatial\GeometricObjectInterface;
 interface LineStringInterface extends GeometricObjectInterface
 {
     public function getPoints(): array;
+    public function getLines(): array;
 }
