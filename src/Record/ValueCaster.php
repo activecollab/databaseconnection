@@ -34,31 +34,21 @@ class ValueCaster implements ValueCasterInterface
 
     /**
      * Cast row value to native PHP types based on caster settings.
-     *
-     * @param array $row
      */
-    public function castRowValues(array &$row)
+    public function castRowValues(array &$row): void
     {
         foreach ($row as $field_name => $value) {
             $row[$field_name] = $this->castValue($field_name, $value);
         }
     }
 
-    /**
-     * Cast a single value.
-     *
-     * @param string $field_name
-     * @param mixed  $value
-     *
-     * @return mixed
-     */
-    public function castValue($field_name, $value)
+    public function castValue(string $field_name, mixed $value): mixed
     {
         if ($value === null) {
             return null; // NULL remains NULL
         }
 
-        switch ($this->getTypeByFieldName($field_name)) {
+        switch ($this->getTypeByFieldName($field_name, $value)) {
             case self::CAST_INT:
                 return (int) $value;
             case self::CAST_FLOAT:
@@ -91,7 +81,7 @@ class ValueCaster implements ValueCasterInterface
         return (string) $value;
     }
 
-    public function getTypeByFieldName(string $field_name): string
+    public function getTypeByFieldName(string $field_name, mixed $value = null): string
     {
         if (isset($this->dictated[$field_name])) {
             return $this->dictated[$field_name];
@@ -106,7 +96,7 @@ class ValueCaster implements ValueCasterInterface
 
         $last_three = substr($field_name, -3);
 
-        if ($last_three === '_id') {
+        if ($last_three === '_id' && ($value === null || ctype_digit($value))) {
             return self::CAST_INT;
         }
 

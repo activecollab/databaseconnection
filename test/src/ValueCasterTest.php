@@ -79,6 +79,42 @@ class ValueCasterTest extends DbLinkedTestCase
     }
 
     /**
+     * @dataProvider provideDataForIntCastingDetection
+     */
+    public function testDetectIntByFieldNameAndValue(
+        ?string $input_value,
+        string $expected_cast_type,
+    )
+    {
+        $this->assertEquals(
+            $expected_cast_type,
+            (new ValueCaster())->getTypeByFieldName('awesome_id', $input_value),
+        );
+    }
+
+    public function provideDataForIntCastingDetection(): array
+    {
+        return [
+            [
+                null,
+                ValueCasterInterface::CAST_INT,
+            ],
+            [
+                '0',
+                ValueCasterInterface::CAST_INT,
+            ],
+            [
+                '123456',
+                ValueCasterInterface::CAST_INT,
+            ],
+            [
+                'not-numeric',
+                ValueCasterInterface::CAST_STRING,
+            ],
+        ];
+    }
+
+    /**
      * Test if NULL value is not cast to other native types.
      */
     public function testNullRemainsNull()

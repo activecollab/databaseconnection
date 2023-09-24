@@ -29,20 +29,15 @@ interface ValueCasterInterface
      *
      * @param array $row
      */
-    public function castRowValues(array &$row);
+    public function castRowValues(array &$row): void;
 
     /**
      * Cast a single value.
-     *
-     * @param string $field_name
-     * @param mixed  $value
-     *
-     * @return bool|\DateTime|float|int|mixed|null|string
      */
-    public function castValue($field_name, $value);
+    public function castValue(string $field_name, mixed $value): mixed;
 
     /**
      * Return type by field name.
      */
-    public function getTypeByFieldName(string $field_name): string;
+    public function getTypeByFieldName(string $field_name, mixed $value = null): string;
 }
