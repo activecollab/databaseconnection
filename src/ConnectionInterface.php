@@ -109,8 +109,8 @@ interface ConnectionInterface
         $load_mode = self::LOAD_ALL_ROWS,
         $return_mode = self::RETURN_ARRAY,
         $return_class_or_field = null,
-        array $constructor_arguments = null,
-        ContainerInterface &$container = null
+        ?array $constructor_arguments = null,
+        ?ContainerInterface &$container = null
     );
 
     /**
@@ -219,7 +219,7 @@ interface ConnectionInterface
     public function delete($table_name, $conditions = null): int;
     public function affectedRows(): int;
 
-    public function transact(callable $body, callable $on_success = null, callable $on_error = null): void;
+    public function transact(callable $body, ?callable $on_success = null, ?callable $on_error = null): void;
     public function beginWork(): void;
     public function commit(): void;
     public function rollback(): void;
@@ -232,7 +232,7 @@ interface ConnectionInterface
 
     public function userExists(string $user_name): bool;
     public function createUser(string $user_name, string $password, string $host_name = '%'): void;
-    public function changeUserPassword(string $user_name, string $password, string $host_name = null): void;
+    public function changeUserPassword(string $user_name, string $password, ?string $host_name = null): void;
     public function dropUser(string $user_name, string $host_name = '%', bool $check_if_exists = true): void;
 
     public function grantAllPrivileges(
@@ -387,5 +387,5 @@ interface ConnectionInterface
      *
      * @param callable|null $callback
      */
-    public function onLogQuery(callable $callback = null): void;
+    public function onLogQuery(?callable $callback = null): void;
 }

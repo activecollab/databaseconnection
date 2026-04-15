@@ -40,6 +40,7 @@ class ResultIterator implements Iterator
      *
      * @see ResultSet::seek()
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         if ($this->result->getCursorPosition() > 0) {
@@ -53,6 +54,7 @@ class ResultIterator implements Iterator
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return $this->result->next();
@@ -63,6 +65,7 @@ class ResultIterator implements Iterator
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->result->getCursorPosition();
@@ -73,6 +76,7 @@ class ResultIterator implements Iterator
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->result->getCurrentRow();
@@ -82,6 +86,7 @@ class ResultIterator implements Iterator
      * This method does not actually do anything since we have already advanced
      * the cursor pos in valid().
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
     }

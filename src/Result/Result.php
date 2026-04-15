@@ -90,7 +90,7 @@ class Result implements ResultInterface
      * @param array|null              $constructor_arguments
      * @param ContainerInterface|null $container
      */
-    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
+    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, ?array $constructor_arguments = null, ?ContainerInterface &$container = null)
     {
         if (!$this->isValidResource($resource)) {
             throw new InvalidArgumentException('mysqli_result expected');
@@ -171,6 +171,7 @@ class Result implements ResultInterface
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return $this->resource->num_rows;
@@ -260,6 +261,7 @@ class Result implements ResultInterface
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         if (!$this->count()) {
@@ -302,6 +304,7 @@ class Result implements ResultInterface
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $offset >= 0 && $offset < $this->count();
@@ -314,6 +317,7 @@ class Result implements ResultInterface
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getRowAt($offset);
@@ -327,6 +331,7 @@ class Result implements ResultInterface
      *
      * @throws BadMethodCallException
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         throw new BadMethodCallException('Database results are read only');
@@ -339,6 +344,7 @@ class Result implements ResultInterface
      *
      * @throws BadMethodCallException
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         throw new BadMethodCallException('Database results are read only');
@@ -349,6 +355,7 @@ class Result implements ResultInterface
      *
      * @return ResultIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ResultIterator($this);

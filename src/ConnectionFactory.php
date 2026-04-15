@@ -29,7 +29,7 @@ class ConnectionFactory
     /**
      * @param LoggerInterface|null $log
      */
-    public function __construct(LoggerInterface &$log = null)
+    public function __construct(?LoggerInterface &$log = null)
     {
         $this->log = $log;
     }
