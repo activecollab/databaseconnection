@@ -55,7 +55,7 @@ class MysqliConnection implements ConnectionInterface
      * @param mysqli               $link
      * @param LoggerInterface|null $logger
      */
-    public function __construct(mysqli $link, LoggerInterface $logger = null)
+    public function __construct(mysqli $link, ?LoggerInterface $logger = null)
     {
         $this->link = $link;
         $this->logger = $logger;
@@ -121,8 +121,8 @@ class MysqliConnection implements ConnectionInterface
         $load_mode = ConnectionInterface::LOAD_ALL_ROWS,
         $return_mode = ConnectionInterface::RETURN_ARRAY,
         $return_class_or_field = null,
-        array $constructor_arguments = null,
-        ContainerInterface &$container = null
+        ?array $constructor_arguments = null,
+        ?ContainerInterface &$container = null
     )
     {
         if ($return_mode == ConnectionInterface::RETURN_OBJECT_BY_CLASS && empty($return_class_or_field)) {
@@ -351,7 +351,7 @@ class MysqliConnection implements ConnectionInterface
         return (int) $this->link->affected_rows;
     }
 
-    public function transact(callable $body, callable $on_success = null, callable $on_error = null): void
+    public function transact(callable $body, ?callable $on_success = null, ?callable $on_error = null): void
     {
         try {
             $this->beginWork();
@@ -481,7 +481,7 @@ class MysqliConnection implements ConnectionInterface
         }
     }
 
-    public function changeUserPassword(string $user_name, string $password, string $host_name = null): void
+    public function changeUserPassword(string $user_name, string $password, ?string $host_name = null): void
     {
         if ($host_name) {
             $hosts = [$host_name];
@@ -918,7 +918,7 @@ class MysqliConnection implements ConnectionInterface
 
     private $on_log_query;
 
-    public function onLogQuery(callable $callback = null): void
+    public function onLogQuery(?callable $callback = null): void
     {
         $this->on_log_query = $callback;
     }

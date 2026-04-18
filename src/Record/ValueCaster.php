@@ -25,7 +25,7 @@ class ValueCaster implements ValueCasterInterface
         'row_count' => self::CAST_INT,
     ];
 
-    public function __construct(array $dictated = null)
+    public function __construct(?array $dictated = null)
     {
         if ($dictated) {
             $this->dictated = array_merge($this->dictated, $dictated);

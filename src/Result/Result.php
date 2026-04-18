@@ -93,7 +93,7 @@ class Result implements ResultInterface
      * @param array|null              $constructor_arguments
      * @param ContainerInterface|null $container
      */
-    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, array $constructor_arguments = null, ContainerInterface &$container = null)
+    public function __construct($resource, $return_mode = ConnectionInterface::RETURN_ARRAY, $return_class_or_field = null, ?array $constructor_arguments = null, ?ContainerInterface &$container = null)
     {
         if (!$this->isValidResource($resource)) {
             throw new InvalidArgumentException('mysqli_result expected');

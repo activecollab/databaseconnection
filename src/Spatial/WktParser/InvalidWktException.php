@@ -15,7 +15,7 @@ use Throwable;
 
 class InvalidWktException extends Exception
 {
-    public function __construct(string $text, Throwable $previous = null) {
+    public function __construct(string $text, ?Throwable $previous = null) {
         parent::__construct(
             sprintf(
                 "Invalid WKT: '%s'",

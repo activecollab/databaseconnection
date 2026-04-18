@@ -23,14 +23,14 @@ interface ConnectionFactoryInterface
         string $user,
         string $pass,
         string $select_database = '',
-        string $set_connection_encoding = null,
+        ?string $set_connection_encoding = null,
         bool $set_connection_encoding_with_query = false
     ): MysqliConnection;
 
     public function mysqliFromLink(
         MysqliLink $link,
         string $select_database = '',
-        string $set_connection_encoding = null,
+        ?string $set_connection_encoding = null,
         bool $set_connection_encoding_with_query = false
     ): MysqliConnection;
 }
